@@ -93,6 +93,15 @@ Known limitations at this stage:
 
 These limitations motivate the later scenarios.
 
+## Domain Model
+
+The initial facilities operations domain is defined in
+[`docs/domain`](docs/domain/README.md).
+
+It describes the baseline customers, sites, service requests, work orders,
+technicians, audit events, lifecycle rules, SLA behavior, and reporting needs
+that the Rails monolith will implement.
+
 ## Repository Structure
 
 ```text
@@ -103,6 +112,8 @@ gridline-platform-evolution/
   docs/
     adr/
       # Architecture Decision Records
+    domain/
+      # Facilities operations domain model
 
   scenarios/
     00-vertical-scaling-limit/
