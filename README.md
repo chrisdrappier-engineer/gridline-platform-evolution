@@ -66,6 +66,10 @@ though the project is maintained by one person:
 Codex is not part of the Gridline application at runtime. It is part of the
 engineering process used to build, document, and verify the case study.
 
+Substantial AI-assisted architecture discussions may be summarized in
+[`docs/decision-notes`](docs/decision-notes/README.md). ADRs remain the source
+of truth for final architecture decisions.
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |
@@ -135,6 +139,8 @@ gridline-platform-evolution/
   docs/
     adr/
       # Architecture Decision Records
+    decision-notes/
+      # Context for substantial planning discussions
     domain/
       # Facilities operations domain model
 

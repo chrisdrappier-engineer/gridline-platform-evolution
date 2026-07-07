@@ -114,15 +114,8 @@ modern Rails stack.
 
 ## AI Involvement
 
-Codex was used as an AI development collaborator while drafting this decision.
+This decision was developed through substantial AI-assisted discussion with
+Codex.
 
-The human maintainer directed the discussion, challenged assumptions, and made
-the final framing decisions. Codex contributed by proposing plausible Rails
-application timelines, deployment histories, scaling pressures, and ADR
-structure. The maintainer reviewed and refined those suggestions, including the
-decision to be explicit that Gridline is fictional and that the repository
-reconstructs a modern case-study baseline rather than simulating a literal
-three-year-old Rails codebase.
-
-This ADR records the resulting project decision, not an autonomous AI decision
-and not an in-universe Gridline company document.
+See the related
+[decision note](../decision-notes/2026-07-07-mature-monolith-baseline.md).
