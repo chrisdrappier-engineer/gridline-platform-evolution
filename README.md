@@ -43,6 +43,29 @@ The project focuses on horizontal scaling concepts commonly encountered as a Rai
 
 CI/CD is included as a supporting engineering practice. Each scenario is intended to be buildable, testable, and smoke-verifiable, but the primary story is application scaling.
 
+## Development Workflow
+
+This project is being built with Codex as an AI development collaborator.
+
+Codex is used to help convert planning discussions into issues, ADRs,
+documentation, implementation branches, verification steps, commits, and pull
+request summaries. Architectural direction and merge decisions remain
+human-owned.
+
+The workflow is intentionally shaped like a scalable engineering process even
+though the project is maintained by one person:
+
+- work starts from GitHub issues
+- each meaningful change happens on an issue-specific branch
+- pull requests explain the scaling story, demo steps, verification, and
+  follow-up work
+- ADRs capture architecture decisions before they become invisible assumptions
+- Docker Compose provides a repeatable runtime for both human and Codex-assisted
+  verification
+
+Codex is not part of the Gridline application at runtime. It is part of the
+engineering process used to build, document, and verify the case study.
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |
