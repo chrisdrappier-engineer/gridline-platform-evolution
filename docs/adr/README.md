@@ -13,3 +13,4 @@ understand why the system evolved the way it did.
 - [ADR 0002: Model Gridline as a mature single-region monolith](0002-model-gridline-as-a-mature-single-region-monolith.md)
 - [ADR 0003: Keep scaling stages as scenario folders on main](0003-keep-scaling-stages-as-scenario-folders-on-main.md)
 - [ADR 0004: Define the mature monolith baseline as a reconstructed case study](0004-define-the-mature-monolith-baseline-as-a-reconstructed-case-study.md)
+- [ADR 0005: Simulate the baseline production architecture](0005-simulate-the-baseline-production-architecture.md)
