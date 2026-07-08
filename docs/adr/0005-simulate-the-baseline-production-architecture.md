@@ -223,10 +223,5 @@ avoid host-local shortcuts that would weaken the baseline story.
 ## AI Involvement
 
 This decision was developed through substantial AI-assisted discussion with
-Codex. The discussion explored hosted versus local simulation, security
-tradeoffs, Docker Compose versus other local options, topology boundaries, Redis
-and worker timing, PaaS-style runtime boundaries, DNS/routing/TLS scope, and how
-the fictional product roadmap motivates proactive scaling before catastrophic
-failure.
-
-A decision note should summarize that discussion and link back to this ADR.
+Codex. See the related decision note:
+[Baseline Production Simulation](../decision-notes/2026-07-07-baseline-production-simulation.md).
