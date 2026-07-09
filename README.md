@@ -70,6 +70,43 @@ Substantial AI-assisted architecture discussions may be summarized in
 [`docs/decision-notes`](docs/decision-notes/README.md). ADRs remain the source
 of truth for final architecture decisions.
 
+## Container Baseline
+
+The current runnable foundation is a Docker Compose simulation of the baseline
+PaaS boundary. It intentionally comes before the Rails application is generated.
+
+The baseline includes:
+
+- an `app` container that stands in for the future Rails web/application service
+- a `db` container running Postgres as the managed database stand-in
+- environment-variable configuration
+- app-to-database communication over the Compose network
+- stdout logging from the app container
+- health and smoke-check scripts
+- a named Postgres volume for durable database state
+
+The placeholder app proves that the application container can boot, expose a
+health endpoint, and connect to Postgres. It is not the Gridline Rails
+application yet.
+
+Run the baseline checks with:
+
+```bash
+bin/ci
+```
+
+Or run the services directly:
+
+```bash
+docker compose up --build
+```
+
+Then visit:
+
+```text
+http://localhost:3000/health
+```
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |

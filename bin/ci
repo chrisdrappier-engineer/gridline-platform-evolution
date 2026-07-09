@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cleanup() {
+  docker compose down --remove-orphans
+}
+
+trap cleanup EXIT
+
+docker compose build
+docker compose up -d db
+docker compose run --rm app ./bin/check-db
+docker compose up -d app
+docker compose exec app ./bin/healthcheck

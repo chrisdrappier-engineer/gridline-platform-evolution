@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+
+curl -fsS "http://localhost:${APP_PORT:-3000}/health" >/dev/null
