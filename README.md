@@ -73,21 +73,21 @@ of truth for final architecture decisions.
 ## Container Baseline
 
 The current runnable foundation is a Docker Compose simulation of the baseline
-PaaS boundary. It intentionally comes before the Rails application is generated.
+PaaS boundary for the initial Rails application skeleton.
 
 The baseline includes:
 
-- an `app` container that stands in for the future Rails web/application service
+- an `app` container that runs the Rails monolith skeleton with Puma
 - a `db` container running Postgres as the managed database stand-in
 - environment-variable configuration
 - app-to-database communication over the Compose network
 - stdout logging from the app container
-- health and smoke-check scripts
+- Rails database preparation, test, and health smoke-check scripts
 - a named Postgres volume for durable database state
 
-The placeholder app proves that the application container can boot, expose a
-health endpoint, and connect to Postgres. It is not the Gridline Rails
-application yet.
+The Rails app currently proves that the application container can boot, expose
+a health endpoint, run the generated test suite, and connect to Postgres. The
+Gridline domain model will be added in later passes.
 
 Run the baseline checks with:
 

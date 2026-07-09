@@ -3,8 +3,16 @@ set -euo pipefail
 
 history_file="docs/rails-generator-history.md"
 
-if [[ -f app/config/application.rb ]]; then
+force_requested=false
+for arg in "$@"; do
+  if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
+    force_requested=true
+  fi
+done
+
+if [[ -f app/config/application.rb && "$force_requested" == false ]]; then
   echo "Refusing to run rails new because app/config/application.rb already exists." >&2
+  echo "Pass --force if you intentionally want Rails to overwrite the existing app skeleton." >&2
   exit 1
 fi
 
@@ -32,7 +40,5 @@ record_command() {
   } >> "$history_file"
 }
 
-docker compose -f compose.generator.yml run --rm \
-  -e BUNDLE_GEMFILE=/generator/Gemfile \
-  generator bundle exec rails new app "$@"
+docker compose -f compose.generator.yml run --rm generator rails new app "$@"
 record_command "$@"
