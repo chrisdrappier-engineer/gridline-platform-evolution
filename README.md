@@ -107,6 +107,25 @@ Then visit:
 http://localhost:3000/health
 ```
 
+## Rails Generator Tooling
+
+Rails application files should be created with Rails generators instead of
+being handwritten into place. This keeps generated framework structure aligned
+with Rails itself while preserving the project's Docker-first development
+boundary.
+
+Generator tooling lives outside the application runtime:
+
+- `generator/` defines the Ruby and Rails image used only for file generation
+- `compose.generator.yml` mounts the repository into the generator container
+- `bin/rails-new` creates the initial Rails application under `app/`
+- `bin/rails-generate` runs future Rails generators inside the generated app
+- `docs/rails-generator-history.md` records successful generator commands
+
+The generator history is intentionally factual. Architectural context and
+human/AI decision-making belong in ADRs, decision notes, commit messages, and
+pull request descriptions.
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |
@@ -173,6 +192,9 @@ gridline-platform-evolution/
   app/
     # Rails monolith shared by scenarios
 
+  generator/
+    # Container image for Rails file generation
+
   docs/
     adr/
       # Architecture Decision Records
@@ -196,3 +218,6 @@ gridline-platform-evolution/
 
   bin/
     ci
+    rails-new
+    rails-generate
+```

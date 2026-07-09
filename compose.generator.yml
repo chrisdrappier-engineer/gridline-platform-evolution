@@ -1,0 +1,7 @@
+services:
+  generator:
+    build:
+      context: ./generator
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
