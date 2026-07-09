@@ -126,6 +126,9 @@ The generator history is intentionally factual. Architectural context and
 human/AI decision-making belong in ADRs, decision notes, commit messages, and
 pull request descriptions.
 
+The reasoning behind this tooling is captured in
+[`docs/decision-notes/2026-07-09-rails-generator-tooling.md`](docs/decision-notes/2026-07-09-rails-generator-tooling.md).
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |
