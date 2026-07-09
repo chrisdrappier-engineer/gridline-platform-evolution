@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Northstar Property Group
+  account_status: active
+  industry: property_management
+  created_by: one
+
+two:
+  name: Acme Warehouse Network
+  account_status: onboarding
+  industry: warehousing
+  created_by: two

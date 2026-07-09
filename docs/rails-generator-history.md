@@ -12,3 +12,15 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-09
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-new --database=postgresql --skip-git --skip-docker --skip-kamal --skip-devcontainer --skip-ci --skip-solid --force`
+
+### 2026-07-09
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model User email:string name:string role:string active:boolean`
+
+### 2026-07-09
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model Customer name:string account_status:string industry:string created_by:references`
+
+### 2026-07-09
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model CustomerSite customer:references name:string address_line_1:string address_line_2:string city:string state:string postal_code:string site_status:string created_by:references`

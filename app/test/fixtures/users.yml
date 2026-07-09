@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  email: dispatcher@example.com
+  name: Dana Dispatcher
+  role: dispatcher
+  active: true
+
+two:
+  email: manager@example.com
+  name: Morgan Manager
+  role: operations_manager
+  active: true
