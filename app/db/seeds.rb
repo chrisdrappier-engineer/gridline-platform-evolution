@@ -13,6 +13,9 @@ module SeedData
   end
 end
 
+load Rails.root.join("db/seeds/rbac.rb")
+RbacSeedData.seed_definitions
+
 if SeedData.enabled?("SEED_DEMO_DATA")
   load Rails.root.join("db/seeds/demo.rb")
 else

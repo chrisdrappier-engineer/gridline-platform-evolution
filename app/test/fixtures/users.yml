@@ -11,3 +11,27 @@ two:
   name: Morgan Manager
   role: operations_manager
   active: true
+
+three:
+  email: facility.manager@example.com
+  name: Riley Facility Manager
+  role: facility_manager
+  active: true
+
+four:
+  email: customer.contact@example.com
+  name: Casey Customer Contact
+  role: customer_contact
+  active: true
+
+five:
+  email: provider.user@example.com
+  name: Taylor Provider User
+  role: service_provider_user
+  active: true
+
+six:
+  email: admin@example.com
+  name: Avery Admin
+  role: admin
+  active: true

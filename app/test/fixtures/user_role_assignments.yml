@@ -1,0 +1,22 @@
+dispatcher_global:
+  user: one
+  role: dispatcher
+
+facility_manager_site:
+  user: three
+  role: facility_manager
+  resource: one (CustomerSite)
+
+customer_contact_customer:
+  user: four
+  role: customer_contact
+  resource: one (Customer)
+
+service_provider_user_provider:
+  user: five
+  role: service_provider_user
+  resource: two (ServiceProvider)
+
+admin_global:
+  user: six
+  role: admin

@@ -1,0 +1,53 @@
+service_requests_read:
+  resource: service_requests
+  action: read
+  name: Read service requests
+  description: View service requests.
+
+service_requests_create:
+  resource: service_requests
+  action: create
+  name: Create service requests
+  description: Create service requests.
+
+service_requests_triage:
+  resource: service_requests
+  action: triage
+  name: Triage service requests
+  description: Triage service requests.
+
+service_requests_assign:
+  resource: service_requests
+  action: assign
+  name: Assign service requests
+  description: Assign service requests.
+
+service_requests_respond:
+  resource: service_requests
+  action: respond
+  name: Respond to service requests
+  description: Record service provider response details.
+
+service_requests_verify_completion:
+  resource: service_requests
+  action: verify_completion
+  name: Verify service request completion
+  description: Verify completed service requests.
+
+customers_read:
+  resource: customers
+  action: read
+  name: Read customers
+  description: View customer records.
+
+customer_sites_read:
+  resource: customer_sites
+  action: read
+  name: Read customer sites
+  description: View customer site records.
+
+service_providers_read:
+  resource: service_providers
+  action: read
+  name: Read service providers
+  description: View service provider records.

@@ -32,3 +32,19 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-09
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequest customer_site:references service_provider:references created_by:references assigned_dispatcher:references title:string description:text priority:string status:string reported_at:datetime`
+
+### 2026-07-10
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model Role key:string name:string description:text`
+
+### 2026-07-10
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model Permission resource:string action:string name:string description:text`
+
+### 2026-07-10
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model RolePermission role:references permission:references`
+
+### 2026-07-10
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model UserRoleAssignment user:references role:references resource:references\{polymorphic\}`

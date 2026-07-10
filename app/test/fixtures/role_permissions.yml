@@ -1,0 +1,103 @@
+dispatcher_service_requests_read:
+  role: dispatcher
+  permission: service_requests_read
+
+dispatcher_service_requests_create:
+  role: dispatcher
+  permission: service_requests_create
+
+dispatcher_service_requests_triage:
+  role: dispatcher
+  permission: service_requests_triage
+
+dispatcher_service_requests_assign:
+  role: dispatcher
+  permission: service_requests_assign
+
+dispatcher_customers_read:
+  role: dispatcher
+  permission: customers_read
+
+dispatcher_customer_sites_read:
+  role: dispatcher
+  permission: customer_sites_read
+
+dispatcher_service_providers_read:
+  role: dispatcher
+  permission: service_providers_read
+
+facility_manager_service_requests_read:
+  role: facility_manager
+  permission: service_requests_read
+
+facility_manager_service_requests_create:
+  role: facility_manager
+  permission: service_requests_create
+
+facility_manager_service_requests_verify_completion:
+  role: facility_manager
+  permission: service_requests_verify_completion
+
+facility_manager_customer_sites_read:
+  role: facility_manager
+  permission: customer_sites_read
+
+customer_contact_service_requests_read:
+  role: customer_contact
+  permission: service_requests_read
+
+customer_contact_customers_read:
+  role: customer_contact
+  permission: customers_read
+
+customer_contact_customer_sites_read:
+  role: customer_contact
+  permission: customer_sites_read
+
+service_provider_user_service_requests_read:
+  role: service_provider_user
+  permission: service_requests_read
+
+service_provider_user_service_requests_respond:
+  role: service_provider_user
+  permission: service_requests_respond
+
+service_provider_user_service_providers_read:
+  role: service_provider_user
+  permission: service_providers_read
+
+admin_service_requests_read:
+  role: admin
+  permission: service_requests_read
+
+admin_service_requests_create:
+  role: admin
+  permission: service_requests_create
+
+admin_service_requests_triage:
+  role: admin
+  permission: service_requests_triage
+
+admin_service_requests_assign:
+  role: admin
+  permission: service_requests_assign
+
+admin_service_requests_respond:
+  role: admin
+  permission: service_requests_respond
+
+admin_service_requests_verify_completion:
+  role: admin
+  permission: service_requests_verify_completion
+
+admin_customers_read:
+  role: admin
+  permission: customers_read
+
+admin_customer_sites_read:
+  role: admin
+  permission: customer_sites_read
+
+admin_service_providers_read:
+  role: admin
+  permission: service_providers_read

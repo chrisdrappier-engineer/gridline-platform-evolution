@@ -22,6 +22,30 @@ admin = SeedData.upsert(
   active: true
 )
 
+facility_manager = SeedData.upsert(
+  User,
+  { email: "facility.manager@magnoliaproperty.test" },
+  name: "Riley Facility Manager",
+  role: "facility_manager",
+  active: true
+)
+
+customer_contact = SeedData.upsert(
+  User,
+  { email: "customer.contact@magnoliaproperty.test" },
+  name: "Casey Customer Contact",
+  role: "customer_contact",
+  active: true
+)
+
+provider_user = SeedData.upsert(
+  User,
+  { email: "provider.user@coastalcoldchain.test" },
+  name: "Taylor Provider User",
+  role: "service_provider_user",
+  active: true
+)
+
 internal_provider = SeedData.upsert(
   ServiceProvider,
   { name: "Gridline Internal Dispatch Team" },
@@ -189,3 +213,10 @@ SeedData.upsert(
   status: "scheduled",
   reported_at: Time.zone.parse("2026-07-10 11:30:00")
 )
+
+RbacSeedData.assign_role(dispatcher, "dispatcher")
+RbacSeedData.assign_role(admin, "admin")
+RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_midtown)
+RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_buckhead)
+RbacSeedData.assign_role(customer_contact, "customer_contact", resource: magnolia)
+RbacSeedData.assign_role(provider_user, "service_provider_user", resource: cold_chain_provider)

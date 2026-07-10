@@ -1,6 +1,15 @@
 class User < ApplicationRecord
-  ROLES = %w[dispatcher operations_manager admin].freeze
+  ROLES = %w[
+    dispatcher
+    operations_manager
+    facility_manager
+    customer_contact
+    service_provider_user
+    admin
+  ].freeze
 
+  has_many :user_role_assignments, dependent: :restrict_with_error
+  has_many :roles, through: :user_role_assignments
   has_many :created_customers,
            class_name: "Customer",
            foreign_key: :created_by_id,

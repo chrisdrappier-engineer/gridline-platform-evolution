@@ -7,7 +7,10 @@ Faker::UniqueGenerator.clear
 roles = [
   ["dev-dispatcher@gridline.test", "dispatcher"],
   ["dev-manager@gridline.test", "operations_manager"],
-  ["dev-admin@gridline.test", "admin"]
+  ["dev-admin@gridline.test", "admin"],
+  ["dev-facility-manager@gridline.test", "facility_manager"],
+  ["dev-customer-contact@gridline.test", "customer_contact"],
+  ["dev-provider-user@gridline.test", "service_provider_user"]
 ]
 
 users = roles.to_h do |email, role|
@@ -83,3 +86,9 @@ sites.each_with_index do |site, index|
     reported_at: Time.zone.parse("2026-07-10 08:00:00") + index.hours
   )
 end
+
+RbacSeedData.assign_role(users.fetch("dispatcher"), "dispatcher")
+RbacSeedData.assign_role(users.fetch("admin"), "admin")
+RbacSeedData.assign_role(users.fetch("facility_manager"), "facility_manager", resource: sites.first)
+RbacSeedData.assign_role(users.fetch("customer_contact"), "customer_contact", resource: customers.first)
+RbacSeedData.assign_role(users.fetch("service_provider_user"), "service_provider_user", resource: providers.last)
