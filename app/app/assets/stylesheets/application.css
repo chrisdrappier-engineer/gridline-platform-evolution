@@ -436,6 +436,23 @@ textarea {
   padding-left: 20px;
 }
 
+.link-list {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding-left: 18px;
+}
+
+.link-list a {
+  color: var(--link);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.link-list a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 800px) {
   .header-content,
   .page-header,

@@ -16,15 +16,21 @@
           <tr>
             <td>
               <%= link_to request.title, service_request_path(request), class: "table-link" %>
-              <span><%= request.service_provider.name %></span>
+              <%= link_to request.service_provider.name, service_provider_path(request.service_provider), class: "muted-link" %>
             </td>
             <td>
-              <strong><%= request.customer_site.customer.name %></strong>
+              <%= link_to request.customer_site.customer.name, customer_path(request.customer_site.customer), class: "table-link" %>
               <%= link_to request.customer_site.name, customer_site_path(request.customer_site), class: "muted-link" %>
             </td>
             <td><span class="status-pill status-<%= request.status %>"><%= request.status.humanize %></span></td>
             <td><span class="priority-pill priority-<%= request.priority %>"><%= request.priority.humanize %></span></td>
-            <td><%= request.assigned_dispatcher&.name || "Unassigned" %></td>
+            <td>
+              <% if request.assigned_dispatcher %>
+                <%= link_to request.assigned_dispatcher.name, dispatcher_path(request.assigned_dispatcher), class: "table-link" %>
+              <% else %>
+                Unassigned
+              <% end %>
+            </td>
             <td><%= l request.reported_at, format: :short %></td>
           </tr>
         <% end %>

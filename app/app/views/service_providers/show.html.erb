@@ -1,0 +1,37 @@
+<% content_for :title, @service_provider.name %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Service Provider</p>
+    <h1><%= @service_provider.name %></h1>
+  </div>
+  <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Provider Details</h2>
+    <dl class="detail-list">
+      <dt>Type</dt>
+      <dd><%= @service_provider.provider_type.humanize %></dd>
+      <dt>Status</dt>
+      <dd><%= @service_provider.status.humanize %></dd>
+      <dt>Created By</dt>
+      <dd><%= @service_provider.created_by.name %></dd>
+    </dl>
+  </article>
+
+  <article class="metric-card">
+    <span>Related Requests</span>
+    <strong><%= @service_requests.count %></strong>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Service Requests</h2>
+    <%= link_to "New Request", new_service_request_path, class: "secondary-button" %>
+  </div>
+
+  <%= render "service_requests/table", service_requests: @service_requests %>
+</section>

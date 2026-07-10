@@ -1,0 +1,41 @@
+<% content_for :title, @customer.name %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Customer</p>
+    <h1><%= @customer.name %></h1>
+  </div>
+  <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Account</h2>
+    <dl class="detail-list">
+      <dt>Status</dt>
+      <dd><%= @customer.account_status.humanize %></dd>
+      <dt>Industry</dt>
+      <dd><%= @customer.industry %></dd>
+      <dt>Created By</dt>
+      <dd><%= @customer.created_by.name %></dd>
+    </dl>
+  </article>
+
+  <article class="detail-panel">
+    <h2>Sites</h2>
+    <ul class="link-list">
+      <% @customer.customer_sites.each do |site| %>
+        <li><%= link_to site.name, customer_site_path(site) %></li>
+      <% end %>
+    </ul>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Service Requests</h2>
+    <%= link_to "New Request", new_service_request_path, class: "secondary-button" %>
+  </div>
+
+  <%= render "service_requests/table", service_requests: @service_requests %>
+</section>
