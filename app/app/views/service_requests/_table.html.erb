@@ -20,7 +20,7 @@
             </td>
             <td>
               <strong><%= request.customer_site.customer.name %></strong>
-              <span><%= request.customer_site.name %></span>
+              <%= link_to request.customer_site.name, customer_site_path(request.customer_site), class: "muted-link" %>
             </td>
             <td><span class="status-pill status-<%= request.status %>"><%= request.status.humanize %></span></td>
             <td><span class="priority-pill priority-<%= request.priority %>"><%= request.priority.humanize %></span></td>

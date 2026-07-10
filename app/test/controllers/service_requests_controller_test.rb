@@ -15,6 +15,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Service Requests"
     assert_select "a", text: service_requests(:one).title
+    assert_select "a[href='#{customer_site_path(customer_sites(:one))}']", text: customer_sites(:one).name
     assert_select ".status-new", text: "New"
   end
 

@@ -330,6 +330,18 @@ textarea {
   color: var(--link);
 }
 
+.muted-link {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.muted-link:hover {
+  color: var(--link);
+  text-decoration: underline;
+}
+
 .status-pill,
 .priority-pill {
   display: inline-flex;

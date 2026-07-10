@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :service_requests, only: %i[index show new create] do
     patch :triage, on: :member
   end
+  resources :customer_sites, only: %i[show]
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
