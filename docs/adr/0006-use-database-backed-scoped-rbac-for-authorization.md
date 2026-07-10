@@ -58,25 +58,31 @@ The authorization model will include:
 Roles represent actor types such as `dispatcher`, `facility_manager`,
 `customer_contact`, `service_provider_user`, and `admin`.
 
-Permissions represent granular capabilities such as:
+Permissions represent granular capabilities as a resource plus an action. For
+example:
 
-- `service_requests.read`
-- `service_requests.create`
-- `service_requests.triage`
-- `service_requests.assign`
-- `service_requests.respond`
-- `service_requests.verify_completion`
-- `customers.read`
-- `customer_sites.read`
-- `service_providers.read`
+- resource `service_requests`, action `read`
+- resource `service_requests`, action `create`
+- resource `service_requests`, action `triage`
+- resource `service_requests`, action `assign`
+- resource `service_requests`, action `respond`
+- resource `service_requests`, action `verify_completion`
+- resource `customers`, action `read`
+- resource `customer_sites`, action `read`
+- resource `service_providers`, action `read`
+
+The application may expose a derived display key such as
+`service_requests.create`, but the database should store `resource` and
+`action` separately rather than treating a dot-separated string as the primary
+permission identity.
 
 Role permissions map roles to capabilities. For example:
 
-- `facility_manager` can `service_requests.create`
-- `facility_manager` can `service_requests.verify_completion`
-- `dispatcher` can `service_requests.triage`
-- `dispatcher` can `service_requests.assign`
-- `service_provider_user` can `service_requests.respond`
+- `facility_manager` can create `service_requests`
+- `facility_manager` can verify completion for `service_requests`
+- `dispatcher` can triage `service_requests`
+- `dispatcher` can assign `service_requests`
+- `service_provider_user` can respond to `service_requests`
 
 User role assignments map users to roles and may include a scope. Scoped
 assignments will identify the resource where the role applies, such as a
@@ -190,7 +196,8 @@ A likely first schema:
   - description
 - permissions
   - id
-  - key
+  - resource
+  - action
   - name
   - description
 - role_permissions
@@ -204,13 +211,15 @@ A likely first schema:
   - resource_type
   - resource_id
 
-The resource fields should support global assignments by allowing
+The permission table should have a unique index on `[resource, action]`.
+
+The user role assignment resource fields should support global assignments by allowing
 `resource_type` and `resource_id` to be null.
 
 Initial authorization service shape:
 
-- `can?(user, permission_key, target = nil)`
-- `accessible_scope(user, permission_key, relation)`
+- `can?(user, resource:, action:, target: nil)`
+- `accessible_scope(user, resource:, action:, relation:)`
 
 Initial implementation should seed:
 

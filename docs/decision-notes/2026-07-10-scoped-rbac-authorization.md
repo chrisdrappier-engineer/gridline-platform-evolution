@@ -173,6 +173,16 @@ RBAC model:
 - seeded initial roles, permissions, mappings, and demo assignments
 - tests for capability checks and scope checks
 
+After drafting the ADR, the user asked whether permission identity should be
+stored as a dot-separated key such as `customer_sites.read`, or split into
+separate fields such as resource `customer_sites` and action `read`.
+
+Codex recommended splitting resource and action because it avoids parsing
+encoded strings, supports cleaner database constraints, makes future
+administrative screens easier to group by resource or action, and improves
+permission audits. The ADR was updated so permissions are stored with separate
+`resource` and `action` columns plus a unique index on those two fields.
+
 The decision explicitly does not require an administrative permissions UI in
 the first implementation. The database model should support that future, but
 the initial implementation can be seeded and code-consumed.
@@ -204,6 +214,8 @@ The user made the decisive architectural calls:
 - requiring dashboards and data visibility to differ by role
 - requiring database-visible permission information
 - clarifying that permission checks must include resource scope
+- refining permissions to store resource and action separately instead of as
+  encoded dot-separated strings
 - challenging whether Rolify plus CanCanCan was sufficient
 - choosing the mature-baseline interpretation that favors a custom scoped RBAC
   model now instead of a planned authorization replacement later
