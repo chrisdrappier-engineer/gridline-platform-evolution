@@ -20,4 +20,6 @@ commit message or pull request body instead of adding a decision note.
 ## Notes
 
 - [2026-07-07: Mature Monolith Baseline](2026-07-07-mature-monolith-baseline.md)
+- [2026-07-07: Baseline Production Simulation](2026-07-07-baseline-production-simulation.md)
 - [2026-07-09: Rails Generator Tooling](2026-07-09-rails-generator-tooling.md)
+- [2026-07-10: Scoped RBAC Authorization](2026-07-10-scoped-rbac-authorization.md)

@@ -14,3 +14,4 @@ understand why the system evolved the way it did.
 - [ADR 0003: Keep scaling stages as scenario folders on main](0003-keep-scaling-stages-as-scenario-folders-on-main.md)
 - [ADR 0004: Define the mature monolith baseline as a reconstructed case study](0004-define-the-mature-monolith-baseline-as-a-reconstructed-case-study.md)
 - [ADR 0005: Simulate the baseline production architecture](0005-simulate-the-baseline-production-architecture.md)
+- [ADR 0006: Use database-backed scoped RBAC for authorization](0006-use-database-backed-scoped-rbac-for-authorization.md)
