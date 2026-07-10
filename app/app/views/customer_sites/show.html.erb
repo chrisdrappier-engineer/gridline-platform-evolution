@@ -43,7 +43,7 @@
 <section class="section-block">
   <div class="section-header">
     <h2>Service Requests</h2>
-    <%= link_to "New Request", new_service_request_path, class: "secondary-button" %>
+    <%= link_to "Create Service Request", new_service_request_path(customer_site_id: @customer_site.id), class: "secondary-button" %>
   </div>
 
   <%= render "service_requests/table", service_requests: @service_requests %>

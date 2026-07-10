@@ -12,7 +12,10 @@ class ServiceRequestsController < ApplicationController
   end
 
   def new
-    @service_request = ServiceRequest.new(priority: "normal")
+    @service_request = ServiceRequest.new(
+      priority: "normal",
+      customer_site: preselected_customer_site
+    )
   end
 
   def create
@@ -51,5 +54,11 @@ class ServiceRequestsController < ApplicationController
 
   def service_request_params
     params.require(:service_request).permit(:customer_site_id, :service_provider_id, :title, :description, :priority)
+  end
+
+  def preselected_customer_site
+    return if params[:customer_site_id].blank?
+
+    CustomerSite.includes(:customer).find_by(id: params[:customer_site_id])
   end
 end

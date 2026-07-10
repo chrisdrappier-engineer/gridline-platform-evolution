@@ -10,6 +10,19 @@
     </div>
   <% end %>
 
+  <% if service_request.customer_site %>
+    <section class="context-panel" aria-label="Selected site context">
+      <span>Selected Site</span>
+      <strong><%= service_request.customer_site.customer.name %> - <%= service_request.customer_site.name %></strong>
+      <p>
+        <%= service_request.customer_site.address_line_1 %>,
+        <%= service_request.customer_site.city %>,
+        <%= service_request.customer_site.state %>
+        <%= service_request.customer_site.postal_code %>
+      </p>
+    </section>
+  <% end %>
+
   <div class="field">
     <%= form.label :customer_site_id, "Site" %>
     <%= form.collection_select :customer_site_id, @customer_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { prompt: "Select a site" }, required: true %>

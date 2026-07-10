@@ -246,6 +246,32 @@ textarea {
   font-size: 0.9rem;
 }
 
+.context-panel {
+  border: 1px solid rgba(47, 111, 78, 0.25);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(47, 111, 78, 0.08);
+}
+
+.context-panel span {
+  display: block;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.context-panel strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.context-panel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

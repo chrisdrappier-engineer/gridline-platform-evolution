@@ -33,6 +33,16 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='service_request[service_provider_id]']"
   end
 
+  test "prefills site context when launched from a site page" do
+    sign_in_as users(:one)
+
+    get new_service_request_path(customer_site_id: customer_sites(:one).id)
+
+    assert_response :success
+    assert_select ".context-panel", text: /#{customer_sites(:one).name}/
+    assert_select "select[name='service_request[customer_site_id]'] option[selected][value='#{customer_sites(:one).id}']"
+  end
+
   test "shows service request detail" do
     sign_in_as users(:one)
 
