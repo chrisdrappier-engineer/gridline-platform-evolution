@@ -42,4 +42,12 @@ class CustomerSiteTest < ActiveSupport::TestCase
     assert_not site.valid?
     assert_includes site.errors[:site_status], "is not included in the list"
   end
+
+  test "cannot be destroyed while it has service requests" do
+    site = customer_sites(:one)
+
+    assert_not site.destroy
+    assert site.persisted?
+    assert site.errors.any?
+  end
 end
