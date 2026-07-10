@@ -1,0 +1,41 @@
+<%= form_with model: service_request, class: "form-panel wide-form" do |form| %>
+  <% if service_request.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(service_request.errors.count, "error") %> prevented this request from being saved</h2>
+      <ul>
+        <% service_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :customer_site_id, "Site" %>
+    <%= form.collection_select :customer_site_id, @customer_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { prompt: "Select a site" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :service_provider_id, "Service Provider" %>
+    <%= form.collection_select :service_provider_id, @service_providers, :id, :name, { prompt: "Select a provider" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :priority %>
+    <%= form.select :priority, ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 6 %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Create Request", class: "primary-button" %>
+  </div>
+<% end %>

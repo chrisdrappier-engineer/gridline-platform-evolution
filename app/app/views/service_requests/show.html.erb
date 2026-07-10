@@ -1,0 +1,55 @@
+<% content_for :title, @service_request.title %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow"><%= @service_request.customer_site.customer.name %></p>
+    <h1><%= @service_request.title %></h1>
+  </div>
+  <div class="action-row">
+    <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+    <% if @service_request.status == "new" %>
+      <%= button_to "Triage", triage_service_request_path(@service_request), method: :patch, class: "primary-button" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Request</h2>
+    <dl class="detail-list">
+      <dt>Status</dt>
+      <dd><span class="status-pill status-<%= @service_request.status %>"><%= @service_request.status.humanize %></span></dd>
+      <dt>Priority</dt>
+      <dd><span class="priority-pill priority-<%= @service_request.priority %>"><%= @service_request.priority.humanize %></span></dd>
+      <dt>Reported</dt>
+      <dd><%= l @service_request.reported_at, format: :long %></dd>
+      <dt>Assigned Dispatcher</dt>
+      <dd><%= @service_request.assigned_dispatcher&.name || "Unassigned" %></dd>
+      <dt>Provider</dt>
+      <dd><%= @service_request.service_provider.name %></dd>
+    </dl>
+  </article>
+
+  <article class="detail-panel">
+    <h2>Site</h2>
+    <dl class="detail-list">
+      <dt>Location</dt>
+      <dd><%= @service_request.customer_site.name %></dd>
+      <dt>Address</dt>
+      <dd>
+        <%= @service_request.customer_site.address_line_1 %><br>
+        <% if @service_request.customer_site.address_line_2.present? %>
+          <%= @service_request.customer_site.address_line_2 %><br>
+        <% end %>
+        <%= @service_request.customer_site.city %>, <%= @service_request.customer_site.state %> <%= @service_request.customer_site.postal_code %>
+      </dd>
+      <dt>Created By</dt>
+      <dd><%= @service_request.created_by.name %></dd>
+    </dl>
+  </article>
+</section>
+
+<section class="section-block">
+  <h2>Description</h2>
+  <div class="request-description"><%= simple_format(@service_request.description) %></div>
+</section>

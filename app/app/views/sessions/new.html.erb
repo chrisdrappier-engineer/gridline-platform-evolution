@@ -1,0 +1,24 @@
+<% content_for :title, "Sign In" %>
+
+<section class="auth-panel">
+  <div>
+    <p class="eyebrow">Dispatcher Workspace</p>
+    <h1>Sign in to Gridline Operations</h1>
+    <p class="lede">Use a seeded active user and the stub password to enter the demo workflow.</p>
+  </div>
+
+  <%= form_with scope: :session, url: login_path, class: "form-panel" do |form| %>
+    <div class="field">
+      <%= form.label :email %>
+      <%= form.email_field :email, value: "dispatcher@gridline.test", autocomplete: "email", required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password %>
+      <%= form.password_field :password, value: "gridline", autocomplete: "current-password", required: true %>
+      <p class="field-hint">Default stub password: gridline</p>
+    </div>
+
+    <%= form.submit "Sign in", class: "primary-button" %>
+  <% end %>
+</section>

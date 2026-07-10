@@ -1,0 +1,39 @@
+<% if service_requests.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Request</th>
+          <th>Site</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Dispatcher</th>
+          <th>Reported</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% service_requests.each do |request| %>
+          <tr>
+            <td>
+              <%= link_to request.title, service_request_path(request), class: "table-link" %>
+              <span><%= request.service_provider.name %></span>
+            </td>
+            <td>
+              <strong><%= request.customer_site.customer.name %></strong>
+              <span><%= request.customer_site.name %></span>
+            </td>
+            <td><span class="status-pill status-<%= request.status %>"><%= request.status.humanize %></span></td>
+            <td><span class="priority-pill priority-<%= request.priority %>"><%= request.priority.humanize %></span></td>
+            <td><%= request.assigned_dispatcher&.name || "Unassigned" %></td>
+            <td><%= l request.reported_at, format: :short %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2>No service requests yet</h2>
+    <p>Create the first request to start the dispatch workflow.</p>
+  </div>
+<% end %>
