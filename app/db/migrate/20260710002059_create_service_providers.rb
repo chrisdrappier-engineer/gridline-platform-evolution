@@ -1,10 +1,10 @@
 class CreateServiceProviders < ActiveRecord::Migration[8.1]
   def change
-    create_table :service_providers do |t|
+    create_table :service_providers, id: :uuid do |t|
       t.string :name, null: false
       t.string :provider_type, null: false
       t.string :status, null: false
-      t.references :created_by, null: false, foreign_key: { to_table: :users }
+      t.references :created_by, null: false, type: :uuid, foreign_key: { to_table: :users }
 
       t.timestamps
     end

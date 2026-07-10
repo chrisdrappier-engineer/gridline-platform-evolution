@@ -1,10 +1,10 @@
 class CreateServiceRequests < ActiveRecord::Migration[8.1]
   def change
-    create_table :service_requests do |t|
-      t.references :customer_site, null: false, foreign_key: true
-      t.references :service_provider, null: false, foreign_key: true
-      t.references :created_by, null: false, foreign_key: { to_table: :users }
-      t.references :assigned_dispatcher, foreign_key: { to_table: :users }
+    create_table :service_requests, id: :uuid do |t|
+      t.references :customer_site, null: false, type: :uuid, foreign_key: true
+      t.references :service_provider, null: false, type: :uuid, foreign_key: true
+      t.references :created_by, null: false, type: :uuid, foreign_key: { to_table: :users }
+      t.references :assigned_dispatcher, type: :uuid, foreign_key: { to_table: :users }
       t.string :title, null: false
       t.text :description
       t.string :priority, null: false
