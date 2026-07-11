@@ -17,4 +17,12 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{new_service_request_path(customer_site_id: customer_sites(:one).id)}']", text: "Create Service Request"
     assert_select "a", text: service_requests(:one).title
   end
+
+  test "rejects site outside user assignment scope" do
+    sign_in_as users(:three)
+
+    get customer_site_path(customer_sites(:two))
+
+    assert_redirected_to dashboard_path
+  end
 end

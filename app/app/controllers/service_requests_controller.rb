@@ -3,12 +3,15 @@ class ServiceRequestsController < ApplicationController
   before_action :set_form_options, only: %i[new create]
 
   def index
-    @service_requests = ServiceRequest
-                        .includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
-                        .order(reported_at: :desc)
+    @service_requests = authorized_scope(
+      "service_requests",
+      "read",
+      ServiceRequest.includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
+    ).order(reported_at: :desc)
   end
 
   def show
+    authorize!("service_requests", "read", @service_request)
   end
 
   def new
@@ -16,9 +19,13 @@ class ServiceRequestsController < ApplicationController
       priority: "normal",
       customer_site: preselected_customer_site
     )
+    authorize!("service_requests", "create", @service_request.customer_site) if @service_request.customer_site
   end
 
   def create
+    customer_site = CustomerSite.find(service_request_params.fetch(:customer_site_id))
+    authorize!("service_requests", "create", customer_site)
+
     @service_request = ServiceRequest.new(service_request_params)
     @service_request.created_by = current_user
     @service_request.status = "new"
@@ -32,6 +39,8 @@ class ServiceRequestsController < ApplicationController
   end
 
   def triage
+    authorize!("service_requests", "triage", @service_request)
+
     @service_request.update!(
       status: "triaged",
       assigned_dispatcher: current_user
@@ -48,8 +57,16 @@ class ServiceRequestsController < ApplicationController
   end
 
   def set_form_options
-    @customer_sites = CustomerSite.includes(:customer).order("customers.name", :name).references(:customer)
-    @service_providers = ServiceProvider.where(status: "active").order(:name)
+    @customer_sites = authorized_scope(
+      "service_requests",
+      "create",
+      CustomerSite.includes(:customer).order("customers.name", :name).references(:customer)
+    )
+    @service_providers = authorized_scope(
+      "service_providers",
+      "read",
+      ServiceProvider.where(status: "active").order(:name)
+    )
   end
 
   def service_request_params

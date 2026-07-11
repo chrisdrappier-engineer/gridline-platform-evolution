@@ -17,4 +17,19 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: customer_sites(:one).name
     assert_select "a", text: service_requests(:one).title
   end
+
+  test "customer contact can see assigned customer only" do
+    sign_in_as users(:four)
+
+    get customer_path(customers(:one))
+
+    assert_response :success
+    assert_select "h1", customers(:one).name
+    assert_select "a", text: service_requests(:one).title
+    assert_select "a", { text: service_requests(:two).title, count: 0 }
+
+    get customer_path(customers(:two))
+
+    assert_redirected_to dashboard_path
+  end
 end

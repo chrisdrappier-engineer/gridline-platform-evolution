@@ -24,7 +24,7 @@
   <article class="detail-panel">
     <h2>Sites</h2>
     <ul class="link-list">
-      <% @customer.customer_sites.each do |site| %>
+      <% @customer_sites.each do |site| %>
         <li><%= link_to site.name, customer_site_path(site) %></li>
       <% end %>
     </ul>

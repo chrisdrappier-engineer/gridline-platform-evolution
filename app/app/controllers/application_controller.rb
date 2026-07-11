@@ -9,7 +9,17 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :signed_in?
 
+  rescue_from Authorization::AccessDenied, with: :deny_access
+
   private
+
+  def authorize!(resource, action, target = nil)
+    Authorization.authorize!(current_user, resource: resource, action: action, target: target)
+  end
+
+  def authorized_scope(resource, action, relation)
+    Authorization.accessible_scope(current_user, resource: resource, action: action, relation: relation)
+  end
 
   def current_user
     @current_user ||= User.find_by(id: session[:user_id], active: true)
@@ -23,5 +33,9 @@ class ApplicationController < ActionController::Base
     return if signed_in?
 
     redirect_to login_path, alert: "Sign in to continue."
+  end
+
+  def deny_access
+    redirect_to dashboard_path, alert: "You are not authorized to access that page."
   end
 end

@@ -22,6 +22,16 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".status-new", text: "New"
   end
 
+  test "service request queue only shows readable scoped rows" do
+    sign_in_as users(:three)
+
+    get service_requests_path
+
+    assert_response :success
+    assert_select "a", text: service_requests(:one).title
+    assert_select "a", { text: service_requests(:two).title, count: 0 }
+  end
+
   test "shows new service request form" do
     sign_in_as users(:one)
 
@@ -43,6 +53,14 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='service_request[customer_site_id]'] option[selected][value='#{customer_sites(:one).id}']"
   end
 
+  test "rejects new request form for unauthorized preselected site" do
+    sign_in_as users(:three)
+
+    get new_service_request_path(customer_site_id: customer_sites(:two).id)
+
+    assert_redirected_to dashboard_path
+  end
+
   test "shows service request detail" do
     sign_in_as users(:one)
 
@@ -51,6 +69,14 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", service_requests(:one).title
     assert_select "form[action='#{triage_service_request_path(service_requests(:one))}']"
+  end
+
+  test "rejects unreadable service request detail" do
+    sign_in_as users(:three)
+
+    get service_request_path(service_requests(:two))
+
+    assert_redirected_to dashboard_path
   end
 
   test "creates service request" do
@@ -74,6 +100,24 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "new", request.status
   end
 
+  test "rejects service request creation outside assignment scope" do
+    sign_in_as users(:three)
+
+    assert_no_difference "ServiceRequest.count" do
+      post service_requests_path, params: {
+        service_request: {
+          customer_site_id: customer_sites(:two).id,
+          service_provider_id: service_providers(:one).id,
+          title: "Unauthorized alarm",
+          description: "This should not be created.",
+          priority: "high"
+        }
+      }
+    end
+
+    assert_redirected_to dashboard_path
+  end
+
   test "triages service request to current dispatcher" do
     sign_in_as users(:one)
     request = service_requests(:one)
@@ -84,5 +128,15 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     request.reload
     assert_equal "triaged", request.status
     assert_equal users(:one), request.assigned_dispatcher
+  end
+
+  test "rejects triage without triage permission" do
+    sign_in_as users(:three)
+    request = service_requests(:one)
+
+    patch triage_service_request_path(request)
+
+    assert_redirected_to dashboard_path
+    assert_equal "new", request.reload.status
   end
 end
