@@ -1,0 +1,29 @@
+<% content_for :title, "Facility Manager Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Facility Manager</p>
+    <h1>Facility Manager Dashboard</h1>
+  </div>
+  <% if @managed_sites.one? %>
+    <%= link_to "Create Request", new_service_request_path(customer_site_id: @managed_sites.first.id), class: "primary-button" %>
+  <% else %>
+    <%= link_to "Create Request", service_requests_path, class: "secondary-button" %>
+  <% end %>
+</section>
+
+<%= render "request_summary", open_requests: @open_requests, urgent_requests: @urgent_requests, recent_requests: @recent_requests %>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Managed Facilities</h2>
+  </div>
+
+  <ul class="link-list">
+    <% @managed_sites.each do |site| %>
+      <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
+    <% end %>
+  </ul>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Facility Requests" %>

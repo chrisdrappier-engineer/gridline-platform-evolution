@@ -39,4 +39,17 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true
   validates :role, presence: true, inclusion: { in: ROLES }
+
+  DASHBOARD_ROLE_PRIORITY = %w[
+    admin
+    dispatcher
+    facility_manager
+    customer_contact
+    service_provider_user
+  ].freeze
+
+  def dashboard_role_key
+    assigned_role_keys = roles.pluck(:key)
+    DASHBOARD_ROLE_PRIORITY.find { |role_key| assigned_role_keys.include?(role_key) } || role
+  end
 end

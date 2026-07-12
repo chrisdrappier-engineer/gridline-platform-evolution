@@ -1,0 +1,39 @@
+<% content_for :title, "Dispatcher Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Dispatcher</p>
+    <h1>Dispatcher Dashboard</h1>
+  </div>
+  <%= link_to "Create Request", new_service_request_path, class: "primary-button" %>
+</section>
+
+<section class="metric-grid" aria-label="Dispatcher summary">
+  <article class="metric-card">
+    <span>New Queue</span>
+    <strong><%= @new_requests.count %></strong>
+  </article>
+  <article class="metric-card urgent">
+    <span>Urgent Active</span>
+    <strong><%= @urgent_requests.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Unassigned</span>
+    <strong><%= @unassigned_requests.count %></strong>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Visible Sites</h2>
+    <%= link_to "View Requests", service_requests_path %>
+  </div>
+
+  <ul class="link-list">
+    <% @readable_sites.limit(8).each do |site| %>
+      <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
+    <% end %>
+  </ul>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Recent Requests" %>

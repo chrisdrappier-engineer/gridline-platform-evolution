@@ -9,6 +9,9 @@ Rails.application.routes.draw do
 
   resources :service_requests, only: %i[index show new create] do
     patch :triage, on: :member
+    patch :assign, on: :member
+    patch :respond, on: :member
+    patch :verify_completion, on: :member
   end
   resources :customers, only: %i[show]
   resources :customer_sites, only: %i[show]

@@ -1,0 +1,38 @@
+<% content_for :title, "Service Provider Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Service Provider</p>
+    <h1>Service Provider Dashboard</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "primary-button" %>
+</section>
+
+<section class="metric-grid" aria-label="Service provider summary">
+  <article class="metric-card">
+    <span>Active Assigned</span>
+    <strong><%= @response_queue.count %></strong>
+  </article>
+  <article class="metric-card urgent">
+    <span>Urgent Active</span>
+    <strong><%= @urgent_requests.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Visible Providers</span>
+    <strong><%= @service_providers.count %></strong>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>My Providers</h2>
+  </div>
+
+  <ul class="link-list">
+    <% @service_providers.each do |provider| %>
+      <li><%= link_to provider.name, service_provider_path(provider) %></li>
+    <% end %>
+  </ul>
+</section>
+
+<%= render "recent_requests", service_requests: @response_queue.order(reported_at: :desc).limit(8), title: "Response Queue" %>

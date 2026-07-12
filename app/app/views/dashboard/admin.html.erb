@@ -1,0 +1,54 @@
+<% content_for :title, "Admin Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Admin Dashboard</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "primary-button" %>
+</section>
+
+<section class="metric-grid" aria-label="Admin summary">
+  <article class="metric-card">
+    <span>Roles</span>
+    <strong><%= @roles.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Permissions</span>
+    <strong><%= @permissions.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Assignments</span>
+    <strong><%= @role_assignments.count %></strong>
+  </article>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Roles</h2>
+    <ul class="link-list">
+      <% @roles.each do |role| %>
+        <li><%= role.name %></li>
+      <% end %>
+    </ul>
+  </article>
+
+  <article class="detail-panel">
+    <h2>Recent Role Assignments</h2>
+    <ul class="link-list">
+      <% @role_assignments.limit(8).each do |assignment| %>
+        <li>
+          <%= assignment.user.name %>:
+          <%= assignment.role.name %>
+          <% if assignment.resource %>
+            on <%= assignment.resource_type %>
+          <% else %>
+            globally
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </article>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Recent Requests" %>

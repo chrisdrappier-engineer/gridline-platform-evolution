@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
   before_action :require_login
 
-  helper_method :current_user, :signed_in?
+  helper_method :current_user, :signed_in?, :can?
 
   rescue_from Authorization::AccessDenied, with: :deny_access
 
@@ -19,6 +19,10 @@ class ApplicationController < ActionController::Base
 
   def authorized_scope(resource, action, relation)
     Authorization.accessible_scope(current_user, resource: resource, action: action, relation: relation)
+  end
+
+  def can?(resource, action, target = nil)
+    Authorization.can?(current_user, resource: resource, action: action, target: target)
   end
 
   def current_user

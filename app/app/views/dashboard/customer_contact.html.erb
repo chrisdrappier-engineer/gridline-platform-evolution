@@ -1,0 +1,33 @@
+<% content_for :title, "Customer Contact Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Customer Contact</p>
+    <h1>Customer Contact Dashboard</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "primary-button" %>
+</section>
+
+<%= render "request_summary", open_requests: @open_requests, urgent_requests: @urgent_requests, recent_requests: @recent_requests %>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Customers</h2>
+    <ul class="link-list">
+      <% @customers.each do |customer| %>
+        <li><%= link_to customer.name, customer_path(customer) %></li>
+      <% end %>
+    </ul>
+  </article>
+
+  <article class="detail-panel">
+    <h2>Sites</h2>
+    <ul class="link-list">
+      <% @customer_sites.each do |site| %>
+        <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
+      <% end %>
+    </ul>
+  </article>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Account Requests" %>

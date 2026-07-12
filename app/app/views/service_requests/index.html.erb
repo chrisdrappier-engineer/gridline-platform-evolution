@@ -8,4 +8,28 @@
   <%= link_to "New Request", new_service_request_path, class: "primary-button" %>
 </section>
 
+<section class="filter-panel" aria-label="Service request filters">
+  <%= form_with url: service_requests_path, method: :get, class: "filter-form" do |form| %>
+    <div class="field">
+      <%= form.label :customer_site_id, "Site" %>
+      <%= form.collection_select :customer_site_id, @filter_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { include_blank: "All sites", selected: params[:customer_site_id] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :status %>
+      <%= form.select :status, ServiceRequest::STATUSES.map { |status| [status.humanize, status] }, { include_blank: "All statuses", selected: params[:status] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :priority %>
+      <%= form.select :priority, ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] }, { include_blank: "All priorities", selected: params[:priority] } %>
+    </div>
+
+    <div class="filter-actions">
+      <%= form.submit "Apply Filters", class: "primary-button" %>
+      <%= link_to "Clear", service_requests_path, class: "secondary-button" %>
+    </div>
+  <% end %>
+</section>
+
 <%= render "table", service_requests: @service_requests %>

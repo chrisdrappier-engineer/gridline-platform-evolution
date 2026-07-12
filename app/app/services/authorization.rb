@@ -66,7 +66,7 @@ class Authorization
       when "CustomerSite"
         customer_site_scope(relation, resource_ids)
       when "Customer"
-        relation.where(id: resource_ids["Customer"])
+        customer_scope(relation, resource_ids)
       when "ServiceProvider"
         relation.where(id: resource_ids["ServiceProvider"])
       else
@@ -102,6 +102,21 @@ class Authorization
 
       if resource_ids["Customer"].present?
         scope = scope.or(relation.where(customer_id: resource_ids["Customer"]))
+      end
+
+      scope
+    end
+
+    def customer_scope(relation, resource_ids)
+      scope = relation.none
+
+      if resource_ids["Customer"].present?
+        scope = scope.or(relation.where(id: resource_ids["Customer"]))
+      end
+
+      if resource_ids["CustomerSite"].present?
+        customer_ids = CustomerSite.where(id: resource_ids["CustomerSite"]).select(:customer_id)
+        scope = scope.or(relation.where(id: customer_ids))
       end
 
       scope

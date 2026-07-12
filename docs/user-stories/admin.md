@@ -11,14 +11,14 @@ operational oversight, and permission auditing.
 
 As an admin, I can inspect user role assignments so permissions can be audited.
 
-Status: Proposed
+Status: Implemented
 
 ### Review Permission Matrix
 
 As an admin, I can review the role-to-permission matrix so I can understand what
 each role is allowed to do.
 
-Status: Proposed
+Status: Implemented
 
 ### Manage Baseline Configuration
 

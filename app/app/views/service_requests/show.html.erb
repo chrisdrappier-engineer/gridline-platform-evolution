@@ -7,8 +7,11 @@
   </div>
   <div class="action-row">
     <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
-    <% if @service_request.status == "new" %>
+    <% if @service_request.status == "new" && can?("service_requests", "triage", @service_request) %>
       <%= button_to "Triage", triage_service_request_path(@service_request), method: :patch, class: "primary-button" %>
+    <% end %>
+    <% if @service_request.status == "resolved" && !@service_request.completion_verified? && can?("service_requests", "verify_completion", @service_request) %>
+      <%= button_to "Verify Completion", verify_completion_service_request_path(@service_request), method: :patch, class: "primary-button" %>
     <% end %>
   </div>
 </section>
@@ -27,6 +30,17 @@
       <dd><%= @service_request.assigned_dispatcher&.name || "Unassigned" %></dd>
       <dt>Provider</dt>
       <dd><%= @service_request.service_provider.name %></dd>
+      <dt>Provider Work Complete</dt>
+      <dd><%= @service_request.provider_work_complete? ? l(@service_request.provider_work_completed_at, format: :long) : "No" %></dd>
+      <dt>Completion Verified</dt>
+      <dd>
+        <% if @service_request.completion_verified? %>
+          <%= l @service_request.completion_verified_at, format: :long %>
+          by <%= @service_request.completion_verified_by.name %>
+        <% else %>
+          Not verified
+        <% end %>
+      </dd>
     </dl>
   </article>
 
@@ -53,3 +67,56 @@
   <h2>Description</h2>
   <div class="request-description"><%= simple_format(@service_request.description) %></div>
 </section>
+
+<% if @service_request.provider_response_summary.present? || @service_request.follow_up_notes.present? %>
+  <section class="section-block">
+    <h2>Provider Response</h2>
+    <% if @service_request.provider_response_summary.present? %>
+      <h3>Actions Taken</h3>
+      <div class="request-description"><%= simple_format(@service_request.provider_response_summary) %></div>
+    <% end %>
+    <% if @service_request.follow_up_notes.present? %>
+      <h3>Follow-Up Requirements</h3>
+      <div class="request-description"><%= simple_format(@service_request.follow_up_notes) %></div>
+    <% end %>
+  </section>
+<% end %>
+
+<% if can?("service_requests", "assign", @service_request) %>
+  <section class="section-block">
+    <h2>Assign Service Provider</h2>
+    <%= form_with model: @service_request, url: assign_service_request_path(@service_request), method: :patch, class: "inline-form" do |form| %>
+      <div class="field">
+        <%= form.label :service_provider_id, "Service Provider" %>
+        <%= form.collection_select :service_provider_id, @assignable_service_providers, :id, :name, {}, required: true %>
+      </div>
+      <%= form.submit "Assign Provider", class: "primary-button" %>
+    <% end %>
+  </section>
+<% end %>
+
+<% if can?("service_requests", "respond", @service_request) %>
+  <section class="section-block">
+    <h2>Record Provider Work</h2>
+    <%= form_with model: @service_request, url: respond_service_request_path(@service_request), method: :patch, class: "form-panel embedded-form" do |form| %>
+      <div class="field">
+        <%= form.label :provider_response_summary, "Actions Taken" %>
+        <%= form.text_area :provider_response_summary, rows: 4 %>
+      </div>
+
+      <div class="field">
+        <%= form.label :follow_up_notes, "Follow-Up Requirements" %>
+        <%= form.text_area :follow_up_notes, rows: 3 %>
+      </div>
+
+      <label class="checkbox-field">
+        <%= form.check_box :mark_provider_work_complete %>
+        <span>Mark provider work complete</span>
+      </label>
+
+      <div class="form-actions">
+        <%= form.submit "Record Provider Response", class: "primary-button" %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
