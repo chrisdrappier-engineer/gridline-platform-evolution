@@ -4,17 +4,27 @@ class ServiceRequestsController < ApplicationController
   before_action :set_assign_options, only: %i[show assign]
 
   def index
-    @service_requests = filtered_service_requests(authorized_scope(
+    relation = authorized_scope(
       "service_requests",
       "read",
-      ServiceRequest.includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
-    )).order(reported_at: :desc)
+      ServiceRequest
+        .left_joins(:assigned_dispatcher, :service_provider, customer_site: :customer)
+        .includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
+    )
 
     @filter_sites = authorized_scope(
       "customer_sites",
       "read",
       CustomerSite.includes(:customer).order("customers.name", :name).references(:customer)
     )
+
+    @service_requests_table = ServiceRequestsTable.build(
+      relation: relation,
+      params: service_requests_table_params,
+      path: service_requests_path,
+      paginator: ->(scope, limit:, page:) { pagy(:offset, scope, limit: limit, page: page) }
+    )
+    @service_requests = @service_requests_table.rows
   end
 
   def show
@@ -147,6 +157,21 @@ class ServiceRequestsController < ApplicationController
     scope = scope.where(priority: params[:priority]) if params[:priority].present?
     scope = scope.where(customer_site_id: params[:customer_site_id]) if params[:customer_site_id].present?
     scope
+  end
+
+  def service_requests_table_params
+    table_params = params.fetch(:service_requests, {}).permit(
+      :search,
+      :status,
+      :priority,
+      :customer_site_id,
+      :sort,
+      :direction,
+      :page
+    ).to_h
+
+    legacy_params = params.permit(:status, :priority, :customer_site_id).to_h
+    legacy_params.merge(table_params)
   end
 
   def service_request_params

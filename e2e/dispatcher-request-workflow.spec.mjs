@@ -11,6 +11,8 @@ async function signInAsDispatcher(page) {
 test("dispatcher can open a site and create a request with site context", async ({ page }) => {
   await signInAsDispatcher(page);
 
+  await page.getByRole("link", { name: "View Sites" }).click();
+  await expect(page.getByRole("heading", { name: "Sites" })).toBeVisible();
   await page.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).first().click();
   await expect(page.getByRole("heading", { name: "Magnolia Midtown Atlanta" })).toBeVisible();
 

@@ -3,12 +3,18 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Request</th>
-          <th>Site</th>
-          <th>Status</th>
-          <th>Priority</th>
-          <th>Dispatcher</th>
-          <th>Reported</th>
+          <% if local_assigns[:table] %>
+            <% table.columns.each do |column| %>
+              <th><%= data_table_sort_link(table, column) %></th>
+            <% end %>
+          <% else %>
+            <th>Request</th>
+            <th>Site</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Dispatcher</th>
+            <th>Reported</th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +45,7 @@
   </div>
 <% else %>
   <div class="empty-state">
-    <h2>No service requests yet</h2>
-    <p>Create the first request to start the dispatch workflow.</p>
+    <h2><%= local_assigns[:table]&.empty_title || "No service requests yet" %></h2>
+    <p><%= local_assigns[:table]&.empty_message || "Create the first request to start the dispatch workflow." %></p>
   </div>
 <% end %>

@@ -8,28 +8,67 @@
   <%= link_to "New Request", new_service_request_path, class: "primary-button" %>
 </section>
 
-<section class="filter-panel" aria-label="Service request filters">
-  <%= form_with url: service_requests_path, method: :get, class: "filter-form" do |form| %>
-    <div class="field">
-      <%= form.label :customer_site_id, "Site" %>
-      <%= form.collection_select :customer_site_id, @filter_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { include_blank: "All sites", selected: params[:customer_site_id] } %>
-    </div>
+<%= turbo_frame_tag @service_requests_table.frame_id, data: { turbo_action: "advance" } do %>
+  <section class="filter-panel" aria-label="Service request filters">
+    <%= form_with url: @service_requests_table.path,
+                  method: :get,
+                  scope: @service_requests_table.key,
+                  class: "filter-form table-filter-form",
+                  data: {
+                    controller: "table-search",
+                    table_search_target: "form",
+                    turbo_frame: @service_requests_table.frame_id,
+                    turbo_action: "advance"
+                  } do |form| %>
+      <%= form.hidden_field :sort, value: @service_requests_table.sort %>
+      <%= form.hidden_field :direction, value: @service_requests_table.direction %>
+      <%= form.hidden_field :page, value: @service_requests_table.page, data: { table_search_target: "page" } %>
 
-    <div class="field">
-      <%= form.label :status %>
-      <%= form.select :status, ServiceRequest::STATUSES.map { |status| [status.humanize, status] }, { include_blank: "All statuses", selected: params[:status] } %>
-    </div>
+      <div class="field table-search-field">
+        <%= form.label :search, "Search" %>
+        <%= form.search_field :search,
+                              value: @service_requests_table.search,
+                              placeholder: "Search requests, sites, customers, providers",
+                              autocomplete: "off",
+                              data: { action: "input->table-search#submit" } %>
+      </div>
 
-    <div class="field">
-      <%= form.label :priority %>
-      <%= form.select :priority, ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] }, { include_blank: "All priorities", selected: params[:priority] } %>
-    </div>
+      <div class="field">
+        <%= form.label :customer_site_id, "Site" %>
+        <%= form.collection_select :customer_site_id,
+                                   @filter_sites,
+                                   :id,
+                                   ->(site) { "#{site.customer.name} - #{site.name}" },
+                                   { include_blank: "All sites", selected: @service_requests_table.filter_value(ServiceRequestsTable.filters.first) },
+                                   data: { action: "change->table-search#submitNow" } %>
+      </div>
 
-    <div class="filter-actions">
-      <%= form.submit "Apply Filters", class: "primary-button" %>
-      <%= link_to "Clear", service_requests_path, class: "secondary-button" %>
-    </div>
-  <% end %>
-</section>
+      <div class="field">
+        <%= form.label :status %>
+        <%= form.select :status,
+                        ServiceRequest::STATUSES.map { |status| [status.humanize, status] },
+                        { include_blank: "All statuses", selected: @service_requests_table.filter_value(ServiceRequestsTable.filters.second) },
+                        data: { action: "change->table-search#submitNow" } %>
+      </div>
 
-<%= render "table", service_requests: @service_requests %>
+      <div class="field">
+        <%= form.label :priority %>
+        <%= form.select :priority,
+                        ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] },
+                        { include_blank: "All priorities", selected: @service_requests_table.filter_value(ServiceRequestsTable.filters.third) },
+                        data: { action: "change->table-search#submitNow" } %>
+      </div>
+
+      <div class="filter-actions">
+        <%= form.submit "Apply", class: "primary-button" %>
+        <%= link_to "Clear",
+                    @service_requests_table.path,
+                    class: "secondary-button",
+                    data: { turbo_frame: @service_requests_table.frame_id, turbo_action: "advance" } %>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "table", service_requests: @service_requests, table: @service_requests_table %>
+  <%= render "shared/data_tables/pagination", table: @service_requests_table %>
+<% end %>
