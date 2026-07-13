@@ -79,6 +79,8 @@ The baseline includes:
 
 - an `app` container that runs the Rails monolith skeleton with Puma
 - a `db` container running Postgres as the managed database stand-in
+- a bind mount from `./app` into the app container so local Rails file changes
+  are visible without rebuilding the image
 - environment-variable configuration
 - app-to-database communication over the Compose network
 - stdout logging from the app container
@@ -100,6 +102,18 @@ Or run the services directly:
 ```bash
 docker compose up --build
 ```
+
+After the image has been built once, most Rails source changes do not require a
+rebuild:
+
+```bash
+docker compose up app
+```
+
+Changes under `app/` are mounted into the running container. Restart the app
+container for changes that Rails does not reload automatically, and rebuild only
+when image-level inputs change, such as `app/Gemfile`, `app/Gemfile.lock`, or
+`app/Dockerfile`.
 
 Then visit:
 

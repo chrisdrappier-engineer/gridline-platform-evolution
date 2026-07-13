@@ -261,6 +261,38 @@ textarea {
   width: auto;
 }
 
+.permission-matrix th,
+.permission-matrix td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.permission-matrix th:first-child {
+  min-width: 220px;
+  text-align: left;
+}
+
+.matrix-allowed,
+.matrix-denied {
+  display: inline-flex;
+  min-width: 96px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.matrix-allowed {
+  background: rgba(47, 111, 78, 0.12);
+  color: var(--primary);
+}
+
+.matrix-denied {
+  background: rgba(100, 112, 103, 0.12);
+  color: var(--muted);
+}
+
 .field {
   display: grid;
   gap: 7px;

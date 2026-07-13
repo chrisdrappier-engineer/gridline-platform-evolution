@@ -68,6 +68,11 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Admin Dashboard"
     assert_select ".metric-card", count: 3
+    assert_select "h2", "Role Permission Matrix"
+    assert_select ".permission-matrix th", text: roles(:admin).name
+    assert_select ".permission-matrix th", text: /Read service requests/
+    assert_select ".matrix-allowed[aria-label='Admin can read service_requests']", text: "Allowed"
+    assert_select ".matrix-denied[aria-label='Customer Contact cannot create service_requests']", text: "Not allowed"
     assert_select "li", text: roles(:admin).name
   end
 end

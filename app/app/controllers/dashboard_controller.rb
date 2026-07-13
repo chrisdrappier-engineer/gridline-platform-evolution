@@ -70,7 +70,7 @@ class DashboardController < ApplicationController
   end
 
   def load_admin_dashboard
-    @roles = Role.order(:key)
+    @roles = Role.includes(:permissions).order(:key)
     @permissions = Permission.order(:resource, :action)
     @role_assignments = UserRoleAssignment.joins(:user, :role).includes(:user, :role).order("users.email", "roles.key")
   end

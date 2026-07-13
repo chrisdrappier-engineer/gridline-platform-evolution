@@ -14,6 +14,8 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-gridline}
     ports:
       - "${APP_PORT:-3000}:3000"
+    volumes:
+      - ./app:/app
     depends_on:
       db:
         condition: service_healthy
