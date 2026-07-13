@@ -34,3 +34,32 @@ As a customer contact, I can see urgent or overdue requests across my customer
 account so I can escalate issues appropriately.
 
 Status: Implemented
+
+### View Customer Service Costs
+
+As a customer contact, I can view service costs across all sites for my customer
+so I can understand total spend and compare cost by site.
+
+Status: Proposed
+
+### Filter Cost Reporting
+
+As a customer contact, I can filter service cost reporting by site, provider,
+date range, and cost type so I can investigate billing and operational trends.
+
+Status: Proposed
+
+### Review Provider Performance
+
+As a customer contact, I can review response time, completion time, resolution
+percentage, and rating trends for providers serving my customer so I can
+understand service quality.
+
+Status: Proposed
+
+### Export Customer Service Report
+
+As a customer contact, I can export customer-visible service history, cost, and
+performance summaries so I can share operational reporting outside Gridline.
+
+Status: Proposed

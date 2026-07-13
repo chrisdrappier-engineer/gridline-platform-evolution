@@ -15,6 +15,7 @@ before the project moves into horizontal scaling scenarios.
 - [Customer Contact](customer-contact.md)
 - [Service Provider User](service-provider-user.md)
 - [Admin](admin.md)
+- [Company Management](company-management.md)
 
 ## Story Status
 

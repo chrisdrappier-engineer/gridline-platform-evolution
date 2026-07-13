@@ -42,3 +42,49 @@ As a dispatcher, I can review recent activity across customers, sites, and
 providers so I can keep operational work moving.
 
 Status: Implemented
+
+### Record Provider Work Update
+
+As a dispatcher, I can record actions taken, follow-up requirements, and provider
+completion status from phone, email, or field updates so the request lifecycle
+stays accurate even when providers do not update the system directly.
+
+Status: Implemented
+
+### Record Service Cost
+
+As a dispatcher, I can record one or more cost entries for a completed service
+request so Gridline can report charges by request, site, customer, and provider.
+
+Status: Proposed
+
+### Classify Service Cost
+
+As a dispatcher, I can classify service costs by type such as labor, parts,
+trip charge, emergency fee, or other so later reporting can explain what drove
+spend.
+
+Status: Proposed
+
+### Add Internal Request Note
+
+As a dispatcher, I can add internal notes to a service request so call details,
+exceptions, and operational context are preserved without exposing everything
+to external users.
+
+Status: Proposed
+
+### Attach Request File
+
+As a dispatcher, I can attach files such as invoices, work orders, or photos to
+a service request note so supporting evidence stays connected to the request.
+
+Status: Proposed
+
+### View Provider Performance Summary
+
+As a dispatcher, I can view provider response time, completion time, resolution
+percentage, and rating trends so I can make better routing decisions during
+assignment.
+
+Status: Proposed

@@ -25,4 +25,25 @@ Status: Implemented
 As an admin, I can review customers, sites, providers, users, and role
 assignments so the operational baseline can be maintained.
 
-Status: Deferred
+Status: Implemented
+
+### Manage Service Cost Entries
+
+As an admin, I can create, review, update, or correct service cost entries so
+financial reporting remains accurate.
+
+Status: Proposed
+
+### Audit Request Notes And Files
+
+As an admin, I can review notes and uploaded files across requests so I can
+support compliance, troubleshooting, and operational oversight.
+
+Status: Proposed
+
+### Review Permission Impact On Reporting
+
+As an admin, I can verify which roles can see cost, performance, notes, ratings,
+and files so reporting data is exposed only to appropriate users.
+
+Status: Proposed
