@@ -7,16 +7,16 @@ Rails.application.routes.draw do
 
   get "dashboard", to: "dashboard#show"
 
-  resources :service_requests, only: %i[index show new create] do
+  resources :service_requests, only: %i[index show new create edit update] do
     patch :triage, on: :member
     patch :assign, on: :member
     patch :respond, on: :member
     patch :verify_completion, on: :member
   end
-  resources :customers, only: %i[index show]
-  resources :customer_sites, only: %i[index show]
+  resources :customers, only: %i[index show new create edit update]
+  resources :customer_sites, only: %i[index show new create edit update]
   resources :dispatchers, only: %i[show], controller: :users
-  resources :service_providers, only: %i[index show]
+  resources :service_providers, only: %i[index show new create edit update]
 
   namespace :admin do
     resources :role_permissions, only: %i[index], path: "permission-matrix"

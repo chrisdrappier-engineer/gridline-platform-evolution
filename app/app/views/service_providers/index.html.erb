@@ -5,7 +5,12 @@
     <p class="eyebrow">Operations</p>
     <h1>Service Providers</h1>
   </div>
-  <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+  <div class="action-row">
+    <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+    <% if permitted?("service_providers", "create") %>
+      <%= link_to "New Service Provider", new_service_provider_path, class: "primary-button" %>
+    <% end %>
+  </div>
 </section>
 
 <%= turbo_frame_tag @service_providers_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>

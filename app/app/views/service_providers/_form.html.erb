@@ -1,0 +1,31 @@
+<%= form_with model: service_provider, class: "form-panel wide-form" do |form| %>
+  <% if service_provider.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(service_provider.errors.count, "error") %> prevented this provider from being saved</h2>
+      <ul>
+        <% service_provider.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :provider_type, "Type" %>
+    <%= form.select :provider_type, ServiceProvider::PROVIDER_TYPES.map { |type| [type.humanize, type] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.select :status, ServiceProvider::STATUSES.map { |status| [status.humanize, status] }, {}, required: true %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit service_provider.persisted? ? "Update Provider" : "Create Provider", class: "primary-button" %>
+  </div>
+<% end %>

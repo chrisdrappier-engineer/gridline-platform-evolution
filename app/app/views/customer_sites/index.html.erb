@@ -5,7 +5,12 @@
     <p class="eyebrow">Operations</p>
     <h1>Sites</h1>
   </div>
-  <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+  <div class="action-row">
+    <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+    <% if permitted?("customer_sites", "create") %>
+      <%= link_to "New Site", new_customer_site_path, class: "primary-button" %>
+    <% end %>
+  </div>
 </section>
 
 <%= turbo_frame_tag @customer_sites_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
@@ -31,6 +36,9 @@
               <td>
                 <% if can?("service_requests", "create", site) %>
                   <%= link_to "Create Request", new_service_request_path(customer_site_id: site.id), class: "table-link" %>
+                <% end %>
+                <% if can?("customer_sites", "update", site) %>
+                  <%= link_to "Edit", edit_customer_site_path(site), class: "table-link" %>
                 <% end %>
               </td>
             </tr>

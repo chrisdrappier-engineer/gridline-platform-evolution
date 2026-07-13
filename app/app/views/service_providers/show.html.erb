@@ -5,7 +5,12 @@
     <p class="eyebrow">Service Provider</p>
     <h1><%= @service_provider.name %></h1>
   </div>
-  <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+  <div class="action-row">
+    <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+    <% if can?("service_providers", "update", @service_provider) %>
+      <%= link_to "Edit Provider", edit_service_provider_path(@service_provider), class: "primary-button" %>
+    <% end %>
+  </div>
 </section>
 
 <section class="detail-grid">
@@ -30,7 +35,9 @@
 <section class="section-block">
   <div class="section-header">
     <h2>Service Requests</h2>
-    <%= link_to "New Request", new_service_request_path, class: "secondary-button" %>
+    <% if permitted?("service_requests", "create") %>
+      <%= link_to "New Request", new_service_request_path, class: "secondary-button" %>
+    <% end %>
   </div>
 
   <%= render "service_requests/table", service_requests: @service_requests %>

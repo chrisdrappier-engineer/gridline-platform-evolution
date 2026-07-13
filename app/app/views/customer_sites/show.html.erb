@@ -5,7 +5,12 @@
     <p class="eyebrow"><%= @customer_site.customer.name %></p>
     <h1><%= @customer_site.name %></h1>
   </div>
-  <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+  <div class="action-row">
+    <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+    <% if can?("customer_sites", "update", @customer_site) %>
+      <%= link_to "Edit Site", edit_customer_site_path(@customer_site), class: "primary-button" %>
+    <% end %>
+  </div>
 </section>
 
 <section class="detail-grid">

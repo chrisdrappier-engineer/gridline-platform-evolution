@@ -48,4 +48,54 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to dashboard_path
   end
+
+  test "admin creates customer" do
+    sign_in_as users(:six)
+
+    assert_difference "Customer.count", 1 do
+      post customers_path, params: {
+        customer: {
+          name: "Lakeview Facilities",
+          account_status: "onboarding",
+          industry: "property_management"
+        }
+      }
+    end
+
+    customer = Customer.order(:created_at).last
+    assert_redirected_to customer_path(customer)
+    assert_equal users(:six), customer.created_by
+  end
+
+  test "admin updates customer" do
+    sign_in_as users(:six)
+
+    patch customer_path(customers(:one)), params: {
+      customer: {
+        name: "Northstar Facilities Group",
+        account_status: "suspended",
+        industry: "property_management"
+      }
+    }
+
+    assert_redirected_to customer_path(customers(:one))
+    assert_equal "Northstar Facilities Group", customers(:one).reload.name
+    assert_equal "suspended", customers(:one).account_status
+  end
+
+  test "dispatcher cannot create customer" do
+    sign_in_as users(:one)
+
+    assert_no_difference "Customer.count" do
+      post customers_path, params: {
+        customer: {
+          name: "Unauthorized Customer",
+          account_status: "active",
+          industry: "warehousing"
+        }
+      }
+    end
+
+    assert_redirected_to dashboard_path
+  end
 end

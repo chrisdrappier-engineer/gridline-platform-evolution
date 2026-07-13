@@ -1,4 +1,6 @@
 class CustomersController < ApplicationController
+  before_action :set_customer, only: %i[show edit update]
+
   def index
     relation = authorized_scope(
       "customers",
@@ -16,7 +18,6 @@ class CustomersController < ApplicationController
   end
 
   def show
-    @customer = Customer.includes(:created_by, :customer_sites).find(params[:id])
     authorize!("customers", "read", @customer)
 
     @customer_sites = authorized_scope(
@@ -34,9 +35,49 @@ class CustomersController < ApplicationController
     ).order(reported_at: :desc)
   end
 
+  def new
+    authorize!("customers", "create")
+    @customer = Customer.new(account_status: "onboarding")
+  end
+
+  def create
+    authorize!("customers", "create")
+
+    @customer = Customer.new(customer_params)
+    @customer.created_by = current_user
+
+    if @customer.save
+      redirect_to @customer, notice: "Customer created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    authorize!("customers", "update", @customer)
+  end
+
+  def update
+    authorize!("customers", "update", @customer)
+
+    if @customer.update(customer_params)
+      redirect_to @customer, notice: "Customer updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def set_customer
+    @customer = Customer.includes(:created_by, :customer_sites).find(params[:id])
+  end
 
   def customers_table_params
     params.fetch(:customers, {}).permit(:search, :account_status, :sort, :direction, :page, :limit).to_h
+  end
+
+  def customer_params
+    params.require(:customer).permit(:name, :account_status, :industry)
   end
 end

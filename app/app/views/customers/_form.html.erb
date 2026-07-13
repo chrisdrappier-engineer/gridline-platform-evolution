@@ -1,0 +1,31 @@
+<%= form_with model: customer, class: "form-panel wide-form" do |form| %>
+  <% if customer.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(customer.errors.count, "error") %> prevented this customer from being saved</h2>
+      <ul>
+        <% customer.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :account_status, "Status" %>
+    <%= form.select :account_status, Customer::ACCOUNT_STATUSES.map { |status| [status.humanize, status] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :industry %>
+    <%= form.text_field :industry, placeholder: "property_management" %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit customer.persisted? ? "Update Customer" : "Create Customer", class: "primary-button" %>
+  </div>
+<% end %>

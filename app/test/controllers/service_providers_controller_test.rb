@@ -47,4 +47,54 @@ class ServiceProvidersControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to dashboard_path
   end
+
+  test "admin creates service provider" do
+    sign_in_as users(:six)
+
+    assert_difference "ServiceProvider.count", 1 do
+      post service_providers_path, params: {
+        service_provider: {
+          name: "Central Mechanical",
+          provider_type: "vendor_partner",
+          status: "active"
+        }
+      }
+    end
+
+    provider = ServiceProvider.order(:created_at).last
+    assert_redirected_to service_provider_path(provider)
+    assert_equal users(:six), provider.created_by
+  end
+
+  test "admin updates service provider" do
+    sign_in_as users(:six)
+
+    patch service_provider_path(service_providers(:two)), params: {
+      service_provider: {
+        name: "North Region Mechanical Partner",
+        provider_type: "vendor_partner",
+        status: "inactive"
+      }
+    }
+
+    assert_redirected_to service_provider_path(service_providers(:two))
+    assert_equal "North Region Mechanical Partner", service_providers(:two).reload.name
+    assert_equal "inactive", service_providers(:two).status
+  end
+
+  test "dispatcher cannot create service provider" do
+    sign_in_as users(:one)
+
+    assert_no_difference "ServiceProvider.count" do
+      post service_providers_path, params: {
+        service_provider: {
+          name: "Unauthorized Provider",
+          provider_type: "vendor_partner",
+          status: "active"
+        }
+      }
+    end
+
+    assert_redirected_to dashboard_path
+  end
 end

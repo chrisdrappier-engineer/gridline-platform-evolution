@@ -1,0 +1,11 @@
+<% content_for :title, "Edit #{@customer.name}" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Customer</p>
+    <h1>Edit <%= @customer.name %></h1>
+  </div>
+  <%= link_to "Back to Customer", customer_path(@customer), class: "secondary-button" %>
+</section>
+
+<%= render "form", customer: @customer %>

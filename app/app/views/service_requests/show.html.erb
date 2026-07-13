@@ -7,6 +7,9 @@
   </div>
   <div class="action-row">
     <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+    <% if can?("service_requests", "update", @service_request) %>
+      <%= link_to "Edit Request", edit_service_request_path(@service_request), class: "secondary-button" %>
+    <% end %>
     <% if @service_request.status == "new" && can?("service_requests", "triage", @service_request) %>
       <%= button_to "Triage", triage_service_request_path(@service_request), method: :patch, class: "primary-button" %>
     <% end %>
@@ -97,7 +100,7 @@
 
 <% if can?("service_requests", "respond", @service_request) %>
   <section class="section-block">
-    <h2>Record Provider Work</h2>
+    <h2>Record Provider Work Update</h2>
     <%= form_with model: @service_request, url: respond_service_request_path(@service_request), method: :patch, class: "form-panel embedded-form" do |form| %>
       <div class="field">
         <%= form.label :provider_response_summary, "Actions Taken" %>
@@ -115,7 +118,7 @@
       </label>
 
       <div class="form-actions">
-        <%= form.submit "Record Provider Response", class: "primary-button" %>
+        <%= form.submit "Record Provider Update", class: "primary-button" %>
       </div>
     <% end %>
   </section>

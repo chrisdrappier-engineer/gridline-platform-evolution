@@ -1,0 +1,56 @@
+<%= form_with model: customer_site, class: "form-panel wide-form" do |form| %>
+  <% if customer_site.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(customer_site.errors.count, "error") %> prevented this site from being saved</h2>
+      <ul>
+        <% customer_site.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :customer_id, "Customer" %>
+    <%= form.collection_select :customer_id, @customer_options, :id, :name, { prompt: "Select a customer" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :site_status, "Status" %>
+    <%= form.select :site_status, CustomerSite::SITE_STATUSES.map { |status| [status.humanize, status] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :address_line_1, "Address Line 1" %>
+    <%= form.text_field :address_line_1, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :address_line_2, "Address Line 2" %>
+    <%= form.text_field :address_line_2 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :city %>
+    <%= form.text_field :city, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :state %>
+    <%= form.text_field :state, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :postal_code, "Postal Code" %>
+    <%= form.text_field :postal_code, required: true %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit customer_site.persisted? ? "Update Site" : "Create Site", class: "primary-button" %>
+  </div>
+<% end %>

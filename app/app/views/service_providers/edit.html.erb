@@ -1,0 +1,11 @@
+<% content_for :title, "Edit #{@service_provider.name}" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Service Provider</p>
+    <h1>Edit <%= @service_provider.name %></h1>
+  </div>
+  <%= link_to "Back to Provider", service_provider_path(@service_provider), class: "secondary-button" %>
+</section>
+
+<%= render "form", service_provider: @service_provider %>

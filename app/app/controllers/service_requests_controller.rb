@@ -1,5 +1,5 @@
 class ServiceRequestsController < ApplicationController
-  before_action :set_service_request, only: %i[show triage assign respond verify_completion]
+  before_action :set_service_request, only: %i[show edit update triage assign respond verify_completion]
   before_action :set_form_options, only: %i[new create]
   before_action :set_assign_options, only: %i[show assign]
 
@@ -32,6 +32,20 @@ class ServiceRequestsController < ApplicationController
 
   def show
     authorize!("service_requests", "read", @service_request)
+  end
+
+  def edit
+    authorize!("service_requests", "update", @service_request)
+  end
+
+  def update
+    authorize!("service_requests", "update", @service_request)
+
+    if @service_request.update(service_request_update_params)
+      redirect_to @service_request, notice: "Service request updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def new
@@ -206,6 +220,10 @@ class ServiceRequestsController < ApplicationController
     params
       .require(:service_request)
       .permit(:provider_response_summary, :follow_up_notes, :mark_provider_work_complete)
+  end
+
+  def service_request_update_params
+    params.require(:service_request).permit(:title, :description, :priority, :status)
   end
 
   def preselected_customer_site

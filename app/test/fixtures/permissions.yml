@@ -10,6 +10,12 @@ service_requests_create:
   name: Create service requests
   description: Create service requests.
 
+service_requests_update:
+  resource: service_requests
+  action: update
+  name: Update service requests
+  description: Update service request details.
+
 service_requests_triage:
   resource: service_requests
   action: triage
@@ -40,17 +46,53 @@ customers_read:
   name: Read customers
   description: View customer records.
 
+customers_create:
+  resource: customers
+  action: create
+  name: Create customers
+  description: Create customer records.
+
+customers_update:
+  resource: customers
+  action: update
+  name: Update customers
+  description: Update customer records.
+
 customer_sites_read:
   resource: customer_sites
   action: read
   name: Read customer sites
   description: View customer site records.
 
+customer_sites_create:
+  resource: customer_sites
+  action: create
+  name: Create customer sites
+  description: Create customer site records.
+
+customer_sites_update:
+  resource: customer_sites
+  action: update
+  name: Update customer sites
+  description: Update customer site records.
+
 service_providers_read:
   resource: service_providers
   action: read
   name: Read service providers
   description: View service provider records.
+
+service_providers_create:
+  resource: service_providers
+  action: create
+  name: Create service providers
+  description: Create service provider records.
+
+service_providers_update:
+  resource: service_providers
+  action: update
+  name: Update service providers
+  description: Update service provider records.
 
 roles_read:
   resource: roles

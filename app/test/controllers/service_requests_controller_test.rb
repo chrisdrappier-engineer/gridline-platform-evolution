@@ -211,6 +211,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", service_requests(:one).title
     assert_select "form[action='#{triage_service_request_path(service_requests(:one))}']"
+    assert_select "a[href='#{edit_service_request_path(service_requests(:one))}']", text: "Edit Request"
   end
 
   test "rejects unreadable service request detail" do
@@ -242,10 +243,44 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "new", request.status
   end
 
-  test "facility manager creates request for managed facility with dispatch default provider" do
+  test "dispatcher updates service request details" do
+    sign_in_as users(:one)
+
+    patch service_request_path(service_requests(:one)), params: {
+      service_request: {
+        title: "Updated lobby HVAC issue",
+        description: "Tenant reports cycling equipment after reset.",
+        priority: "urgent",
+        status: "in_progress"
+      }
+    }
+
+    assert_redirected_to service_request_path(service_requests(:one))
+    service_requests(:one).reload
+    assert_equal "Updated lobby HVAC issue", service_requests(:one).title
+    assert_equal "urgent", service_requests(:one).priority
+    assert_equal "in_progress", service_requests(:one).status
+  end
+
+  test "facility manager cannot update service request details" do
     sign_in_as users(:three)
 
-    assert_difference "ServiceRequest.count", 1 do
+    patch service_request_path(service_requests(:one)), params: {
+      service_request: {
+        title: "Unauthorized title",
+        priority: "urgent",
+        status: "in_progress"
+      }
+    }
+
+    assert_redirected_to dashboard_path
+    assert_not_equal "Unauthorized title", service_requests(:one).reload.title
+  end
+
+  test "facility manager cannot create request directly" do
+    sign_in_as users(:three)
+
+    assert_no_difference "ServiceRequest.count" do
       post service_requests_path, params: {
         service_request: {
           customer_site_id: customer_sites(:one).id,
@@ -256,10 +291,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    request = ServiceRequest.order(:created_at).last
-    assert_redirected_to service_request_path(request)
-    assert_equal users(:three), request.created_by
-    assert_equal service_providers(:one), request.service_provider
+    assert_redirected_to dashboard_path
   end
 
   test "rejects service request creation outside assignment scope" do
@@ -323,8 +355,8 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal service_providers(:one), request.reload.service_provider
   end
 
-  test "records service provider response" do
-    sign_in_as users(:five)
+  test "dispatcher records provider response" do
+    sign_in_as users(:one)
     request = service_requests(:two)
 
     patch respond_service_request_path(request), params: {
@@ -341,8 +373,8 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "triaged", request.status
   end
 
-  test "marks provider work complete" do
-    sign_in_as users(:five)
+  test "dispatcher marks provider work complete" do
+    sign_in_as users(:one)
     request = service_requests(:two)
 
     patch respond_service_request_path(request), params: {
@@ -358,9 +390,9 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert request.provider_work_completed_at.present?
   end
 
-  test "rejects provider response outside provider scope" do
+  test "rejects provider user response because providers track lifecycle only" do
     sign_in_as users(:five)
-    request = service_requests(:one)
+    request = service_requests(:two)
 
     patch respond_service_request_path(request), params: {
       service_request: {
@@ -372,8 +404,8 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_nil request.reload.provider_response_summary
   end
 
-  test "facility manager verifies resolved work" do
-    sign_in_as users(:three)
+  test "dispatcher verifies resolved work" do
+    sign_in_as users(:one)
     request = service_requests(:one)
     request.update!(status: "resolved", provider_work_completed_at: Time.current)
 
@@ -382,11 +414,11 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_request_path(request)
     request.reload
     assert request.completion_verified_at.present?
-    assert_equal users(:three), request.completion_verified_by
+    assert_equal users(:one), request.completion_verified_by
   end
 
   test "rejects completion verification before provider work is resolved" do
-    sign_in_as users(:three)
+    sign_in_as users(:one)
     request = service_requests(:one)
 
     patch verify_completion_service_request_path(request)

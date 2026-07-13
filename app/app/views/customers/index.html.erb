@@ -5,7 +5,12 @@
     <p class="eyebrow">Operations</p>
     <h1>Customers</h1>
   </div>
-  <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+  <div class="action-row">
+    <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+    <% if permitted?("customers", "create") %>
+      <%= link_to "New Customer", new_customer_path, class: "primary-button" %>
+    <% end %>
+  </div>
 </section>
 
 <%= turbo_frame_tag @customers_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>

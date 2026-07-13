@@ -38,6 +38,7 @@ async function expectSharedTableControls(page, { frameId, search, filters = [] }
 
     await searchbox.fill(search);
     await expect(frame.locator("tbody")).toContainText(search);
+    await expect(frame.locator(".table-results")).toContainText("1-1 of 1");
     await expect(searchbox).toBeFocused();
   }
 }
@@ -64,9 +65,9 @@ test("sites table supports search, filters, sorting, pagination, and normal row 
 
   await frame.getByRole("link", { name: "Clear" }).click();
   await expect(frame.getByRole("searchbox", { name: "Search" })).toHaveValue("");
-  await frame.getByRole("searchbox", { name: "Search" }).fill("Magnolia Midtown Atlanta");
-  await frame.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Magnolia Midtown Atlanta" })).toBeVisible();
+  await expect(frame.locator("tbody")).toContainText("Atlantic Light Augusta Assembly");
+  await frame.getByRole("link", { name: "Atlantic Light Augusta Assembly", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Atlantic Light Augusta Assembly" })).toBeVisible();
 });
 
 test("migrated operations tables expose the shared table controls", async ({ page }) => {
@@ -114,4 +115,42 @@ test("migrated admin tables expose the shared table controls while permission ma
   await navigateViaMenu(page, "Permission Matrix", "Permission Matrix");
   await expect(page.locator("turbo-frame#role_permissions_table")).toHaveCount(0);
   await expect(page.locator(".permission-matrix")).toBeVisible();
+});
+
+test("admin can maintain customer records through visible UI", async ({ page }) => {
+  await signIn(page, "admin@gridline.test", "Admin Dashboard");
+
+  await navigateViaMenu(page, "Customers", "Customers");
+  await page.getByRole("link", { name: "New Customer" }).click();
+  await expect(page.getByRole("heading", { name: "New Customer" })).toBeVisible();
+
+  const customerName = `E2E Customer ${Date.now()}`;
+  const updatedName = `${customerName} Updated`;
+
+  await page.getByLabel("Name").fill(customerName);
+  await page.getByLabel("Status").selectOption("onboarding");
+  await page.getByLabel("Industry").fill("property_management");
+  await page.getByRole("button", { name: "Create Customer" }).click();
+
+  await expect(page.getByRole("heading", { name: customerName })).toBeVisible();
+  await page.getByRole("link", { name: "Edit Customer" }).click();
+  await expect(page.getByRole("heading", { name: `Edit ${customerName}` })).toBeVisible();
+  await page.getByLabel("Name").fill(updatedName);
+  await page.getByLabel("Status").selectOption("active");
+  await page.getByRole("button", { name: "Update Customer" }).click();
+
+  await expect(page.getByRole("heading", { name: updatedName })).toBeVisible();
+  await expect(page.getByText("Active")).toBeVisible();
+});
+
+test("external users track lifecycle without request mutation controls", async ({ page }) => {
+  await signIn(page, "provider.user@coastalcoldchain.test", "Service Provider Dashboard");
+
+  await page.getByRole("link", { name: "View Assigned Requests" }).click();
+  await expect(page.getByRole("heading", { name: "Service Requests" })).toBeVisible();
+  await page.getByRole("searchbox", { name: "Search" }).fill("Freezer temperature alarm");
+  await page.getByRole("link", { name: "Freezer temperature alarm", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Freezer temperature alarm" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Edit Request" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Record Provider Update" })).toHaveCount(0);
 });

@@ -8,11 +8,12 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Authorization.can?(user, resource: "service_requests", action: "read", target: service_requests(:two))
   end
 
-  test "site scoped assignment grants permission for matching site" do
+  test "site scoped assignment grants lifecycle visibility without request mutation" do
     user = users(:three)
 
-    assert Authorization.can?(user, resource: "service_requests", action: "create", target: customer_sites(:one))
-    assert_not Authorization.can?(user, resource: "service_requests", action: "create", target: customer_sites(:two))
+    assert Authorization.can?(user, resource: "service_requests", action: "read", target: service_requests(:one))
+    assert_not Authorization.can?(user, resource: "service_requests", action: "create", target: customer_sites(:one))
+    assert_not Authorization.can?(user, resource: "service_requests", action: "verify_completion", target: service_requests(:one))
   end
 
   test "customer scoped assignment grants permission for customer service requests" do
@@ -22,10 +23,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert_not Authorization.can?(user, resource: "service_requests", action: "read", target: service_requests(:two))
   end
 
-  test "service provider scoped assignment grants provider response permission" do
+  test "service provider scoped assignment grants lifecycle visibility without response mutation" do
     user = users(:five)
 
-    assert Authorization.can?(user, resource: "service_requests", action: "respond", target: service_requests(:two))
+    assert Authorization.can?(user, resource: "service_requests", action: "read", target: service_requests(:two))
+    assert_not Authorization.can?(user, resource: "service_requests", action: "respond", target: service_requests(:two))
     assert_not Authorization.can?(user, resource: "service_requests", action: "respond", target: service_requests(:one))
   end
 
