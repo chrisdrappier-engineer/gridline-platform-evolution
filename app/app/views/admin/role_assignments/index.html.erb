@@ -1,0 +1,52 @@
+<% content_for :title, "Role Assignments" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1>Role Assignments</h1>
+  </div>
+  <%= link_to "Permission Matrix", admin_role_permissions_path, class: "secondary-button" %>
+</section>
+
+<%= turbo_frame_tag @role_assignments_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
+  <%= render "shared/data_tables/controls",
+             table: @role_assignments_table,
+             context: { roles: @roles },
+             search_placeholder: "Search users, roles, scopes" %>
+
+  <% if @role_assignments.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <% @role_assignments_table.columns.each do |column| %>
+              <th><%= data_table_sort_link(@role_assignments_table, column) %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @role_assignments.each do |assignment| %>
+            <tr>
+              <td><%= assignment.user.name %></td>
+              <td><%= assignment.role.name %></td>
+              <td>
+                <% if assignment.resource %>
+                  <%= assignment.resource_type %>: <%= assignment.resource.try(:name) || assignment.resource_id %>
+                <% else %>
+                  Global
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2><%= @role_assignments_table.empty_title %></h2>
+      <p><%= @role_assignments_table.empty_message %></p>
+    </div>
+  <% end %>
+
+  <%= render "shared/data_tables/pagination", table: @role_assignments_table %>
+<% end %>

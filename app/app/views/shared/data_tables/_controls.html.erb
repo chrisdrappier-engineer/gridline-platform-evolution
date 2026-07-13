@@ -1,0 +1,52 @@
+<section class="filter-panel" aria-label="<%= table.key.to_s.humanize %> filters">
+  <%= form_with url: table.path,
+                method: :get,
+                scope: table.key,
+                class: "filter-form table-filter-form",
+                data: {
+                  controller: "table-search",
+                  table_search_target: "form",
+                  turbo_frame: table.frame_id,
+                  turbo_action: "advance"
+                } do |form| %>
+    <%= form.hidden_field :sort, value: table.sort %>
+    <%= form.hidden_field :direction, value: table.direction %>
+    <%= form.hidden_field :page, value: table.page, data: { table_search_target: "page" } %>
+
+    <div class="field table-search-field">
+      <%= form.label :search, "Search" %>
+      <%= form.search_field :search,
+                            value: table.search,
+                            placeholder: local_assigns.fetch(:search_placeholder, "Search"),
+                            autocomplete: "off",
+                            data: { table_search_target: "search", action: "input->table-search#submit" } %>
+    </div>
+
+    <% table.filters.each do |filter| %>
+      <div class="field">
+        <% filter_options = filter.resolved_options(local_assigns.fetch(:context, {})) %>
+        <% selected_filter_value = table.filter_value(filter) %>
+        <%= form.label filter.key, filter.header %>
+        <%= form.select filter.key,
+                        filter_options,
+                        { include_blank: "All #{filter.header.to_s.downcase.pluralize}", selected: selected_filter_value },
+                        data: { action: "change->table-search#submitNow" } %>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= form.label :limit, "Per Page" %>
+      <%= form.select :limit,
+                      table.page_size_options.map { |limit| [limit, limit] },
+                      { selected: table.limit },
+                      data: { action: "change->table-search#submitNow" } %>
+    </div>
+
+    <div class="filter-actions">
+      <%= link_to "Clear",
+                  table.path,
+                  class: "secondary-button",
+                  data: { turbo_frame: table.frame_id, turbo_action: "advance" } %>
+    </div>
+  <% end %>
+</section>

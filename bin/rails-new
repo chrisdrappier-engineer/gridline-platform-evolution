@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+history_file="docs/rails-generator-history.md"
+
+force_requested=false
+for arg in "$@"; do
+  if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
+    force_requested=true
+  fi
+done
+
+if [[ -f app/config/application.rb && "$force_requested" == false ]]; then
+  echo "Refusing to run rails new because app/config/application.rb already exists." >&2
+  echo "Pass --force if you intentionally want Rails to overwrite the existing app skeleton." >&2
+  exit 1
+fi
+
+quote_command() {
+  printf "%q" "$1"
+  shift
+
+  for arg in "$@"; do
+    printf " %q" "$arg"
+  done
+}
+
+record_command() {
+  local command
+  command="$(quote_command bin/rails-new "$@")"
+
+  if grep -q "No Rails generator commands have been recorded yet." "$history_file"; then
+    sed -i.bak '/No Rails generator commands have been recorded yet\./d' "$history_file"
+    rm -f "${history_file}.bak"
+  fi
+
+  {
+    printf "\n### %s\n\n" "$(date +%F)"
+    printf -- '- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `%s`%s' "$command" $'\n'
+  } >> "$history_file"
+}
+
+docker compose -f compose.generator.yml run --rm generator rails new app "$@"
+record_command "$@"

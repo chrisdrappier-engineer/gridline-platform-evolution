@@ -1,0 +1,147 @@
+dispatcher_service_requests_read:
+  role: dispatcher
+  permission: service_requests_read
+
+dispatcher_service_requests_create:
+  role: dispatcher
+  permission: service_requests_create
+
+dispatcher_service_requests_update:
+  role: dispatcher
+  permission: service_requests_update
+
+dispatcher_service_requests_triage:
+  role: dispatcher
+  permission: service_requests_triage
+
+dispatcher_service_requests_assign:
+  role: dispatcher
+  permission: service_requests_assign
+
+dispatcher_service_requests_respond:
+  role: dispatcher
+  permission: service_requests_respond
+
+dispatcher_service_requests_verify_completion:
+  role: dispatcher
+  permission: service_requests_verify_completion
+
+dispatcher_customers_read:
+  role: dispatcher
+  permission: customers_read
+
+dispatcher_customer_sites_read:
+  role: dispatcher
+  permission: customer_sites_read
+
+dispatcher_service_providers_read:
+  role: dispatcher
+  permission: service_providers_read
+
+facility_manager_service_requests_read:
+  role: facility_manager
+  permission: service_requests_read
+
+facility_manager_customer_sites_read:
+  role: facility_manager
+  permission: customer_sites_read
+
+customer_contact_service_requests_read:
+  role: customer_contact
+  permission: service_requests_read
+
+customer_contact_customers_read:
+  role: customer_contact
+  permission: customers_read
+
+customer_contact_customer_sites_read:
+  role: customer_contact
+  permission: customer_sites_read
+
+service_provider_user_service_requests_read:
+  role: service_provider_user
+  permission: service_requests_read
+
+service_provider_user_service_providers_read:
+  role: service_provider_user
+  permission: service_providers_read
+
+admin_service_requests_read:
+  role: admin
+  permission: service_requests_read
+
+admin_service_requests_create:
+  role: admin
+  permission: service_requests_create
+
+admin_service_requests_update:
+  role: admin
+  permission: service_requests_update
+
+admin_service_requests_triage:
+  role: admin
+  permission: service_requests_triage
+
+admin_service_requests_assign:
+  role: admin
+  permission: service_requests_assign
+
+admin_service_requests_respond:
+  role: admin
+  permission: service_requests_respond
+
+admin_service_requests_verify_completion:
+  role: admin
+  permission: service_requests_verify_completion
+
+admin_customers_read:
+  role: admin
+  permission: customers_read
+
+admin_customers_create:
+  role: admin
+  permission: customers_create
+
+admin_customers_update:
+  role: admin
+  permission: customers_update
+
+admin_customer_sites_read:
+  role: admin
+  permission: customer_sites_read
+
+admin_customer_sites_create:
+  role: admin
+  permission: customer_sites_create
+
+admin_customer_sites_update:
+  role: admin
+  permission: customer_sites_update
+
+admin_service_providers_read:
+  role: admin
+  permission: service_providers_read
+
+admin_service_providers_create:
+  role: admin
+  permission: service_providers_create
+
+admin_service_providers_update:
+  role: admin
+  permission: service_providers_update
+
+admin_roles_read:
+  role: admin
+  permission: roles_read
+
+admin_role_permissions_read:
+  role: admin
+  permission: role_permissions_read
+
+admin_user_role_assignments_read:
+  role: admin
+  permission: user_role_assignments_read
+
+admin_users_read:
+  role: admin
+  permission: users_read

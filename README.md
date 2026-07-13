@@ -10,12 +10,14 @@ The goal is not to showcase infrastructure for its own sake. Each scenario intro
 
 Gridline provides facilities maintenance services for multi-location businesses: retail chains, clinics, warehouses, restaurants, and property managers.
 
-When something breaks at a customer site, Gridline dispatchers create and triage service requests, assign technicians or vendor partners, track SLA deadlines, and keep customers informed until the work is complete.
+When something breaks at a customer site, Gridline dispatchers create and
+triage service requests, assign internal teams or vendor partners, record
+provider updates, and keep customers informed until the work is complete.
 
 The platform began as a single-region Rails monolith. As Gridline expanded, the system faced new pressures:
 
 - More dispatchers using the system concurrently
-- Technicians checking in from the field
+- Service providers communicating work updates
 - Customer sites submitting more service requests
 - Dispatch dashboards becoming slower
 - Reports blocking web requests
@@ -43,12 +45,145 @@ The project focuses on horizontal scaling concepts commonly encountered as a Rai
 
 CI/CD is included as a supporting engineering practice. Each scenario is intended to be buildable, testable, and smoke-verifiable, but the primary story is application scaling.
 
+## Development Workflow
+
+This project is being built with Codex as an AI development collaborator.
+
+Codex is used to help convert planning discussions into issues, ADRs,
+documentation, implementation branches, verification steps, commits, and pull
+request summaries. Architectural direction and merge decisions remain
+human-owned.
+
+The workflow is intentionally shaped like a scalable engineering process even
+though the project is maintained by one person:
+
+- work starts from GitHub issues
+- each meaningful change happens on an issue-specific branch
+- pull requests explain the scaling story, demo steps, verification, and
+  follow-up work
+- ADRs capture architecture decisions before they become invisible assumptions
+- Docker Compose provides a repeatable runtime for both human and Codex-assisted
+  verification
+
+Codex is not part of the Gridline application at runtime. It is part of the
+engineering process used to build, document, and verify the case study.
+
+Substantial AI-assisted architecture discussions may be summarized in
+[`docs/decision-notes`](docs/decision-notes/README.md). ADRs remain the source
+of truth for final architecture decisions.
+
+## Container Baseline
+
+The current runnable foundation is a Docker Compose simulation of the baseline
+PaaS boundary for the initial Rails monolith.
+
+The baseline includes:
+
+- an `app` container that runs the Rails monolith with Puma
+- a `db` container running Postgres as the managed database stand-in
+- a bind mount from `./app` into the app container so local Rails file changes
+  are visible without rebuilding the image
+- environment-variable configuration
+- app-to-database communication over the Compose network
+- stdout logging from the app container
+- Rails database preparation, test, and health smoke-check scripts
+- a named Postgres volume for durable database state
+
+The Rails app currently implements the first operational baseline:
+
+- customers, customer sites, service providers, users, roles, and permissions
+- dispatcher-owned service request intake, triage, assignment, update, provider
+  work recording, and completion verification
+- scoped read access for facility managers, customer contacts, and service
+  provider users
+- admin maintenance screens for customers, sites, providers, users, role
+  assignments, and the permission matrix
+- role-specific dashboards
+- backend-driven searchable, filterable, sortable, paginated tables
+- seeded development and demo data
+- Minitest controller/model/service coverage
+- Playwright browser workflow coverage
+
+Run the baseline checks with:
+
+```bash
+bin/ci
+```
+
+Or run the services directly:
+
+```bash
+docker compose up --build
+```
+
+After the image has been built once, most Rails source changes do not require a
+rebuild:
+
+```bash
+docker compose up app
+```
+
+Changes under `app/` are mounted into the running container. Restart the app
+container for changes that Rails does not reload automatically, and rebuild only
+when image-level inputs change, such as `app/Gemfile`, `app/Gemfile.lock`, or
+`app/Dockerfile`.
+
+Then visit:
+
+```text
+http://localhost:3000/health
+```
+
+To prepare the development database with presentation-friendly demo data:
+
+```bash
+docker compose run --rm -e SEED_DEMO_DATA=true app bin/rails db:prepare db:seed
+```
+
+Then start the app and visit:
+
+```text
+http://localhost:3000/login
+```
+
+The default stub password for seeded users is `gridline`.
+
+Run headed browser smoke tests with:
+
+```bash
+npm run test:e2e:headed
+```
+
+Additional browser test details live in [`e2e/README.md`](e2e/README.md).
+
+## Rails Generator Tooling
+
+Rails application files should be created with Rails generators instead of
+being handwritten into place. This keeps generated framework structure aligned
+with Rails itself while preserving the project's Docker-first development
+boundary.
+
+Generator tooling lives outside the application runtime:
+
+- `generator/` defines the Ruby and Rails image used only for file generation
+- `compose.generator.yml` mounts the repository into the generator container
+- `bin/rails-new` creates the initial Rails application under `app/`
+- `bin/rails-generate` runs future Rails generators inside the generated app
+- `docs/rails-generator-history.md` records successful generator commands
+
+The generator history is intentionally factual. Architectural context and
+human/AI decision-making belong in ADRs, decision notes, commit messages, and
+pull request descriptions.
+
+The reasoning behind this tooling is captured in
+[`docs/decision-notes/2026-07-09-rails-generator-tooling.md`](docs/decision-notes/2026-07-09-rails-generator-tooling.md).
+
 ## Scenario Roadmap
 
 | Scenario | Focus | Status |
 |---|---|---|
 | 00 Vertical Scaling Limit | Pre-history: why vertical scaling is no longer enough | Planned |
-| 01 Mature Monolith Baseline | Single-instance Rails operations platform | Planned |
+| 01 Mature Monolith Baseline | Single-instance Rails operations platform | In Progress |
 | 02 Load-Balanced Web Tier | Multiple Rails web workers behind a load balancer | Planned |
 | 03 Shared Redis Sessions | Stateless web containers and shared session state | Planned |
 | 04 Persistent Postgres State | Shared durable database state | Planned |
@@ -69,27 +204,33 @@ The baseline application includes:
 
 - Customers and customer sites
 - Service requests
-- Work orders
-- Technician assignment
-- SLA tracking
-- Dispatch board views
-- Basic reporting
+- Service providers
+- Dispatcher-owned request intake, triage, assignment, provider update capture,
+  and completion verification
+- Scoped RBAC with role assignments that may be global or tied to customers,
+  sites, or providers
+- Role-specific dashboards for dispatchers, facility managers, customer
+  contacts, service provider users, and admins
+- Admin maintenance workflows for customers, sites, providers, users, role
+  assignments, and the permission matrix
+- Backend-driven operational tables with search, filters, sorting, pagination,
+  and shareable query params
+- Seeded development and demo data
 - Health and identity endpoints
-- Seeded demo data
-- RSpec test coverage
-- Local CI verification
+- Minitest and Playwright test coverage
+- Docker Compose CI verification
 
 Known limitations at this stage:
 
 - One web process handles all traffic
 - Deployments affect the only app instance
-- Reports run synchronously
-- Dispatch board reads are recomputed per request
 - No shared session store
 - No external cache
 - No background job processor
 - No read replica
 - Limited operational visibility
+- Cost tracking, notes, file uploads, ratings, SLA reporting, and provider
+  performance reporting are captured as user stories but not yet implemented
 
 These limitations motivate the later scenarios.
 
@@ -98,9 +239,11 @@ These limitations motivate the later scenarios.
 The initial facilities operations domain is defined in
 [`docs/domain`](docs/domain/README.md).
 
-It describes the baseline customers, sites, service requests, work orders,
-technicians, audit events, lifecycle rules, SLA behavior, and reporting needs
-that the Rails monolith will implement.
+The current implementation is intentionally narrower than the original domain
+sketch. The app currently centers on customers, sites, service providers,
+service requests, users, and scoped RBAC. Cost tracking, notes, files, ratings,
+SLA reporting, and provider performance reporting are captured in
+[`docs/user-stories`](docs/user-stories/README.md) for future feature work.
 
 ## Repository Structure
 
@@ -109,24 +252,30 @@ gridline-platform-evolution/
   app/
     # Rails monolith shared by scenarios
 
+  generator/
+    # Container image for Rails file generation
+
   docs/
     adr/
       # Architecture Decision Records
+    decision-notes/
+      # Context for substantial planning discussions
+    design/
+      # Application interaction, table, and implementation rules
     domain/
       # Facilities operations domain model
+    user-stories/
+      # Role-centered workflow stories for implemented and planned features
+
+  e2e/
+    # Playwright browser workflow tests
 
   scenarios/
-    00-vertical-scaling-limit/
-    01-mature-monolith-baseline/
     02-load-balanced-web-tier/
-    03-shared-redis-sessions/
-    04-persistent-postgres-state/
-    05-read-replica-split/
-    06-redis-cache-store/
-    07-background-jobs/
-    08-backpressure-rate-limiting/
-    09-observability/
-    10-orchestration-patterns/
+      # First future scaling scenario workspace
 
   bin/
     ci
+    rails-new
+    rails-generate
+```

@@ -1,0 +1,25 @@
+<% content_for :title, "Customer Contact Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Customer Contact</p>
+    <h1>Customer Contact Dashboard</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "primary-button" %>
+</section>
+
+<%= render "request_summary", open_requests: @open_requests, urgent_requests: @urgent_requests, recent_requests: @recent_requests %>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Account Views</h2>
+  </div>
+
+  <ul class="link-list">
+    <li><%= link_to "View Requests", service_requests_path %></li>
+    <li><%= link_to "View Customers", customers_path %></li>
+    <li><%= link_to "View Sites", customer_sites_path %></li>
+  </ul>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Account Requests" %>

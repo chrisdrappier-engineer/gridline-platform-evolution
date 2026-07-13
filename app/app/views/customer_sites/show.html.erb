@@ -1,0 +1,57 @@
+<% content_for :title, @customer_site.name %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow"><%= @customer_site.customer.name %></p>
+    <h1><%= @customer_site.name %></h1>
+  </div>
+  <div class="action-row">
+    <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+    <% if can?("customer_sites", "update", @customer_site) %>
+      <%= link_to "Edit Site", edit_customer_site_path(@customer_site), class: "primary-button" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Site Details</h2>
+    <dl class="detail-list">
+      <dt>Status</dt>
+      <dd><%= @customer_site.site_status.humanize %></dd>
+      <dt>Address</dt>
+      <dd>
+        <%= @customer_site.address_line_1 %><br>
+        <% if @customer_site.address_line_2.present? %>
+          <%= @customer_site.address_line_2 %><br>
+        <% end %>
+        <%= @customer_site.city %>, <%= @customer_site.state %> <%= @customer_site.postal_code %>
+      </dd>
+      <dt>Created By</dt>
+      <dd><%= @customer_site.created_by.name %></dd>
+    </dl>
+  </article>
+
+  <article class="detail-panel">
+    <h2>Customer</h2>
+    <dl class="detail-list">
+      <dt>Name</dt>
+      <dd><%= @customer_site.customer.name %></dd>
+      <dt>Industry</dt>
+      <dd><%= @customer_site.customer.industry %></dd>
+      <dt>Status</dt>
+      <dd><%= @customer_site.customer.account_status.humanize %></dd>
+    </dl>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Service Requests</h2>
+    <% if can?("service_requests", "create", @customer_site) %>
+      <%= link_to "Create Service Request", new_service_request_path(customer_site_id: @customer_site.id), class: "secondary-button" %>
+    <% end %>
+  </div>
+
+  <%= render "service_requests/table", service_requests: @service_requests %>
+</section>

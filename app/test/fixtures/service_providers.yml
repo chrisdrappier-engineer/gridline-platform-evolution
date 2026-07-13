@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Gridline Internal Dispatch Team
+  provider_type: internal_team
+  status: active
+  created_by: one
+
+two:
+  name: North Region Vendor Partner
+  provider_type: vendor_partner
+  status: active
+  created_by: two

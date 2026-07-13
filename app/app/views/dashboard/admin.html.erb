@@ -1,0 +1,38 @@
+<% content_for :title, "Admin Dashboard" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Admin Dashboard</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "primary-button" %>
+</section>
+
+<section class="metric-grid" aria-label="Admin summary">
+  <article class="metric-card">
+    <span>Roles</span>
+    <strong><%= @roles.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Permissions</span>
+    <strong><%= @permissions.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Assignments</span>
+    <strong><%= @role_assignments.count %></strong>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Administration Views</h2>
+  </div>
+
+  <ul class="link-list">
+    <li><%= link_to "Permission Matrix", admin_role_permissions_path %></li>
+    <li><%= link_to "Role Assignments", admin_role_assignments_path %></li>
+    <li><%= link_to "Users", admin_users_path %></li>
+  </ul>
+</section>
+
+<%= render "recent_requests", service_requests: @recent_requests, title: "Recent Requests" %>

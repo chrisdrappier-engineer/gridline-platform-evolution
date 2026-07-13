@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Gridline Operations" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Gridline Operations">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body<%= " data-controller=\"navigation-panel\"".html_safe if signed_in? %>>
+    <header class="app-header">
+      <div class="app-shell header-content">
+        <% if signed_in? %>
+          <div class="brand-group">
+            <button
+              type="button"
+              class="menu-toggle"
+              aria-controls="primary-navigation-panel"
+              aria-expanded="false"
+              data-navigation-panel-target="button"
+              data-action="navigation-panel#toggle"
+            >
+              <span aria-hidden="true">☰</span>
+              <span>Menu</span>
+            </button>
+            <%= link_to "Gridline Operations", root_path, class: "brand" %>
+          </div>
+
+          <div class="session-summary">
+            <span><%= current_user.name %></span>
+            <%= button_to "Sign out", logout_path, method: :delete, class: "text-button" %>
+          </div>
+        <% else %>
+          <%= link_to "Gridline Operations", root_path, class: "brand" %>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="app-frame<%= " app-frame-with-navigation" if signed_in? %>"<%= " data-navigation-panel-target=\"frame\"".html_safe if signed_in? %>>
+      <% if signed_in? %>
+        <aside
+          id="primary-navigation-panel"
+          class="side-navigation"
+          data-navigation-panel-target="panel"
+        >
+          <nav class="side-navigation-inner" aria-label="Primary navigation">
+            <% navigation_sections.each do |section| %>
+              <section class="nav-section">
+                <h2 class="nav-heading"><%= section.fetch(:label) %></h2>
+                <div class="nav-links">
+                  <% section.fetch(:links).each do |label, path, _visible| %>
+                    <%= link_to label, path %>
+                  <% end %>
+                </div>
+              </section>
+            <% end %>
+          </nav>
+        </aside>
+      <% end %>
+
+      <main class="app-shell main-content">
+        <% flash.each do |type, message| %>
+          <div class="flash flash-<%= type %>" role="status" data-controller="dismissible-flash">
+            <span><%= message %></span>
+            <button
+              type="button"
+              class="flash-dismiss"
+              aria-label="Dismiss notification"
+              data-action="dismissible-flash#dismiss"
+            >
+              ×
+            </button>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

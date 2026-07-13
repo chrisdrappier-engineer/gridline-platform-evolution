@@ -1,0 +1,49 @@
+<% content_for :title, "Customers" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operations</p>
+    <h1>Customers</h1>
+  </div>
+  <div class="action-row">
+    <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+    <% if permitted?("customers", "create") %>
+      <%= link_to "New Customer", new_customer_path, class: "primary-button" %>
+    <% end %>
+  </div>
+</section>
+
+<%= turbo_frame_tag @customers_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
+  <%= render "shared/data_tables/controls", table: @customers_table, search_placeholder: "Search customers, industries, creators" %>
+
+  <% if @customers.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <% @customers_table.columns.each do |column| %>
+              <th><%= data_table_sort_link(@customers_table, column) %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @customers.each do |customer| %>
+            <tr>
+              <td><%= link_to customer.name, customer_path(customer), class: "table-link" %></td>
+              <td><%= customer.account_status.humanize %></td>
+              <td><%= customer.industry.humanize %></td>
+              <td><%= customer.created_by.name %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2><%= @customers_table.empty_title %></h2>
+      <p><%= @customers_table.empty_message %></p>
+    </div>
+  <% end %>
+
+  <%= render "shared/data_tables/pagination", table: @customers_table %>
+<% end %>

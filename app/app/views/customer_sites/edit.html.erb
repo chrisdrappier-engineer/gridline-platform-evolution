@@ -1,0 +1,11 @@
+<% content_for :title, "Edit #{@customer_site.name}" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Site</p>
+    <h1>Edit <%= @customer_site.name %></h1>
+  </div>
+  <%= link_to "Back to Site", customer_site_path(@customer_site), class: "secondary-button" %>
+</section>
+
+<%= render "form", customer_site: @customer_site %>

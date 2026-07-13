@@ -1,0 +1,51 @@
+<% if service_requests.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <% if local_assigns[:table] %>
+            <% table.columns.each do |column| %>
+              <th><%= data_table_sort_link(table, column) %></th>
+            <% end %>
+          <% else %>
+            <th>Request</th>
+            <th>Site</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Dispatcher</th>
+            <th>Reported</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% service_requests.each do |request| %>
+          <tr>
+            <td>
+              <%= link_to request.title, service_request_path(request), class: "table-link" %>
+              <%= link_to request.service_provider.name, service_provider_path(request.service_provider), class: "muted-link" %>
+            </td>
+            <td>
+              <%= link_to request.customer_site.customer.name, customer_path(request.customer_site.customer), class: "table-link" %>
+              <%= link_to request.customer_site.name, customer_site_path(request.customer_site), class: "muted-link" %>
+            </td>
+            <td><span class="status-pill status-<%= request.status %>"><%= request.status.humanize %></span></td>
+            <td><span class="priority-pill priority-<%= request.priority %>"><%= request.priority.humanize %></span></td>
+            <td>
+              <% if request.assigned_dispatcher %>
+                <%= link_to request.assigned_dispatcher.name, dispatcher_path(request.assigned_dispatcher), class: "table-link" %>
+              <% else %>
+                Unassigned
+              <% end %>
+            </td>
+            <td><%= l request.reported_at, format: :short %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2><%= local_assigns[:table]&.empty_title || "No service requests yet" %></h2>
+    <p><%= local_assigns[:table]&.empty_message || "Create the first request to start the dispatch workflow." %></p>
+  </div>
+<% end %>

@@ -1,0 +1,24 @@
+dispatcher:
+  key: dispatcher
+  name: Dispatcher
+  description: Internal Gridline dispatcher.
+
+facility_manager:
+  key: facility_manager
+  name: Facility Manager
+  description: Customer-side site manager.
+
+customer_contact:
+  key: customer_contact
+  name: Customer Contact
+  description: Customer-side account contact.
+
+service_provider_user:
+  key: service_provider_user
+  name: Service Provider User
+  description: Provider-side service user.
+
+admin:
+  key: admin
+  name: Admin
+  description: Internal Gridline administrator.

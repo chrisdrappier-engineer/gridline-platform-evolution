@@ -1,0 +1,8 @@
+<section class="section-block">
+  <div class="section-header">
+    <h2><%= local_assigns.fetch(:title, "Recent Requests") %></h2>
+    <%= link_to "View all", service_requests_path %>
+  </div>
+
+  <%= render "service_requests/table", service_requests: service_requests %>
+</section>

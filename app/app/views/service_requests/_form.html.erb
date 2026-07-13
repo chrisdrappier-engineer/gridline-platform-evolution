@@ -1,0 +1,75 @@
+<%= form_with model: service_request, class: "form-panel wide-form" do |form| %>
+  <% if service_request.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(service_request.errors.count, "error") %> prevented this request from being saved</h2>
+      <ul>
+        <% service_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if service_request.customer_site %>
+    <section class="context-panel" aria-label="Selected site context">
+      <span>Selected Site</span>
+      <strong><%= service_request.customer_site.customer.name %> - <%= service_request.customer_site.name %></strong>
+      <p>
+        <%= service_request.customer_site.address_line_1 %>,
+        <%= service_request.customer_site.city %>,
+        <%= service_request.customer_site.state %>
+        <%= service_request.customer_site.postal_code %>
+      </p>
+    </section>
+  <% elsif @context_customer %>
+    <section class="context-panel" aria-label="Selected customer context">
+      <span>Selected Customer</span>
+      <strong><%= @context_customer.name %></strong>
+      <p>Only sites for this customer are available for this request.</p>
+    </section>
+  <% end %>
+
+  <% if service_request.customer_site && @customer_sites.one? %>
+    <%= form.hidden_field :customer_site_id %>
+  <% else %>
+    <div class="field">
+      <%= form.label :customer_site_id, "Site" %>
+      <%= form.collection_select :customer_site_id, @customer_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { prompt: "Select a site" }, required: true %>
+      <% if @context_customer %>
+        <p class="field-hint">Site choices are limited to the selected customer.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @service_providers.any? %>
+    <div class="field">
+      <%= form.label :service_provider_id, "Service Provider" %>
+      <%= form.collection_select :service_provider_id, @service_providers, :id, :name, { prompt: "Select a provider" }, required: true %>
+    </div>
+  <% else %>
+    <section class="context-panel" aria-label="Provider routing context">
+      <span>Initial Routing</span>
+      <strong>Gridline dispatch will assign a provider</strong>
+      <p>This request will enter the intake queue for provider assignment.</p>
+    </section>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :priority %>
+    <%= form.select :priority, ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 6 %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Create Request", class: "primary-button" %>
+  </div>
+<% end %>

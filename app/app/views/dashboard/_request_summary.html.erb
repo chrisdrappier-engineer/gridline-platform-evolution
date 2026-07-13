@@ -1,0 +1,14 @@
+<section class="metric-grid" aria-label="Service request summary">
+  <article class="metric-card">
+    <span>Open Requests</span>
+    <strong><%= open_requests.count %></strong>
+  </article>
+  <article class="metric-card urgent">
+    <span>Urgent Active</span>
+    <strong><%= urgent_requests.count %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Recent Visible</span>
+    <strong><%= recent_requests.count %></strong>
+  </article>
+</section>

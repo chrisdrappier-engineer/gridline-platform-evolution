@@ -1,0 +1,11 @@
+<% content_for :title, "New Site" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Site</p>
+    <h1>New Site</h1>
+  </div>
+  <%= link_to "Back to Sites", customer_sites_path, class: "secondary-button" %>
+</section>
+
+<%= render "form", customer_site: @customer_site %>

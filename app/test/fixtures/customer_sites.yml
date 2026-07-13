@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer: one
+  name: Northstar Downtown
+  address_line_1: 100 Main St
+  address_line_2: Suite 200
+  city: Chicago
+  state: IL
+  postal_code: "60601"
+  site_status: active
+  created_by: one
+
+two:
+  customer: two
+  name: Acme West Dock
+  address_line_1: 500 Industrial Pkwy
+  address_line_2:
+  city: Aurora
+  state: IL
+  postal_code: "60502"
+  site_status: active
+  created_by: two

@@ -1,0 +1,37 @@
+<% content_for :title, @dispatcher.name %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Dispatcher</p>
+    <h1><%= @dispatcher.name %></h1>
+  </div>
+  <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-panel">
+    <h2>Profile</h2>
+    <dl class="detail-list">
+      <dt>Email</dt>
+      <dd><%= @dispatcher.email %></dd>
+      <dt>Role</dt>
+      <dd><%= @dispatcher.role.humanize %></dd>
+      <dt>Status</dt>
+      <dd><%= @dispatcher.active? ? "Active" : "Inactive" %></dd>
+    </dl>
+  </article>
+
+  <article class="metric-card">
+    <span>Assigned Requests</span>
+    <strong><%= @assigned_service_requests.count %></strong>
+  </article>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Assigned Service Requests</h2>
+    <%= link_to "View Queue", service_requests_path, class: "secondary-button" %>
+  </div>
+
+  <%= render "service_requests/table", service_requests: @assigned_service_requests %>
+</section>
