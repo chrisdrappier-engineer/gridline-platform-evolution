@@ -180,6 +180,9 @@ The reasoning behind this tooling is captured in
 
 ## Scenario Roadmap
 
+The architecture scenario roadmap is listed below. A broader product and
+scaling roadmap lives in [`docs/roadmap`](docs/roadmap/README.md).
+
 | Scenario | Focus | Status |
 |---|---|---|
 | 00 Vertical Scaling Limit | Pre-history: why vertical scaling is no longer enough | Planned |
@@ -264,6 +267,8 @@ gridline-platform-evolution/
       # Application interaction, table, and implementation rules
     domain/
       # Facilities operations domain model
+    roadmap/
+      # Product and scaling roadmap horizons
     user-stories/
       # Role-centered workflow stories for implemented and planned features
 
