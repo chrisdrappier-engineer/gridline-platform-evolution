@@ -1,24 +1,54 @@
-# README
+# Gridline Rails App
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This directory contains the Rails monolith used by the Gridline Platform
+Evolution case study.
 
-Things you may want to cover:
+The app is intended to run through the repository-level Docker Compose setup
+rather than directly on the host. See the top-level `README.md` for the primary
+runtime and CI commands.
 
-* Ruby version
+## Current Baseline
 
-* System dependencies
+The app currently includes:
 
-* Configuration
+- customers and customer sites
+- service providers
+- service requests
+- users, roles, permissions, and scoped role assignments
+- role-specific dashboards
+- admin maintenance screens
+- dispatcher-owned service request mutation workflows
+- scoped read-only lifecycle visibility for customer and provider users
+- shared backend-driven table interactions
+- Minitest coverage
 
-* Database creation
+## Seeds
 
-* Database initialization
+RBAC definitions are always seeded. The app uses development seed data by
+default:
 
-* How to run the test suite
+```bash
+bin/rails db:prepare db:seed
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Set `SEED_DEMO_DATA=true` to load larger presentation-friendly demo data:
 
-* Deployment instructions
+```bash
+SEED_DEMO_DATA=true bin/rails db:prepare db:seed
+```
 
-* ...
+Seeded users share the stub password `gridline`.
+
+## Tests
+
+From inside the app container:
+
+```bash
+bin/rails test
+```
+
+From the repository root, prefer:
+
+```bash
+bin/ci
+```

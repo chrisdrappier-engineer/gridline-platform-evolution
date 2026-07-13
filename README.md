@@ -10,12 +10,14 @@ The goal is not to showcase infrastructure for its own sake. Each scenario intro
 
 Gridline provides facilities maintenance services for multi-location businesses: retail chains, clinics, warehouses, restaurants, and property managers.
 
-When something breaks at a customer site, Gridline dispatchers create and triage service requests, assign technicians or vendor partners, track SLA deadlines, and keep customers informed until the work is complete.
+When something breaks at a customer site, Gridline dispatchers create and
+triage service requests, assign internal teams or vendor partners, record
+provider updates, and keep customers informed until the work is complete.
 
 The platform began as a single-region Rails monolith. As Gridline expanded, the system faced new pressures:
 
 - More dispatchers using the system concurrently
-- Technicians checking in from the field
+- Service providers communicating work updates
 - Customer sites submitting more service requests
 - Dispatch dashboards becoming slower
 - Reports blocking web requests
@@ -73,11 +75,11 @@ of truth for final architecture decisions.
 ## Container Baseline
 
 The current runnable foundation is a Docker Compose simulation of the baseline
-PaaS boundary for the initial Rails application skeleton.
+PaaS boundary for the initial Rails monolith.
 
 The baseline includes:
 
-- an `app` container that runs the Rails monolith skeleton with Puma
+- an `app` container that runs the Rails monolith with Puma
 - a `db` container running Postgres as the managed database stand-in
 - a bind mount from `./app` into the app container so local Rails file changes
   are visible without rebuilding the image
@@ -87,9 +89,20 @@ The baseline includes:
 - Rails database preparation, test, and health smoke-check scripts
 - a named Postgres volume for durable database state
 
-The Rails app currently proves that the application container can boot, expose
-a health endpoint, run the generated test suite, and connect to Postgres. The
-Gridline domain model will be added in later passes.
+The Rails app currently implements the first operational baseline:
+
+- customers, customer sites, service providers, users, roles, and permissions
+- dispatcher-owned service request intake, triage, assignment, update, provider
+  work recording, and completion verification
+- scoped read access for facility managers, customer contacts, and service
+  provider users
+- admin maintenance screens for customers, sites, providers, users, role
+  assignments, and the permission matrix
+- role-specific dashboards
+- backend-driven searchable, filterable, sortable, paginated tables
+- seeded development and demo data
+- Minitest controller/model/service coverage
+- Playwright browser workflow coverage
 
 Run the baseline checks with:
 
@@ -121,6 +134,28 @@ Then visit:
 http://localhost:3000/health
 ```
 
+To prepare the development database with presentation-friendly demo data:
+
+```bash
+docker compose run --rm -e SEED_DEMO_DATA=true app bin/rails db:prepare db:seed
+```
+
+Then start the app and visit:
+
+```text
+http://localhost:3000/login
+```
+
+The default stub password for seeded users is `gridline`.
+
+Run headed browser smoke tests with:
+
+```bash
+npm run test:e2e:headed
+```
+
+Additional browser test details live in [`e2e/README.md`](e2e/README.md).
+
 ## Rails Generator Tooling
 
 Rails application files should be created with Rails generators instead of
@@ -148,7 +183,7 @@ The reasoning behind this tooling is captured in
 | Scenario | Focus | Status |
 |---|---|---|
 | 00 Vertical Scaling Limit | Pre-history: why vertical scaling is no longer enough | Planned |
-| 01 Mature Monolith Baseline | Single-instance Rails operations platform | Planned |
+| 01 Mature Monolith Baseline | Single-instance Rails operations platform | In Progress |
 | 02 Load-Balanced Web Tier | Multiple Rails web workers behind a load balancer | Planned |
 | 03 Shared Redis Sessions | Stateless web containers and shared session state | Planned |
 | 04 Persistent Postgres State | Shared durable database state | Planned |
@@ -169,27 +204,33 @@ The baseline application includes:
 
 - Customers and customer sites
 - Service requests
-- Work orders
-- Technician assignment
-- SLA tracking
-- Dispatch board views
-- Basic reporting
+- Service providers
+- Dispatcher-owned request intake, triage, assignment, provider update capture,
+  and completion verification
+- Scoped RBAC with role assignments that may be global or tied to customers,
+  sites, or providers
+- Role-specific dashboards for dispatchers, facility managers, customer
+  contacts, service provider users, and admins
+- Admin maintenance workflows for customers, sites, providers, users, role
+  assignments, and the permission matrix
+- Backend-driven operational tables with search, filters, sorting, pagination,
+  and shareable query params
+- Seeded development and demo data
 - Health and identity endpoints
-- Seeded demo data
-- RSpec test coverage
-- Local CI verification
+- Minitest and Playwright test coverage
+- Docker Compose CI verification
 
 Known limitations at this stage:
 
 - One web process handles all traffic
 - Deployments affect the only app instance
-- Reports run synchronously
-- Dispatch board reads are recomputed per request
 - No shared session store
 - No external cache
 - No background job processor
 - No read replica
 - Limited operational visibility
+- Cost tracking, notes, file uploads, ratings, SLA reporting, and provider
+  performance reporting are captured as user stories but not yet implemented
 
 These limitations motivate the later scenarios.
 
@@ -198,9 +239,11 @@ These limitations motivate the later scenarios.
 The initial facilities operations domain is defined in
 [`docs/domain`](docs/domain/README.md).
 
-It describes the baseline customers, sites, service requests, work orders,
-technicians, audit events, lifecycle rules, SLA behavior, and reporting needs
-that the Rails monolith will implement.
+The current implementation is intentionally narrower than the original domain
+sketch. The app currently centers on customers, sites, service providers,
+service requests, users, and scoped RBAC. Cost tracking, notes, files, ratings,
+SLA reporting, and provider performance reporting are captured in
+[`docs/user-stories`](docs/user-stories/README.md) for future feature work.
 
 ## Repository Structure
 
@@ -221,19 +264,15 @@ gridline-platform-evolution/
       # Application interaction, table, and implementation rules
     domain/
       # Facilities operations domain model
+    user-stories/
+      # Role-centered workflow stories for implemented and planned features
+
+  e2e/
+    # Playwright browser workflow tests
 
   scenarios/
-    00-vertical-scaling-limit/
-    01-mature-monolith-baseline/
     02-load-balanced-web-tier/
-    03-shared-redis-sessions/
-    04-persistent-postgres-state/
-    05-read-replica-split/
-    06-redis-cache-store/
-    07-background-jobs/
-    08-backpressure-rate-limiting/
-    09-observability/
-    10-orchestration-patterns/
+      # First future scaling scenario workspace
 
   bin/
     ci
