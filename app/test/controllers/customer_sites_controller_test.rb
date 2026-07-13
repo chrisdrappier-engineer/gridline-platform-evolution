@@ -14,6 +14,10 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Sites"
+    assert_select "turbo-frame#customer_sites_table"
+    assert_select "input[name='customer_sites[search]']"
+    assert_select "select[name='customer_sites[site_status]']"
+    assert_select "select[name='customer_sites[limit]']"
     assert_select "a", text: customer_sites(:one).name
     assert_select "a", { text: customer_sites(:two).name, count: 0 }
     assert_select "a[href='#{new_service_request_path(customer_site_id: customer_sites(:one).id)}']", text: "Create Request"

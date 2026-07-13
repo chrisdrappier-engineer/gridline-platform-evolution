@@ -6,6 +6,17 @@ Gridline app.
 They are intended for visual workflow verification while the UI is changing
 quickly. They do not replace the Rails model, controller, and service tests.
 
+## Workflow Constraint
+
+E2E tests should exercise features through visible user-facing controls rather
+than direct internal URLs. Tests may start at `/login` as the public entry point,
+but after authentication they should navigate through dashboards, the primary
+navigation menu, links, buttons, forms, and table actions the same way a user
+would.
+
+Avoid direct `page.goto(...)` calls to authenticated feature routes unless the
+test is explicitly covering routing or deep-link behavior.
+
 ## Prerequisites
 
 Start the app with demo data:

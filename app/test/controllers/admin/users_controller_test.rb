@@ -9,6 +9,11 @@ module Admin
 
       assert_response :success
       assert_select "h1", "Users"
+      assert_select "turbo-frame#users_table"
+      assert_select "input[name='users[search]']"
+      assert_select "select[name='users[role]']"
+      assert_select "select[name='users[active]']"
+      assert_select "select[name='users[limit]']"
       assert_select "td", text: users(:one).email
       assert_select "td", text: roles(:dispatcher).name
     end

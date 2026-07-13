@@ -14,6 +14,11 @@ class ServiceProvidersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Service Providers"
+    assert_select "turbo-frame#service_providers_table"
+    assert_select "input[name='service_providers[search]']"
+    assert_select "select[name='service_providers[provider_type]']"
+    assert_select "select[name='service_providers[status]']"
+    assert_select "select[name='service_providers[limit]']"
     assert_select "a", text: service_providers(:two).name
     assert_select "a", { text: service_providers(:one).name, count: 0 }
   end

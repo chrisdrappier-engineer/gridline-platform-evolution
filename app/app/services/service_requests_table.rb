@@ -62,7 +62,9 @@ class ServiceRequestsTable
         key: :customer_site_id,
         label: "Site",
         field: :customer_site_id,
-        options: ->(context) { context.fetch(:filter_sites) }
+        options: lambda { |context|
+          context.fetch(:filter_sites).map { |site| ["#{site.customer.name} - #{site.name}", site.id] }
+        }
       ),
       DataTable::Filter.new(
         key: :status,
@@ -78,7 +80,9 @@ class ServiceRequestsTable
         key: :dispatcher_id,
         label: "Dispatcher",
         field: :assigned_dispatcher_id,
-        options: ->(context) { context.fetch(:filter_dispatchers) },
+        options: lambda { |context|
+          [["Unassigned", "unassigned"]] + context.fetch(:filter_dispatchers).map { |dispatcher| [dispatcher.name, dispatcher.id] }
+        },
         apply: lambda { |scope, value|
           value == "unassigned" ? scope.where(assigned_dispatcher_id: nil) : scope.where(assigned_dispatcher_id: value)
         }

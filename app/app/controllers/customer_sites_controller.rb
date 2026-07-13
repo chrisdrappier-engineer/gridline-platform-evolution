@@ -1,10 +1,18 @@
 class CustomerSitesController < ApplicationController
   def index
-    @customer_sites = authorized_scope(
+    relation = authorized_scope(
       "customer_sites",
       "read",
-      CustomerSite.includes(:customer, :created_by).order("customers.name", :name).references(:customer)
+      CustomerSite.left_joins(:customer).includes(:customer, :created_by)
     )
+
+    @customer_sites_table = CustomerSitesTable.build(
+      relation: relation,
+      params: customer_sites_table_params,
+      path: customer_sites_path,
+      paginator: ->(scope, limit:, page:) { pagy(:offset, scope, limit: limit, page: page) }
+    )
+    @customer_sites = @customer_sites_table.rows
   end
 
   def show
@@ -16,5 +24,11 @@ class CustomerSitesController < ApplicationController
       "read",
       @customer_site.service_requests.includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
     ).order(reported_at: :desc)
+  end
+
+  private
+
+  def customer_sites_table_params
+    params.fetch(:customer_sites, {}).permit(:search, :site_status, :sort, :direction, :page, :limit).to_h
   end
 end

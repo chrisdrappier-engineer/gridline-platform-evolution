@@ -8,32 +8,37 @@
   <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
 </section>
 
-<% if @customers.any? %>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Status</th>
-          <th>Industry</th>
-          <th>Created By</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @customers.each do |customer| %>
+<%= turbo_frame_tag @customers_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
+  <%= render "shared/data_tables/controls", table: @customers_table, search_placeholder: "Search customers, industries, creators" %>
+
+  <% if @customers.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td><%= link_to customer.name, customer_path(customer), class: "table-link" %></td>
-            <td><%= customer.account_status.humanize %></td>
-            <td><%= customer.industry.humanize %></td>
-            <td><%= customer.created_by.name %></td>
+            <% @customers_table.columns.each do |column| %>
+              <th><%= data_table_sort_link(@customers_table, column) %></th>
+            <% end %>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-  <div class="empty-state">
-    <h2>No visible customers</h2>
-    <p>Your current role assignments do not expose any customer records.</p>
-  </div>
+        </thead>
+        <tbody>
+          <% @customers.each do |customer| %>
+            <tr>
+              <td><%= link_to customer.name, customer_path(customer), class: "table-link" %></td>
+              <td><%= customer.account_status.humanize %></td>
+              <td><%= customer.industry.humanize %></td>
+              <td><%= customer.created_by.name %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2><%= @customers_table.empty_title %></h2>
+      <p><%= @customers_table.empty_message %></p>
+    </div>
+  <% end %>
+
+  <%= render "shared/data_tables/pagination", table: @customers_table %>
 <% end %>

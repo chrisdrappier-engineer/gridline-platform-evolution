@@ -8,6 +8,10 @@ module DataTable
       label.presence || key.to_s.titleize
     end
 
+    def resolved_options(context = {})
+      options.respond_to?(:call) ? options.call(context) : options
+    end
+
     def apply_to(scope, value)
       return apply.call(scope, value) if apply
 

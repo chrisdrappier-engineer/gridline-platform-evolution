@@ -8,32 +8,37 @@
   <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
 </section>
 
-<% if @service_providers.any? %>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Provider</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Created By</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @service_providers.each do |provider| %>
+<%= turbo_frame_tag @service_providers_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
+  <%= render "shared/data_tables/controls", table: @service_providers_table, search_placeholder: "Search providers, types, creators" %>
+
+  <% if @service_providers.any? %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td><%= link_to provider.name, service_provider_path(provider), class: "table-link" %></td>
-            <td><%= provider.provider_type.humanize %></td>
-            <td><%= provider.status.humanize %></td>
-            <td><%= provider.created_by.name %></td>
+            <% @service_providers_table.columns.each do |column| %>
+              <th><%= data_table_sort_link(@service_providers_table, column) %></th>
+            <% end %>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-  <div class="empty-state">
-    <h2>No visible providers</h2>
-    <p>Your current role assignments do not expose any service provider records.</p>
-  </div>
+        </thead>
+        <tbody>
+          <% @service_providers.each do |provider| %>
+            <tr>
+              <td><%= link_to provider.name, service_provider_path(provider), class: "table-link" %></td>
+              <td><%= provider.provider_type.humanize %></td>
+              <td><%= provider.status.humanize %></td>
+              <td><%= provider.created_by.name %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2><%= @service_providers_table.empty_title %></h2>
+      <p><%= @service_providers_table.empty_message %></p>
+    </div>
+  <% end %>
+
+  <%= render "shared/data_tables/pagination", table: @service_providers_table %>
 <% end %>

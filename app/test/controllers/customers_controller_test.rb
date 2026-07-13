@@ -14,6 +14,10 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Customers"
+    assert_select "turbo-frame#customers_table"
+    assert_select "input[name='customers[search]']"
+    assert_select "select[name='customers[account_status]']"
+    assert_select "select[name='customers[limit]']"
     assert_select "a", text: customers(:one).name
     assert_select "a", { text: customers(:two).name, count: 0 }
   end
