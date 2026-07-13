@@ -64,7 +64,28 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".context-panel", text: /#{customer_sites(:one).name}/
-    assert_select "select[name='service_request[customer_site_id]'] option[selected][value='#{customer_sites(:one).id}']"
+    assert_select "input[type='hidden'][name='service_request[customer_site_id]'][value='#{customer_sites(:one).id}']"
+    assert_select "select[name='service_request[customer_site_id]']", count: 0
+  end
+
+  test "locks site choice when customer context has one authorized site" do
+    sign_in_as users(:one)
+
+    get new_service_request_path(customer_id: customers(:one).id)
+
+    assert_response :success
+    assert_select ".context-panel", text: /#{customer_sites(:one).name}/
+    assert_select "input[type='hidden'][name='service_request[customer_site_id]'][value='#{customer_sites(:one).id}']"
+    assert_select "select[name='service_request[customer_site_id]']", count: 0
+    assert_select "select[name='service_request[customer_site_id]'] option[value='#{customer_sites(:two).id}']", count: 0
+  end
+
+  test "rejects new request form for unauthorized customer context" do
+    sign_in_as users(:three)
+
+    get new_service_request_path(customer_id: customers(:two).id)
+
+    assert_redirected_to dashboard_path
   end
 
   test "rejects new request form for unauthorized preselected site" do

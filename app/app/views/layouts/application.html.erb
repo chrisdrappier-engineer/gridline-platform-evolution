@@ -23,7 +23,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="navigation-panel">
+  <body<%= " data-controller=\"navigation-panel\"".html_safe if signed_in? %>>
     <header class="app-header">
       <div class="app-shell header-content">
         <% if signed_in? %>
@@ -52,7 +52,7 @@
       </div>
     </header>
 
-    <div class="app-frame" data-navigation-panel-target="frame">
+    <div class="app-frame<%= " app-frame-with-navigation" if signed_in? %>"<%= " data-navigation-panel-target=\"frame\"".html_safe if signed_in? %>>
       <% if signed_in? %>
         <aside
           id="primary-navigation-panel"
@@ -76,7 +76,17 @@
 
       <main class="app-shell main-content">
         <% flash.each do |type, message| %>
-          <div class="flash flash-<%= type %>" role="status"><%= message %></div>
+          <div class="flash flash-<%= type %>" role="status" data-controller="dismissible-flash">
+            <span><%= message %></span>
+            <button
+              type="button"
+              class="flash-dismiss"
+              aria-label="Dismiss notification"
+              data-action="dismissible-flash#dismiss"
+            >
+              ×
+            </button>
+          </div>
         <% end %>
 
         <%= yield %>

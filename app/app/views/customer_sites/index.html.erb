@@ -17,6 +17,7 @@
           <th>Customer</th>
           <th>Status</th>
           <th>Location</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +27,11 @@
             <td><%= link_to site.customer.name, customer_path(site.customer), class: "table-link" %></td>
             <td><%= site.site_status.humanize %></td>
             <td><%= site.city %>, <%= site.state %></td>
+            <td>
+              <% if can?("service_requests", "create", site) %>
+                <%= link_to "Create Request", new_service_request_path(customer_site_id: site.id), class: "table-link" %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

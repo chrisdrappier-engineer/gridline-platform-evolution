@@ -21,12 +21,25 @@
         <%= service_request.customer_site.postal_code %>
       </p>
     </section>
+  <% elsif @context_customer %>
+    <section class="context-panel" aria-label="Selected customer context">
+      <span>Selected Customer</span>
+      <strong><%= @context_customer.name %></strong>
+      <p>Only sites for this customer are available for this request.</p>
+    </section>
   <% end %>
 
-  <div class="field">
-    <%= form.label :customer_site_id, "Site" %>
-    <%= form.collection_select :customer_site_id, @customer_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { prompt: "Select a site" }, required: true %>
-  </div>
+  <% if service_request.customer_site && @customer_sites.one? %>
+    <%= form.hidden_field :customer_site_id %>
+  <% else %>
+    <div class="field">
+      <%= form.label :customer_site_id, "Site" %>
+      <%= form.collection_select :customer_site_id, @customer_sites, :id, ->(site) { "#{site.customer.name} - #{site.name}" }, { prompt: "Select a site" }, required: true %>
+      <% if @context_customer %>
+        <p class="field-hint">Site choices are limited to the selected customer.</p>
+      <% end %>
+    </div>
+  <% end %>
 
   <% if @service_providers.any? %>
     <div class="field">

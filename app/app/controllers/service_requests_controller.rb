@@ -22,11 +22,12 @@ class ServiceRequestsController < ApplicationController
   end
 
   def new
+    selected_site = @context_customer_site || (@customer_sites.first if @customer_sites.one?)
+
     @service_request = ServiceRequest.new(
       priority: "normal",
-      customer_site: preselected_customer_site
+      customer_site: selected_site
     )
-    authorize!("service_requests", "create", @service_request.customer_site) if @service_request.customer_site
   end
 
   def create
@@ -106,16 +107,31 @@ class ServiceRequestsController < ApplicationController
   end
 
   def set_form_options
-    @customer_sites = authorized_scope(
+    @context_customer_site = preselected_customer_site
+    @context_customer = preselected_customer || @context_customer_site&.customer
+
+    site_scope = authorized_scope(
       "service_requests",
       "create",
       CustomerSite.includes(:customer).order("customers.name", :name).references(:customer)
     )
+
+    if @context_customer_site
+      authorize!("service_requests", "create", @context_customer_site)
+      site_scope = site_scope.where(id: @context_customer_site.id)
+    elsif @context_customer
+      authorize!("customers", "read", @context_customer)
+      site_scope = site_scope.where(customer_id: @context_customer.id)
+    end
+
+    @customer_sites = site_scope.to_a
+    authorize!("service_requests", "create") if action_name == "new" && @customer_sites.empty?
+
     @service_providers = authorized_scope(
       "service_providers",
       "read",
       ServiceProvider.where(status: "active").order(:name)
-    )
+    ).to_a
   end
 
   def set_assign_options
@@ -165,6 +181,12 @@ class ServiceRequestsController < ApplicationController
   def preselected_customer_site
     return if params[:customer_site_id].blank?
 
-    CustomerSite.includes(:customer).find_by(id: params[:customer_site_id])
+    CustomerSite.includes(:customer).find(params[:customer_site_id])
+  end
+
+  def preselected_customer
+    return if params[:customer_id].blank?
+
+    Customer.find(params[:customer_id])
   end
 end

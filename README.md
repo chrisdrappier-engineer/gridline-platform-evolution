@@ -217,6 +217,8 @@ gridline-platform-evolution/
       # Architecture Decision Records
     decision-notes/
       # Context for substantial planning discussions
+    design/
+      # Application interaction and implementation rules
     domain/
       # Facilities operations domain model
 

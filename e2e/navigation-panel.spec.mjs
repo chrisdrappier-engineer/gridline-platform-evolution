@@ -22,3 +22,17 @@ test("navigation panel stays open across route changes until closed", async ({ p
   await page.getByRole("button", { name: "Menu" }).click();
   await expect(navigation).toBeHidden();
 });
+
+test("signed-out login page is not constrained by the navigation layout", async ({ page }) => {
+  await signInAsDispatcher(page);
+  await page.getByRole("button", { name: "Menu" }).click();
+  await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page.getByRole("heading", { name: "Sign in to Gridline Operations" })).toBeVisible();
+
+  const headingWidth = await page
+    .getByRole("heading", { name: "Sign in to Gridline Operations" })
+    .evaluate((element) => element.getBoundingClientRect().width);
+  expect(headingWidth).toBeGreaterThan(300);
+});

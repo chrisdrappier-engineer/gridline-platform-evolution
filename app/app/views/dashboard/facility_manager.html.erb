@@ -8,7 +8,7 @@
   <% if @managed_sites.one? %>
     <%= link_to "Create Request", new_service_request_path(customer_site_id: @managed_sites.first.id), class: "primary-button" %>
   <% else %>
-    <%= link_to "Create Request", service_requests_path, class: "secondary-button" %>
+    <%= link_to "Choose Site", customer_sites_path, class: "secondary-button" %>
   <% end %>
 </section>
 

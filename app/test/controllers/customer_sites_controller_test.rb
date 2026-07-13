@@ -16,6 +16,7 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Sites"
     assert_select "a", text: customer_sites(:one).name
     assert_select "a", { text: customer_sites(:two).name, count: 0 }
+    assert_select "a[href='#{new_service_request_path(customer_site_id: customer_sites(:one).id)}']", text: "Create Request"
   end
 
   test "shows customer site details and related service requests" do

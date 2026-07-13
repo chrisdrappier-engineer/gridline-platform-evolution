@@ -88,6 +88,10 @@ textarea {
 }
 
 .app-frame {
+  display: block;
+}
+
+.app-frame-with-navigation {
   display: grid;
   grid-template-columns: 0 minmax(0, 1fr);
   transition: grid-template-columns 160ms ease;
@@ -159,6 +163,7 @@ textarea {
   }
 
   .app-frame,
+  .app-frame-with-navigation,
   .app-frame-nav-open {
     display: block;
   }
@@ -192,12 +197,36 @@ textarea {
 }
 
 .flash {
+  position: relative;
   margin-bottom: 20px;
-  padding: 12px 14px;
+  padding: 12px 44px 12px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
   font-weight: 700;
+}
+
+.flash-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.flash-dismiss:hover {
+  background: rgba(31, 42, 36, 0.08);
 }
 
 .flash-notice {

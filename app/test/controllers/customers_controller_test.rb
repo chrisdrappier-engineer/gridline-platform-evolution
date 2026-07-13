@@ -27,6 +27,7 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", customers(:one).name
     assert_select "a", text: customer_sites(:one).name
     assert_select "a", text: service_requests(:one).title
+    assert_select "a[href='#{new_service_request_path(customer_id: customers(:one).id)}']", text: "Create Service Request"
   end
 
   test "customer contact can see assigned customer only" do
