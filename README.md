@@ -218,7 +218,7 @@ gridline-platform-evolution/
     decision-notes/
       # Context for substantial planning discussions
     design/
-      # Application interaction and implementation rules
+      # Application interaction, table, and implementation rules
     domain/
       # Facilities operations domain model
 

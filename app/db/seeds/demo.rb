@@ -214,6 +214,149 @@ SeedData.upsert(
   reported_at: Time.zone.parse("2026-07-10 11:30:00")
 )
 
+additional_provider_specs = [
+  ["Palmetto Ridge Facilities", "vendor_partner"],
+  ["Lowcountry Mechanical Group", "vendor_partner"],
+  ["Peachtree Electrical Services", "vendor_partner"],
+  ["Blue Ridge Access Control", "vendor_partner"],
+  ["Gulfstream Plumbing Response", "vendor_partner"],
+  ["Gridline Regional Maintenance", "internal_team"]
+]
+
+additional_providers = additional_provider_specs.map do |name, provider_type|
+  SeedData.upsert(
+    ServiceProvider,
+    { name: name },
+    provider_type: provider_type,
+    status: "active",
+    created_by: admin
+  )
+end
+
+demo_providers = [
+  internal_provider,
+  southeast_vendor,
+  cold_chain_provider,
+  *additional_providers
+]
+
+additional_customer_specs = [
+  ["Palmetto Ridge Communities", "property_management", "active"],
+  ["Bluewater Distribution Group", "warehousing", "active"],
+  ["Piedmont Medical Offices", "healthcare", "active"],
+  ["Riverbend Student Housing", "property_management", "active"],
+  ["Cypress Grove Hospitality", "hospitality", "active"],
+  ["Atlantic Light Manufacturing", "light_manufacturing", "active"],
+  ["Queen City Storage Partners", "self_storage", "onboarding"],
+  ["Live Oak Senior Living", "senior_living", "active"],
+  ["Foothills Retail Centers", "retail", "active"]
+]
+
+additional_customers = additional_customer_specs.map do |name, industry, account_status|
+  SeedData.upsert(
+    Customer,
+    { name: name },
+    account_status: account_status,
+    industry: industry,
+    created_by: manager
+  )
+end
+
+site_specs = [
+  ["Palmetto Ridge Communities", "Palmetto Ridge Lakewood", "410 Lakewood Dr", nil, "Orlando", "FL", "32803"],
+  ["Palmetto Ridge Communities", "Palmetto Ridge Winter Park", "620 Park Ave N", "Clubhouse", "Winter Park", "FL", "32789"],
+  ["Palmetto Ridge Communities", "Palmetto Ridge Kissimmee", "911 Cypress Pkwy", nil, "Kissimmee", "FL", "34741"],
+  ["Bluewater Distribution Group", "Bluewater Charleston Crossdock", "77 Crossdock Ln", "Dock 12", "North Charleston", "SC", "29418"],
+  ["Bluewater Distribution Group", "Bluewater Greenville Fulfillment", "1320 Fulfillment Rd", nil, "Greenville", "SC", "29605"],
+  ["Bluewater Distribution Group", "Bluewater Columbia Returns", "455 Garners Ferry Rd", "Bay C", "Columbia", "SC", "29209"],
+  ["Piedmont Medical Offices", "Piedmont Midtown Clinic", "901 W Trade St", "Suite 300", "Charlotte", "NC", "28202"],
+  ["Piedmont Medical Offices", "Piedmont Cary Plaza", "120 Health Park Dr", nil, "Cary", "NC", "27518"],
+  ["Piedmont Medical Offices", "Piedmont Durham Specialty", "44 Research Way", "Building B", "Durham", "NC", "27709"],
+  ["Riverbend Student Housing", "Riverbend Athens Commons", "315 College Ave", nil, "Athens", "GA", "30601"],
+  ["Riverbend Student Housing", "Riverbend Auburn Lofts", "801 Magnolia Ave", "Leasing Office", "Auburn", "AL", "36830"],
+  ["Riverbend Student Housing", "Riverbend Tallahassee Flats", "522 Gaines St", nil, "Tallahassee", "FL", "32301"],
+  ["Cypress Grove Hospitality", "Cypress Grove Gulf Shores", "181 Beach Blvd", nil, "Gulf Shores", "AL", "36542"],
+  ["Cypress Grove Hospitality", "Cypress Grove Savannah Riverfront", "33 River St", "Kitchen Level", "Savannah", "GA", "31401"],
+  ["Cypress Grove Hospitality", "Cypress Grove Asheville", "70 Biltmore Ave", nil, "Asheville", "NC", "28801"],
+  ["Atlantic Light Manufacturing", "Atlantic Light Mobile Plant", "2400 Industrial Canal Rd", nil, "Mobile", "AL", "36602"],
+  ["Atlantic Light Manufacturing", "Atlantic Light Augusta Assembly", "500 Innovation Dr", "Line 2", "Augusta", "GA", "30901"],
+  ["Atlantic Light Manufacturing", "Atlantic Light Chattanooga Works", "880 Riverport Rd", nil, "Chattanooga", "TN", "37406"],
+  ["Queen City Storage Partners", "Queen City Uptown Storage", "220 Graham St", nil, "Charlotte", "NC", "28202"],
+  ["Queen City Storage Partners", "Queen City Concord Annex", "810 Speedway Blvd", "Office", "Concord", "NC", "28027"],
+  ["Queen City Storage Partners", "Queen City Rock Hill", "145 Textile Way", nil, "Rock Hill", "SC", "29730"],
+  ["Live Oak Senior Living", "Live Oak Decatur Residence", "210 Clairmont Ave", "Front Desk", "Decatur", "GA", "30030"],
+  ["Live Oak Senior Living", "Live Oak Greenville Commons", "370 Pelham Rd", nil, "Greenville", "SC", "29615"],
+  ["Live Oak Senior Living", "Live Oak Jacksonville Harbor", "660 Riverside Ave", nil, "Jacksonville", "FL", "32204"],
+  ["Foothills Retail Centers", "Foothills Knoxville Market", "850 Kingston Pike", "Suite 101", "Knoxville", "TN", "37919"],
+  ["Foothills Retail Centers", "Foothills Huntsville Plaza", "2900 Memorial Pkwy SW", nil, "Huntsville", "AL", "35801"],
+  ["Foothills Retail Centers", "Foothills Birmingham Shops", "310 Summit Blvd", "Security Office", "Birmingham", "AL", "35243"]
+]
+
+customers_by_name = ([magnolia, red_clay, harbor_pine] + additional_customers).index_by(&:name)
+
+additional_sites = site_specs.map do |customer_name, name, address_line_1, address_line_2, city, state, postal_code|
+  SeedData.upsert(
+    CustomerSite,
+    { customer: customers_by_name.fetch(customer_name), name: name },
+    address_line_1: address_line_1,
+    address_line_2: address_line_2,
+    city: city,
+    state: state,
+    postal_code: postal_code,
+    site_status: "active",
+    created_by: dispatcher
+  )
+end
+
+demo_sites = [
+  magnolia_midtown,
+  magnolia_buckhead,
+  red_clay_dock,
+  red_clay_cold_storage,
+  harbor_pine_market,
+  *additional_sites
+]
+
+request_templates = [
+  ["HVAC rooftop unit alarm", "Rooftop unit reported a fault during morning startup."],
+  ["Access control reader offline", "Badge reader is intermittently rejecting valid staff credentials."],
+  ["Exterior lighting outage", "Multiple exterior fixtures are dark near a customer entrance."],
+  ["Loading dock door inspection", "Dock door is moving slowly and needs inspection before peak receiving."],
+  ["Restroom leak response", "Water is pooling near a restroom fixture and needs containment."],
+  ["Fire panel trouble signal", "Panel is reporting a trouble condition after the overnight inspection."],
+  ["Freezer temperature variance", "Cold storage temperature drifted outside the expected range."],
+  ["Elevator service follow-up", "Vendor follow-up is needed after recurring elevator fault codes."],
+  ["Parking gate motor noise", "Gate motor is grinding during open and close cycles."],
+  ["Roof drain blockage", "Standing water was observed near a roof drain after heavy rain."]
+]
+
+base_reported_at = Time.zone.parse("2026-06-03 07:30:00")
+
+demo_sites.each_with_index do |site, site_index|
+  6.times do |request_index|
+    title, description = request_templates.fetch((site_index + request_index) % request_templates.length)
+    sequence = (site_index * 6) + request_index + 1
+    status = ServiceRequest::STATUSES[(site_index + request_index) % ServiceRequest::STATUSES.length]
+
+    SeedData.upsert(
+      ServiceRequest,
+      { customer_site: site, title: "#{title} ##{sequence.to_s.rjust(3, "0")}" },
+      service_provider: demo_providers[(site_index + request_index) % demo_providers.length],
+      created_by: dispatcher,
+      assigned_dispatcher: request_index.even? ? dispatcher : nil,
+      description: description,
+      priority: ServiceRequest::PRIORITIES[(site_index + request_index) % ServiceRequest::PRIORITIES.length],
+      status: status,
+      reported_at: base_reported_at + sequence.hours,
+      provider_response_summary: status == "resolved" ? "Completed service visit and confirmed normal operation." : nil,
+      follow_up_notes: status == "resolved" ? "Monitor for recurrence during the next operating cycle." : nil,
+      provider_work_completed_at: status == "resolved" ? base_reported_at + sequence.hours + 2.hours : nil,
+      completion_verified_at: status == "resolved" ? base_reported_at + sequence.hours + 3.hours : nil,
+      completion_verified_by: status == "resolved" ? facility_manager : nil
+    )
+  end
+end
+
 RbacSeedData.assign_role(dispatcher, "dispatcher")
 RbacSeedData.assign_role(admin, "admin")
 RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_midtown)
