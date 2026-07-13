@@ -60,6 +60,14 @@
       </div>
 
       <div class="field">
+        <%= form.label :dispatcher_id, "Dispatcher" %>
+        <%= form.select :dispatcher_id,
+                        [["Unassigned", "unassigned"]] + @filter_dispatchers.map { |dispatcher| [dispatcher.name, dispatcher.id] },
+                        { include_blank: "All dispatchers", selected: @service_requests_table.filter_value(ServiceRequestsTable.filters.fourth) },
+                        data: { action: "change->table-search#submitNow" } %>
+      </div>
+
+      <div class="field">
         <%= form.label :limit, "Per Page" %>
         <%= form.select :limit,
                         @service_requests_table.page_size_options.map { |limit| [limit, limit] },

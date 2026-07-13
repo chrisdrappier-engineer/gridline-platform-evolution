@@ -44,7 +44,9 @@ class ServiceRequestsTable
         searchable_by: "service_requests.priority"
       ),
       DataTable::Column.new(
-        key: :dispatcher
+        key: :dispatcher,
+        sortable_by: "users.name",
+        searchable_by: "users.name"
       ),
       DataTable::Column.new(
         key: :reported_at,
@@ -71,6 +73,15 @@ class ServiceRequestsTable
         key: :priority,
         field: :priority,
         options: ServiceRequest::PRIORITIES.map { |priority| [priority.humanize, priority] }
+      ),
+      DataTable::Filter.new(
+        key: :dispatcher_id,
+        label: "Dispatcher",
+        field: :assigned_dispatcher_id,
+        options: ->(context) { context.fetch(:filter_dispatchers) },
+        apply: lambda { |scope, value|
+          value == "unassigned" ? scope.where(assigned_dispatcher_id: nil) : scope.where(assigned_dispatcher_id: value)
+        }
       )
     ]
   end

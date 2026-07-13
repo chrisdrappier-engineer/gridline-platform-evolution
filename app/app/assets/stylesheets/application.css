@@ -363,7 +363,7 @@ textarea {
 }
 
 .table-filter-form {
-  grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(150px, 1fr)) minmax(110px, 0.7fr) auto;
+  grid-template-columns: minmax(240px, 2fr) repeat(4, minmax(140px, 1fr)) minmax(110px, 0.7fr) auto;
 }
 
 .filter-actions,

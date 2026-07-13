@@ -20,6 +20,8 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='service_requests[limit]'] option[value='20'][selected]"
     assert_select "select[name='service_requests[limit]'] option[value='30']"
     assert_select "a[href*='service_requests%5Bsort%5D=request']", text: /Request/
+    assert_select "a[href*='service_requests%5Bsort%5D=dispatcher']", text: /Dispatcher/
+    assert_select "select[name='service_requests[dispatcher_id]'] option[value='unassigned']", text: "Unassigned"
     assert_select "a", text: service_requests(:one).title
     assert_select "a[href='#{service_provider_path(service_providers(:one))}']", text: service_providers(:one).name
     assert_select "a[href='#{customer_path(customers(:one))}']", text: customers(:one).name
@@ -83,6 +85,48 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "tbody tr:first-child a", text: newer.title
+  end
+
+  test "service request queue sorts by dispatcher" do
+    sign_in_as users(:one)
+    dana_request = create_table_requests(
+      count: 1,
+      title_prefix: "Dana assigned request",
+      assigned_dispatcher: users(:one),
+      status: "scheduled"
+    ).first
+    morgan_request = create_table_requests(
+      count: 1,
+      title_prefix: "Morgan assigned request",
+      assigned_dispatcher: users(:two),
+      status: "scheduled"
+    ).first
+
+    get service_requests_path(service_requests: { status: "scheduled", sort: "dispatcher", direction: "asc" })
+
+    assert_response :success
+    assert_select "tbody tr:first-child a", text: dana_request.title
+
+    get service_requests_path(service_requests: { status: "scheduled", sort: "dispatcher", direction: "desc" })
+
+    assert_response :success
+    assert_select "tbody tr:first-child a", text: morgan_request.title
+  end
+
+  test "service request queue filters by dispatcher and unassigned requests" do
+    sign_in_as users(:one)
+
+    get service_requests_path(service_requests: { dispatcher_id: users(:two).id })
+
+    assert_response :success
+    assert_select "a", text: service_requests(:two).title
+    assert_select "a", { text: service_requests(:one).title, count: 0 }
+
+    get service_requests_path(service_requests: { dispatcher_id: "unassigned" })
+
+    assert_response :success
+    assert_select "a", text: service_requests(:one).title
+    assert_select "a", { text: service_requests(:two).title, count: 0 }
   end
 
   test "service request queue only shows readable scoped rows" do
@@ -363,17 +407,23 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def create_table_requests(count:, title_prefix: "Table request", reported_at: Time.zone.parse("2026-07-12 08:00:00"))
+  def create_table_requests(
+    count:,
+    title_prefix: "Table request",
+    reported_at: Time.zone.parse("2026-07-12 08:00:00"),
+    assigned_dispatcher: nil,
+    status: nil
+  )
     count.times.map do |index|
       ServiceRequest.create!(
         customer_site: customer_sites(:one),
         service_provider: service_providers(:one),
         created_by: users(:one),
-        assigned_dispatcher: index.even? ? users(:one) : nil,
+        assigned_dispatcher: assigned_dispatcher || (index.even? ? users(:one) : nil),
         title: "#{title_prefix} #{index + 1}",
         description: "Created for table behavior coverage.",
         priority: ServiceRequest::PRIORITIES[index % ServiceRequest::PRIORITIES.length],
-        status: ServiceRequest::STATUSES[index % ServiceRequest::STATUSES.length],
+        status: status || ServiceRequest::STATUSES[index % ServiceRequest::STATUSES.length],
         reported_at: reported_at + index.minutes
       )
     end

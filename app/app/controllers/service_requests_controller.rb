@@ -17,6 +17,9 @@ class ServiceRequestsController < ApplicationController
       "read",
       CustomerSite.includes(:customer).order("customers.name", :name).references(:customer)
     )
+    @filter_dispatchers = User
+                          .where(id: relation.where.not(assigned_dispatcher_id: nil).select(:assigned_dispatcher_id))
+                          .order(:name)
 
     @service_requests_table = ServiceRequestsTable.build(
       relation: relation,
@@ -165,6 +168,7 @@ class ServiceRequestsController < ApplicationController
       :status,
       :priority,
       :customer_site_id,
+      :dispatcher_id,
       :sort,
       :direction,
       :page,

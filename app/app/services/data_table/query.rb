@@ -53,7 +53,7 @@ module DataTable
     def apply_filters(scope)
       @filters.reduce(scope) do |current_scope, filter|
         value = @params[filter.key.to_s]
-        value.present? ? current_scope.where(filter.field => value) : current_scope
+        value.present? ? filter.apply_to(current_scope, value) : current_scope
       end
     end
 
