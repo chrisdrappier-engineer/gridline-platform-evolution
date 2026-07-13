@@ -34,8 +34,11 @@ async function expectSharedTableControls(page, { frameId, search, filters = [] }
   }
 
   if (search) {
-    await frame.getByRole("searchbox", { name: "Search" }).fill(search);
+    const searchbox = frame.getByRole("searchbox", { name: "Search" });
+
+    await searchbox.fill(search);
     await expect(frame.locator("tbody")).toContainText(search);
+    await expect(searchbox).toBeFocused();
   }
 }
 

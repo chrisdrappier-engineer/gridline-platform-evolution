@@ -19,7 +19,7 @@
                             value: table.search,
                             placeholder: local_assigns.fetch(:search_placeholder, "Search"),
                             autocomplete: "off",
-                            data: { action: "input->table-search#submit" } %>
+                            data: { table_search_target: "search", action: "input->table-search#submit" } %>
     </div>
 
     <% table.filters.each do |filter| %>
