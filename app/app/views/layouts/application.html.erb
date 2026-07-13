@@ -23,37 +23,64 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body data-controller="navigation-panel">
     <header class="app-header">
       <div class="app-shell header-content">
-        <%= link_to "Gridline Operations", root_path, class: "brand" %>
         <% if signed_in? %>
-          <nav class="primary-nav" aria-label="Primary navigation">
+          <div class="brand-group">
+            <button
+              type="button"
+              class="menu-toggle"
+              aria-controls="primary-navigation-panel"
+              aria-expanded="false"
+              data-navigation-panel-target="button"
+              data-action="navigation-panel#toggle"
+            >
+              <span aria-hidden="true">☰</span>
+              <span>Menu</span>
+            </button>
+            <%= link_to "Gridline Operations", root_path, class: "brand" %>
+          </div>
+
+          <div class="session-summary">
+            <span><%= current_user.name %></span>
+            <%= button_to "Sign out", logout_path, method: :delete, class: "text-button" %>
+          </div>
+        <% else %>
+          <%= link_to "Gridline Operations", root_path, class: "brand" %>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="app-frame" data-navigation-panel-target="frame">
+      <% if signed_in? %>
+        <aside
+          id="primary-navigation-panel"
+          class="side-navigation"
+          data-navigation-panel-target="panel"
+        >
+          <nav class="side-navigation-inner" aria-label="Primary navigation">
             <% navigation_sections.each do |section| %>
-              <div class="nav-section">
-                <span class="nav-heading"><%= section.fetch(:label) %></span>
+              <section class="nav-section">
+                <h2 class="nav-heading"><%= section.fetch(:label) %></h2>
                 <div class="nav-links">
                   <% section.fetch(:links).each do |label, path, _visible| %>
                     <%= link_to label, path %>
                   <% end %>
                 </div>
-              </div>
+              </section>
             <% end %>
           </nav>
-          <div class="session-summary">
-            <span><%= current_user.name %></span>
-            <%= button_to "Sign out", logout_path, method: :delete, class: "text-button" %>
-          </div>
-        <% end %>
-      </div>
-    </header>
-
-    <main class="app-shell main-content">
-      <% flash.each do |type, message| %>
-        <div class="flash flash-<%= type %>" role="status"><%= message %></div>
+        </aside>
       <% end %>
 
-      <%= yield %>
-    </main>
+      <main class="app-shell main-content">
+        <% flash.each do |type, message| %>
+          <div class="flash flash-<%= type %>" role="status"><%= message %></div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>

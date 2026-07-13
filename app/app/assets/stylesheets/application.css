@@ -46,10 +46,18 @@ textarea {
 }
 
 .header-content {
+  position: relative;
   display: flex;
   min-height: 72px;
   align-items: center;
   gap: 24px;
+  justify-content: space-between;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .brand {
@@ -59,28 +67,76 @@ textarea {
   text-decoration: none;
 }
 
-.primary-nav {
-  display: flex;
-  flex: 1;
-  gap: 24px;
+.menu-toggle {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+  gap: 8px;
 }
 
-.primary-nav a {
+.menu-toggle[aria-expanded="true"] {
+  border-color: rgba(47, 111, 78, 0.35);
+  color: var(--primary);
+}
+
+.app-frame {
+  display: grid;
+  grid-template-columns: 0 minmax(0, 1fr);
+  transition: grid-template-columns 160ms ease;
+}
+
+.app-frame-nav-open {
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.side-navigation {
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-left: 0;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.side-navigation[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.side-navigation-inner {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 22px;
+  min-width: 280px;
+  padding: 24px;
+}
+
+.side-navigation a {
   color: var(--muted);
   font-weight: 700;
   text-decoration: none;
 }
 
-.primary-nav a:hover {
+.side-navigation a:hover {
   color: var(--primary);
 }
 
 .nav-section {
   display: grid;
-  gap: 4px;
+  gap: 8px;
 }
 
 .nav-heading {
+  margin: 0;
   color: var(--accent);
   font-size: 0.68rem;
   font-weight: 900;
@@ -89,9 +145,33 @@ textarea {
 }
 
 .nav-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .brand-group {
+    gap: 10px;
+  }
+
+  .brand {
+    font-size: 0.98rem;
+  }
+
+  .app-frame,
+  .app-frame-nav-open {
+    display: block;
+  }
+
+  .side-navigation {
+    position: fixed;
+    top: 72px;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    width: min(280px, calc(100vw - 32px));
+    border-top: 1px solid var(--border);
+  }
 }
 
 .session-summary,
