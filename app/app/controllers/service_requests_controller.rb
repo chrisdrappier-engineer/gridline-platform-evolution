@@ -167,7 +167,8 @@ class ServiceRequestsController < ApplicationController
       :customer_site_id,
       :sort,
       :direction,
-      :page
+      :page,
+      :limit
     ).to_h
 
     legacy_params = params.permit(:status, :priority, :customer_site_id).to_h

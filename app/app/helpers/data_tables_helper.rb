@@ -8,8 +8,8 @@ module DataTablesHelper
     return column.header unless column.sortable?
 
     active = table.sort == column.key.to_s
-    indicator = active ? (table.direction == "asc" ? "Ascending" : "Descending") : "Sortable"
-    label = safe_join([column.header, content_tag(:span, indicator, class: "sort-indicator")], " ")
+    indicator = active ? (table.direction == "asc" ? "↑" : "↓") : nil
+    label = safe_join([column.header, content_tag(:span, indicator, class: "sort-indicator")].compact, " ")
 
     link_to(
       label,

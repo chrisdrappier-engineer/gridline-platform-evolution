@@ -2,7 +2,7 @@ module DataTable
   class Query
     DIRECTIONS = %w[asc desc].freeze
 
-    def initialize(key:, path:, relation:, params:, columns:, filters:, default_sort:, page_size:, paginator:,
+    def initialize(key:, path:, relation:, params:, columns:, filters:, default_sort:, page_size:, page_size_options:, paginator:,
                    empty_title:, empty_message:)
       @key = key.to_s
       @path = path
@@ -12,6 +12,7 @@ module DataTable
       @filters = filters
       @default_sort = default_sort.stringify_keys
       @page_size = page_size
+      @page_size_options = page_size_options
       @paginator = paginator
       @empty_title = empty_title
       @empty_message = empty_message
@@ -30,6 +31,7 @@ module DataTable
         rows: rows,
         pagy: pagy,
         state: state,
+        page_size_options: @page_size_options,
         empty_title: @empty_title,
         empty_message: @empty_message
       )
@@ -66,10 +68,10 @@ module DataTable
     end
 
     def paginate(scope)
-      pagy, rows = @paginator.call(scope, limit: @page_size, page: page)
+      pagy, rows = @paginator.call(scope, limit: limit, page: page)
 
       if pagy.count.positive? && pagy.page > pagy.pages
-        pagy, rows = @paginator.call(scope, limit: @page_size, page: 1)
+        pagy, rows = @paginator.call(scope, limit: limit, page: 1)
         @params["page"] = "1"
       end
 
@@ -99,10 +101,15 @@ module DataTable
       page_number.positive? ? page_number : 1
     end
 
+    def limit
+      page_limit = @params["limit"].to_i
+      @page_size_options.include?(page_limit) ? page_limit : @page_size
+    end
+
     def state
       @params
-        .merge("search" => search, "sort" => sort_key, "direction" => direction, "page" => page.to_s)
-        .slice("search", "sort", "direction", "page", *@filters.map { |filter| filter.key.to_s })
+        .merge("search" => search, "sort" => sort_key, "direction" => direction, "page" => page.to_s, "limit" => limit.to_s)
+        .slice("search", "sort", "direction", "page", "limit", *@filters.map { |filter| filter.key.to_s })
     end
   end
 end

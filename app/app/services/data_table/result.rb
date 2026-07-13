@@ -7,6 +7,7 @@ module DataTable
     :rows,
     :pagy,
     :state,
+    :page_size_options,
     :empty_title,
     :empty_message,
     keyword_init: true
@@ -29,6 +30,10 @@ module DataTable
 
     def page
       pagy.page
+    end
+
+    def limit
+      pagy.limit
     end
 
     def total_count

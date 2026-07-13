@@ -59,8 +59,15 @@
                         data: { action: "change->table-search#submitNow" } %>
       </div>
 
+      <div class="field">
+        <%= form.label :limit, "Per Page" %>
+        <%= form.select :limit,
+                        @service_requests_table.page_size_options.map { |limit| [limit, limit] },
+                        { selected: @service_requests_table.limit },
+                        data: { action: "change->table-search#submitNow" } %>
+      </div>
+
       <div class="filter-actions">
-        <%= form.submit "Apply", class: "primary-button" %>
         <%= link_to "Clear",
                     @service_requests_table.path,
                     class: "secondary-button",

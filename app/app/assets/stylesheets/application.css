@@ -363,7 +363,7 @@ textarea {
 }
 
 .table-filter-form {
-  grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(150px, 1fr)) auto;
+  grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(150px, 1fr)) minmax(110px, 0.7fr) auto;
 }
 
 .filter-actions,
@@ -546,29 +546,32 @@ textarea {
 }
 
 .sort-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
+  width: 100%;
+  margin: -14px -16px;
+  padding: 14px 16px;
+  border-radius: 6px;
   color: inherit;
   text-decoration: none;
 }
 
 .sort-link:hover {
+  background: rgba(47, 111, 78, 0.08);
   color: var(--link);
 }
 
 .sort-indicator {
-  border-radius: 999px;
-  background: rgba(100, 112, 103, 0.12);
-  padding: 2px 6px;
-  color: var(--muted);
-  font-size: 0.68rem;
+  color: currentColor;
+  font-size: 0.9rem;
   letter-spacing: 0;
   text-transform: none;
 }
 
-.sort-link.active .sort-indicator {
-  background: rgba(47, 111, 78, 0.14);
+.sort-link.active {
+  background: rgba(47, 111, 78, 0.12);
   color: var(--primary);
 }
 

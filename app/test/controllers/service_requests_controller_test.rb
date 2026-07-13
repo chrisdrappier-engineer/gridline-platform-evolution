@@ -16,6 +16,9 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Service Requests"
     assert_select "turbo-frame#service_requests_table"
     assert_select "input[name='service_requests[search]']"
+    assert_select "select[name='service_requests[limit]'] option[value='10']"
+    assert_select "select[name='service_requests[limit]'] option[value='20'][selected]"
+    assert_select "select[name='service_requests[limit]'] option[value='30']"
     assert_select "a[href*='service_requests%5Bsort%5D=request']", text: /Request/
     assert_select "a", text: service_requests(:one).title
     assert_select "a[href='#{service_provider_path(service_providers(:one))}']", text: service_providers(:one).name
@@ -33,7 +36,24 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".pagination"
-    assert_select ".table-results", text: /1-25 of 32/
+    assert_select ".table-results", text: /1-20 of 32/
+  end
+
+  test "service request queue supports whitelisted page size choices" do
+    sign_in_as users(:one)
+    create_table_requests(count: 30)
+
+    get service_requests_path(service_requests: { limit: "10" })
+
+    assert_response :success
+    assert_select ".table-results", text: /1-10 of 32/
+    assert_select "select[name='service_requests[limit]'] option[value='10'][selected]"
+
+    get service_requests_path(service_requests: { limit: "99" })
+
+    assert_response :success
+    assert_select ".table-results", text: /1-20 of 32/
+    assert_select "select[name='service_requests[limit]'] option[value='20'][selected]"
   end
 
   test "service request queue searches on the backend" do

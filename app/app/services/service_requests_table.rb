@@ -1,5 +1,6 @@
 class ServiceRequestsTable
-  PAGE_SIZE = 25
+  PAGE_SIZE = 20
+  PAGE_SIZE_OPTIONS = [10, 20, 30].freeze
 
   def self.build(relation:, params:, path:, paginator:)
     DataTable::Query.new(
@@ -11,6 +12,7 @@ class ServiceRequestsTable
       filters: filters,
       default_sort: { sort: "reported_at", direction: "desc" },
       page_size: PAGE_SIZE,
+      page_size_options: PAGE_SIZE_OPTIONS,
       paginator: paginator,
       empty_title: "No service requests found",
       empty_message: "Adjust the search or filters to find matching requests."
