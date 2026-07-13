@@ -51,3 +51,27 @@ service_providers_read:
   action: read
   name: Read service providers
   description: View service provider records.
+
+roles_read:
+  resource: roles
+  action: read
+  name: Read roles
+  description: View role definitions.
+
+role_permissions_read:
+  resource: role_permissions
+  action: read
+  name: Read role permissions
+  description: View the role-to-permission matrix.
+
+user_role_assignments_read:
+  resource: user_role_assignments
+  action: read
+  name: Read role assignments
+  description: View user role assignments.
+
+users_read:
+  resource: users
+  action: read
+  name: Read users
+  description: View user records.

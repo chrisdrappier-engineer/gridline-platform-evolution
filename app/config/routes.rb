@@ -13,10 +13,16 @@ Rails.application.routes.draw do
     patch :respond, on: :member
     patch :verify_completion, on: :member
   end
-  resources :customers, only: %i[show]
-  resources :customer_sites, only: %i[show]
+  resources :customers, only: %i[index show]
+  resources :customer_sites, only: %i[index show]
   resources :dispatchers, only: %i[show], controller: :users
-  resources :service_providers, only: %i[show]
+  resources :service_providers, only: %i[index show]
+
+  namespace :admin do
+    resources :role_permissions, only: %i[index], path: "permission-matrix"
+    resources :role_assignments, only: %i[index], path: "role-assignments"
+    resources :users, only: %i[index]
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

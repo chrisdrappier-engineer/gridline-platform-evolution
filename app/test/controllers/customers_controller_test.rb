@@ -2,9 +2,20 @@ require "test_helper"
 
 class CustomersControllerTest < ActionDispatch::IntegrationTest
   test "requires sign in" do
-    get customer_path(customers(:one))
+    get customers_path
 
     assert_redirected_to login_path
+  end
+
+  test "shows customer index scoped to readable customers" do
+    sign_in_as users(:four)
+
+    get customers_path
+
+    assert_response :success
+    assert_select "h1", "Customers"
+    assert_select "a", text: customers(:one).name
+    assert_select "a", { text: customers(:two).name, count: 0 }
   end
 
   test "shows customer details, sites, and service requests" do

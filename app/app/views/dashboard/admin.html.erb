@@ -25,68 +25,14 @@
 
 <section class="section-block">
   <div class="section-header">
-    <h2>Role Permission Matrix</h2>
+    <h2>Administration Views</h2>
   </div>
 
-  <div class="table-wrap">
-    <table class="data-table permission-matrix">
-      <thead>
-        <tr>
-          <th>Permission</th>
-          <% @roles.each do |role| %>
-            <th><%= role.name %></th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% @permissions.each do |permission| %>
-          <tr>
-            <th scope="row">
-              <span class="table-link"><%= permission.name %></span>
-              <span class="muted-link"><%= permission.resource %> / <%= permission.action %></span>
-            </th>
-            <% @roles.each do |role| %>
-              <td>
-                <% if role.permissions.any? { |role_permission| role_permission.id == permission.id } %>
-                  <span class="matrix-allowed" aria-label="<%= role.name %> can <%= permission.action %> <%= permission.resource %>">Allowed</span>
-                <% else %>
-                  <span class="matrix-denied" aria-label="<%= role.name %> cannot <%= permission.action %> <%= permission.resource %>">Not allowed</span>
-                <% end %>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section class="detail-grid">
-  <article class="detail-panel">
-    <h2>Roles</h2>
-    <ul class="link-list">
-      <% @roles.each do |role| %>
-        <li><%= role.name %></li>
-      <% end %>
-    </ul>
-  </article>
-
-  <article class="detail-panel">
-    <h2>Recent Role Assignments</h2>
-    <ul class="link-list">
-      <% @role_assignments.limit(8).each do |assignment| %>
-        <li>
-          <%= assignment.user.name %>:
-          <%= assignment.role.name %>
-          <% if assignment.resource %>
-            on <%= assignment.resource_type %>
-          <% else %>
-            globally
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  </article>
+  <ul class="link-list">
+    <li><%= link_to "Permission Matrix", admin_role_permissions_path %></li>
+    <li><%= link_to "Role Assignments", admin_role_assignments_path %></li>
+    <li><%= link_to "Users", admin_users_path %></li>
+  </ul>
 </section>
 
 <%= render "recent_requests", service_requests: @recent_requests, title: "Recent Requests" %>

@@ -25,14 +25,14 @@
 
 <section class="section-block">
   <div class="section-header">
-    <h2>Visible Sites</h2>
-    <%= link_to "View Requests", service_requests_path %>
+    <h2>Operations Views</h2>
   </div>
 
   <ul class="link-list">
-    <% @readable_sites.limit(8).each do |site| %>
-      <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
-    <% end %>
+    <li><%= link_to "View Requests", service_requests_path %></li>
+    <li><%= link_to "View Customers", customers_path %></li>
+    <li><%= link_to "View Sites", customer_sites_path %></li>
+    <li><%= link_to "View Service Providers", service_providers_path %></li>
   </ul>
 </section>
 

@@ -1,0 +1,43 @@
+<% content_for :title, "Role Assignments" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1>Role Assignments</h1>
+  </div>
+  <%= link_to "Permission Matrix", admin_role_permissions_path, class: "secondary-button" %>
+</section>
+
+<% if @role_assignments.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Scope</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @role_assignments.each do |assignment| %>
+          <tr>
+            <td><%= assignment.user.name %></td>
+            <td><%= assignment.role.name %></td>
+            <td>
+              <% if assignment.resource %>
+                <%= assignment.resource_type %>: <%= assignment.resource.try(:name) || assignment.resource_id %>
+              <% else %>
+                Global
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2>No role assignments</h2>
+    <p>No role assignments are currently visible.</p>
+  </div>
+<% end %>

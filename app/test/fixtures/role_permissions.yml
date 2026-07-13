@@ -101,3 +101,19 @@ admin_customer_sites_read:
 admin_service_providers_read:
   role: admin
   permission: service_providers_read
+
+admin_roles_read:
+  role: admin
+  permission: roles_read
+
+admin_role_permissions_read:
+  role: admin
+  permission: role_permissions_read
+
+admin_user_role_assignments_read:
+  role: admin
+  permission: user_role_assignments_read
+
+admin_users_read:
+  role: admin
+  permission: users_read

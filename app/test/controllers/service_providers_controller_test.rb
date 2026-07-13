@@ -2,9 +2,20 @@ require "test_helper"
 
 class ServiceProvidersControllerTest < ActionDispatch::IntegrationTest
   test "requires sign in" do
-    get service_provider_path(service_providers(:one))
+    get service_providers_path
 
     assert_redirected_to login_path
+  end
+
+  test "shows service provider index scoped to readable providers" do
+    sign_in_as users(:five)
+
+    get service_providers_path
+
+    assert_response :success
+    assert_select "h1", "Service Providers"
+    assert_select "a", text: service_providers(:two).name
+    assert_select "a", { text: service_providers(:one).name, count: 0 }
   end
 
   test "shows service provider details and service requests" do

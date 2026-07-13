@@ -16,13 +16,12 @@
 
 <section class="section-block">
   <div class="section-header">
-    <h2>Managed Facilities</h2>
+    <h2>Facility Views</h2>
   </div>
 
   <ul class="link-list">
-    <% @managed_sites.each do |site| %>
-      <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
-    <% end %>
+    <li><%= link_to "View Facility Requests", service_requests_path %></li>
+    <li><%= link_to "View Managed Sites", customer_sites_path %></li>
   </ul>
 </section>
 

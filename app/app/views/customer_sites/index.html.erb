@@ -1,0 +1,39 @@
+<% content_for :title, "Sites" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operations</p>
+    <h1>Sites</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+</section>
+
+<% if @customer_sites.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Site</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @customer_sites.each do |site| %>
+          <tr>
+            <td><%= link_to site.name, customer_site_path(site), class: "table-link" %></td>
+            <td><%= link_to site.customer.name, customer_path(site.customer), class: "table-link" %></td>
+            <td><%= site.site_status.humanize %></td>
+            <td><%= site.city %>, <%= site.state %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2>No visible sites</h2>
+    <p>Your current role assignments do not expose any site records.</p>
+  </div>
+<% end %>

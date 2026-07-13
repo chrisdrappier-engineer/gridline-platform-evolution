@@ -2,9 +2,20 @@ require "test_helper"
 
 class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
   test "requires sign in" do
-    get customer_site_path(customer_sites(:one))
+    get customer_sites_path
 
     assert_redirected_to login_path
+  end
+
+  test "shows site index scoped to readable sites" do
+    sign_in_as users(:three)
+
+    get customer_sites_path
+
+    assert_response :success
+    assert_select "h1", "Sites"
+    assert_select "a", text: customer_sites(:one).name
+    assert_select "a", { text: customer_sites(:two).name, count: 0 }
   end
 
   test "shows customer site details and related service requests" do

@@ -8,6 +8,10 @@ class Authorization
       end
     end
 
+    def permitted?(user, resource:, action:)
+      assignments_for(user, resource, action).exists?
+    end
+
     def authorize!(user, resource:, action:, target: nil)
       return true if can?(user, resource: resource, action: action, target: target)
 

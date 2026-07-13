@@ -1,0 +1,47 @@
+<% content_for :title, "Permission Matrix" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1>Permission Matrix</h1>
+  </div>
+  <%= link_to "Role Assignments", admin_role_assignments_path, class: "secondary-button" %>
+</section>
+
+<section class="section-block">
+  <div class="section-header">
+    <h2>Role Permission Matrix</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table permission-matrix">
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <% @roles.each do |role| %>
+            <th><%= role.name %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @permissions.each do |permission| %>
+          <tr>
+            <th scope="row">
+              <span class="table-link"><%= permission.name %></span>
+              <span class="muted-link"><%= permission.resource %> / <%= permission.action %></span>
+            </th>
+            <% @roles.each do |role| %>
+              <td>
+                <% if role.permissions.any? { |role_permission| role_permission.id == permission.id } %>
+                  <span class="matrix-allowed" aria-label="<%= role.name %> can <%= permission.action %> <%= permission.resource %>">Allowed</span>
+                <% else %>
+                  <span class="matrix-denied" aria-label="<%= role.name %> cannot <%= permission.action %> <%= permission.resource %>">Not allowed</span>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

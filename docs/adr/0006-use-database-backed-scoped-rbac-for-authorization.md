@@ -100,6 +100,21 @@ The application will expose this through a thin authorization layer.
 Controllers, dashboards, and views should ask the authorization layer what the
 current user can do or see rather than querying authorization tables directly.
 
+Information access should be implemented as route-backed resource visibility,
+not as dashboard-specific lists. Dashboards may summarize accessible work and
+link to relevant routes, but resource visibility should live on the resource's
+own index and show pages. Administrative authorization visibility should also
+use dedicated routes, such as a permission matrix and role assignment index,
+rather than being embedded directly in the admin dashboard.
+
+Navigation should be generated from friendly route labels mapped to
+resource/action permissions. For example, `service_requests#index` can be
+labeled "Requests", while `admin/role_permissions#index` can be labeled
+"Permission Matrix". Member workflow actions such as triage, assignment,
+provider response, and completion verification should remain actions on
+authorized records unless they later need queue-oriented index pages of their
+own.
+
 This first implementation will not include a full permissions administration
 UI. Roles, permissions, role-permission mappings, and demo assignments can be
 seeded. An administrative UI can be added later if the product story calls for

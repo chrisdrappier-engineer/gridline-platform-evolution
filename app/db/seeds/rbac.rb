@@ -18,7 +18,11 @@ module RbacSeedData
     ["service_requests", "verify_completion", "Verify service request completion", "Verify completed service requests."],
     ["customers", "read", "Read customers", "View customer records."],
     ["customer_sites", "read", "Read customer sites", "View customer site records."],
-    ["service_providers", "read", "Read service providers", "View service provider records."]
+    ["service_providers", "read", "Read service providers", "View service provider records."],
+    ["roles", "read", "Read roles", "View role definitions."],
+    ["role_permissions", "read", "Read role permissions", "View the role-to-permission matrix."],
+    ["user_role_assignments", "read", "Read role assignments", "View user role assignments."],
+    ["users", "read", "Read users", "View user records."]
   ].freeze
 
   ROLE_PERMISSIONS = {

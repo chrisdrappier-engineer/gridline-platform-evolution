@@ -34,8 +34,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Facility Manager Dashboard"
-    assert_select "a", text: /#{customer_sites(:one).name}/
-    assert_select "a", { text: /#{customer_sites(:two).name}/, count: 0 }
+    assert_select "a[href='#{customer_sites_path}']", text: "View Managed Sites"
+    assert_select "a", text: service_requests(:one).title
   end
 
   test "shows customer contact dashboard" do
@@ -45,8 +45,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Customer Contact Dashboard"
-    assert_select "a", text: customers(:one).name
-    assert_select "a", { text: customers(:two).name, count: 0 }
+    assert_select "a[href='#{customers_path}']", text: "View Customers"
+    assert_select "a[href='#{customer_sites_path}']", text: "View Sites"
   end
 
   test "shows service provider user dashboard" do
@@ -56,8 +56,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Service Provider Dashboard"
-    assert_select "a", text: service_providers(:two).name
-    assert_select "a", { text: service_providers(:one).name, count: 0 }
+    assert_select "a[href='#{service_providers_path}']", text: "View Service Providers"
+    assert_select "a", text: service_requests(:two).title
   end
 
   test "shows admin dashboard" do
@@ -68,11 +68,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Admin Dashboard"
     assert_select ".metric-card", count: 3
-    assert_select "h2", "Role Permission Matrix"
-    assert_select ".permission-matrix th", text: roles(:admin).name
-    assert_select ".permission-matrix th", text: /Read service requests/
-    assert_select ".matrix-allowed[aria-label='Admin can read service_requests']", text: "Allowed"
-    assert_select ".matrix-denied[aria-label='Customer Contact cannot create service_requests']", text: "Not allowed"
-    assert_select "li", text: roles(:admin).name
+    assert_select "a[href='#{admin_role_permissions_path}']", text: "Permission Matrix"
+    assert_select "a[href='#{admin_role_assignments_path}']", text: "Role Assignments"
+    assert_select "a[href='#{admin_users_path}']", text: "Users"
   end
 end

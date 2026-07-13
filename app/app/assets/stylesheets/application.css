@@ -62,7 +62,7 @@ textarea {
 .primary-nav {
   display: flex;
   flex: 1;
-  gap: 16px;
+  gap: 24px;
 }
 
 .primary-nav a {
@@ -73,6 +73,25 @@ textarea {
 
 .primary-nav a:hover {
   color: var(--primary);
+}
+
+.nav-section {
+  display: grid;
+  gap: 4px;
+}
+
+.nav-heading {
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .session-summary,

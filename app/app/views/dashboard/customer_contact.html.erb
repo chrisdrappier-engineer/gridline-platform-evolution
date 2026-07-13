@@ -10,24 +10,16 @@
 
 <%= render "request_summary", open_requests: @open_requests, urgent_requests: @urgent_requests, recent_requests: @recent_requests %>
 
-<section class="detail-grid">
-  <article class="detail-panel">
-    <h2>Customers</h2>
-    <ul class="link-list">
-      <% @customers.each do |customer| %>
-        <li><%= link_to customer.name, customer_path(customer) %></li>
-      <% end %>
-    </ul>
-  </article>
+<section class="section-block">
+  <div class="section-header">
+    <h2>Account Views</h2>
+  </div>
 
-  <article class="detail-panel">
-    <h2>Sites</h2>
-    <ul class="link-list">
-      <% @customer_sites.each do |site| %>
-        <li><%= link_to "#{site.customer.name} - #{site.name}", customer_site_path(site) %></li>
-      <% end %>
-    </ul>
-  </article>
+  <ul class="link-list">
+    <li><%= link_to "View Requests", service_requests_path %></li>
+    <li><%= link_to "View Customers", customers_path %></li>
+    <li><%= link_to "View Sites", customer_sites_path %></li>
+  </ul>
 </section>
 
 <%= render "recent_requests", service_requests: @recent_requests, title: "Account Requests" %>

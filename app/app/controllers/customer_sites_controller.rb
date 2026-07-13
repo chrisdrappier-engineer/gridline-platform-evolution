@@ -1,4 +1,12 @@
 class CustomerSitesController < ApplicationController
+  def index
+    @customer_sites = authorized_scope(
+      "customer_sites",
+      "read",
+      CustomerSite.includes(:customer, :created_by).order("customers.name", :name).references(:customer)
+    )
+  end
+
   def show
     @customer_site = CustomerSite.includes(:customer, :created_by).find(params[:id])
     authorize!("customer_sites", "read", @customer_site)

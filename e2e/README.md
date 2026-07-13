@@ -34,20 +34,7 @@ npm run test:e2e:headed
 
 The browser opens visibly and walks through the workflows.
 
-The specs pause for 1 second after each meaningful page transition or form
-action so the workflow can be watched. To change that review pause:
-
-```bash
-E2E_REVIEW_PAUSE_MS=2000 npm run test:e2e:headed
-```
-
-Set it to `0` to remove the explicit review pauses:
-
-```bash
-E2E_REVIEW_PAUSE_MS=0 npm run test:e2e:headed
-```
-
-To slow individual browser operations down further:
+To slow browser operations down when you want to watch the flow:
 
 ```bash
 E2E_SLOW_MO=750 npm run test:e2e:headed

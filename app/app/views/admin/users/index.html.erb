@@ -1,0 +1,41 @@
+<% content_for :title, "Users" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1>Users</h1>
+  </div>
+  <%= link_to "Role Assignments", admin_role_assignments_path, class: "secondary-button" %>
+</section>
+
+<% if @users.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Legacy Role</th>
+          <th>Assigned Roles</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.role.humanize %></td>
+            <td><%= user.roles.map(&:name).sort.join(", ") %></td>
+            <td><%= user.active? ? "Active" : "Inactive" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2>No users</h2>
+    <p>No users are currently visible.</p>
+  </div>
+<% end %>

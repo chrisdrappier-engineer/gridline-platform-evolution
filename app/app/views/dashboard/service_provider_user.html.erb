@@ -25,13 +25,12 @@
 
 <section class="section-block">
   <div class="section-header">
-    <h2>My Providers</h2>
+    <h2>Provider Views</h2>
   </div>
 
   <ul class="link-list">
-    <% @service_providers.each do |provider| %>
-      <li><%= link_to provider.name, service_provider_path(provider) %></li>
-    <% end %>
+    <li><%= link_to "View Assigned Requests", service_requests_path %></li>
+    <li><%= link_to "View Service Providers", service_providers_path %></li>
   </ul>
 </section>
 

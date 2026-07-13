@@ -1,0 +1,39 @@
+<% content_for :title, "Service Providers" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operations</p>
+    <h1>Service Providers</h1>
+  </div>
+  <%= link_to "View Requests", service_requests_path, class: "secondary-button" %>
+</section>
+
+<% if @service_providers.any? %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Created By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @service_providers.each do |provider| %>
+          <tr>
+            <td><%= link_to provider.name, service_provider_path(provider), class: "table-link" %></td>
+            <td><%= provider.provider_type.humanize %></td>
+            <td><%= provider.status.humanize %></td>
+            <td><%= provider.created_by.name %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h2>No visible providers</h2>
+    <p>Your current role assignments do not expose any service provider records.</p>
+  </div>
+<% end %>
