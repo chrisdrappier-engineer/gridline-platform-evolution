@@ -23,3 +23,4 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-07: Baseline Production Simulation](2026-07-07-baseline-production-simulation.md)
 - [2026-07-09: Rails Generator Tooling](2026-07-09-rails-generator-tooling.md)
 - [2026-07-10: Scoped RBAC Authorization](2026-07-10-scoped-rbac-authorization.md)
+- [2026-07-13: Rails Baseline Implementation And Scaling Breakpoint](2026-07-13-rails-baseline-implementation-and-scaling-breakpoint.md)
