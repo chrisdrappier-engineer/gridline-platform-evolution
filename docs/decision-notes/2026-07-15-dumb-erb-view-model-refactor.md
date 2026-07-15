@@ -58,6 +58,10 @@ The strict boundary is that ERB no longer contains explicit conditional syntax.
 Rendering decisions live in helpers, table helpers, view models, or
 controller-prepared state.
 
+A follow-up to issue 27 adds a custom `bin/dumb-erb-lint` check to CI so this
+boundary is enforced automatically instead of relying on manual repository
+scans.
+
 ## Rationale
 
 Trying to enforce "no method calls in ERB" would fight normal Rails rendering.

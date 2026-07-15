@@ -114,6 +114,7 @@ The Rails app currently implements the first operational baseline:
 - RuboCop linting for Ruby and Rails code
 - Stylelint linting for Rails CSS assets
 - ERB linting for Rails templates
+- custom dumb ERB linting for view-boundary rules
 - Minitest controller/model/service coverage
 - Playwright browser workflow coverage
 
@@ -125,7 +126,8 @@ bin/ci
 
 This lints CSS assets with Stylelint, builds the app image, prepares the
 development and test databases, runs RuboCop, runs ERB lint, runs the Rails
-test suite, starts the app service, and verifies the container health check.
+test suite, enforces the dumb ERB template boundary, starts the app service,
+and verifies the container health check.
 
 Or run the services directly:
 

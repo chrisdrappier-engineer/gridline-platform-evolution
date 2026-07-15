@@ -5,6 +5,7 @@ CI.run do
 
   step "Style: Ruby", "bin/rubocop"
   step "Style: ERB", "bin/erblint"
+  step "Architecture: Dumb ERB templates", "bin/dumb-erb-lint"
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Importmap vulnerability audit", "bin/importmap audit"

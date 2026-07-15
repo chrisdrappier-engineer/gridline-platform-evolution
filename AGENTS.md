@@ -51,7 +51,7 @@ Common patterns include:
 - shared data table controls
 - RuboCop for Ruby and Rails linting
 - Stylelint for Rails CSS asset linting
-- ERB linting and dumb ERB templates
+- ERB linting and custom dumb ERB template checks
 - Minitest for Rails model/controller/service coverage
 - Playwright for browser-visible workflow coverage
 - decision notes only for substantial reasoning paths

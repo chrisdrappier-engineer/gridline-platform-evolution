@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+ForbiddenPattern = Data.define(:regex, :message)
+Violation = Data.define(:path, :line, :message, :snippet)
+
+FORBIDDEN_PATTERNS = [
+  ForbiddenPattern.new(
+    /\A\s*(if|elsif|else|unless|case|when)\b/,
+    "move conditional rendering decisions out of ERB"
+  ),
+  ForbiddenPattern.new(
+    /\s(if|unless)\s+/,
+    "move inline conditional modifiers out of ERB"
+  ),
+  ForbiddenPattern.new(
+    /\?.*:/m,
+    "move ternary rendering decisions out of ERB"
+  ),
+  ForbiddenPattern.new(
+    /&&|\|\|/,
+    "move boolean rendering decisions out of ERB"
+  ),
+  ForbiddenPattern.new(
+    /\b(can\?|permitted\?)\b/,
+    "move authorization checks out of ERB"
+  ),
+  ForbiddenPattern.new(
+    /\.html_safe\b/,
+    "do not bypass HTML escaping from ERB"
+  )
+].freeze
+
+def erb_tags(source)
+  source.to_enum(:scan, /<%(?!#)[=-]?\s*(.*?)\s*%>/m).map do
+    match = Regexp.last_match
+    [match.begin(0), match[1]]
+  end
+end
+
+def line_number(source, offset)
+  source[0...offset].count("\n") + 1
+end
+
+violations = Dir.glob("app/views/**/*.erb").sort.flat_map do |path|
+  source = File.read(path)
+
+  erb_tags(source).flat_map do |offset, code|
+    FORBIDDEN_PATTERNS.filter_map do |pattern|
+      next unless pattern.regex.match?(code)
+
+      Violation.new(
+        path,
+        line_number(source, offset),
+        pattern.message,
+        code.gsub(/\s+/, " ").strip
+      )
+    end
+  end
+end
+
+if violations.any?
+  warn "Dumb ERB lint failed: decision logic belongs in helpers, table objects, view models, or controller-prepared state."
+  warn
+
+  violations.each do |violation|
+    warn "#{violation.path}:#{violation.line}: #{violation.message}"
+    warn "  <%= #{violation.snippet} %>"
+  end
+
+  exit 1
+end
+
+puts "Dumb ERB lint passed: #{Dir.glob("app/views/**/*.erb").count} ERB files inspected."

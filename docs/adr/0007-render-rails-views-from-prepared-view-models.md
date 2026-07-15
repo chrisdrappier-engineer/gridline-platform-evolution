@@ -93,15 +93,16 @@ The boundary is enforced through a combination of:
 
 - code review against this ADR
 - ERB lint for template safety
+- custom dumb ERB linting for explicit template decision logic
 - RuboCop for Ruby code
 - focused Rails tests for view model behavior when page decisions become
   meaningful
 - browser workflow tests for user-visible behavior
 
-Future custom lint checks may be added if ERB decision-making becomes difficult
-to control through review and existing lint tools alone. The current baseline
-also uses direct repository scans for explicit conditional syntax as a practical
-verification step.
+The custom dumb ERB lint check runs in `bin/ci` and rejects explicit
+conditional syntax, inline conditional modifiers, ternary rendering decisions,
+boolean rendering decisions, direct authorization checks, and `.html_safe` in
+ERB templates.
 
 ## AI Involvement
 
