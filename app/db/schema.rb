@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_003651) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_094300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -132,7 +132,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_003651) do
   end
 
   create_table "service_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "assigned_at"
     t.uuid "assigned_dispatcher_id"
+    t.datetime "canceled_at"
     t.datetime "completion_verified_at"
     t.uuid "completion_verified_by_id"
     t.datetime "created_at", null: false
@@ -141,19 +143,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_003651) do
     t.text "description"
     t.text "follow_up_notes"
     t.string "priority", null: false
+    t.integer "provider_completion_seconds"
+    t.datetime "provider_responded_at"
+    t.integer "provider_response_seconds"
     t.text "provider_response_summary"
     t.datetime "provider_work_completed_at"
     t.datetime "reported_at", null: false
+    t.integer "resolution_seconds"
+    t.datetime "resolved_at"
+    t.datetime "scheduled_at"
     t.uuid "service_provider_id", null: false
     t.string "status", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.integer "verification_lag_seconds"
+    t.index ["assigned_at"], name: "index_service_requests_on_assigned_at"
     t.index ["assigned_dispatcher_id"], name: "index_service_requests_on_assigned_dispatcher_id"
     t.index ["completion_verified_by_id"], name: "index_service_requests_on_completion_verified_by_id"
     t.index ["created_by_id"], name: "index_service_requests_on_created_by_id"
     t.index ["customer_site_id"], name: "index_service_requests_on_customer_site_id"
     t.index ["priority"], name: "index_service_requests_on_priority"
+    t.index ["provider_completion_seconds"], name: "index_service_requests_on_provider_completion_seconds"
+    t.index ["provider_responded_at"], name: "index_service_requests_on_provider_responded_at"
+    t.index ["provider_response_seconds"], name: "index_service_requests_on_provider_response_seconds"
     t.index ["reported_at"], name: "index_service_requests_on_reported_at"
+    t.index ["resolved_at"], name: "index_service_requests_on_resolved_at"
     t.index ["service_provider_id"], name: "index_service_requests_on_service_provider_id"
     t.index ["status"], name: "index_service_requests_on_status"
   end

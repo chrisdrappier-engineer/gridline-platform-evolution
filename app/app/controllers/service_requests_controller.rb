@@ -105,8 +105,10 @@ class ServiceRequestsController < ApplicationController
 
     attributes = response_params.to_h
     mark_complete = ActiveModel::Type::Boolean.new.cast(attributes.delete("mark_provider_work_complete"))
+    now = Time.current
+    attributes["provider_responded_at"] = @service_request.provider_responded_at || now
     attributes["status"] = "resolved" if mark_complete
-    attributes["provider_work_completed_at"] = Time.current if mark_complete
+    attributes["provider_work_completed_at"] = now if mark_complete
 
     @service_request.update!(attributes)
     redirect_to @service_request, notice: mark_complete ? "Provider work marked complete." : "Provider response recorded."

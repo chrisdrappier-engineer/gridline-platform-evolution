@@ -57,6 +57,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Service Provider Dashboard"
     assert_select "a[href='#{service_providers_path}']", text: "View Service Providers"
+    assert_select ".metric-card", text: /Avg Response Time/
+    assert_select ".metric-card", text: /Resolution Rate/
     assert_select "a", text: service_requests(:two).title
   end
 

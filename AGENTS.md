@@ -68,7 +68,9 @@ Typical implementation context:
 - model
 - relevant service or table object
 - relevant view
-- seeds or permissions when behavior depends on them
+- permissions when behavior depends on them
+- demo seeds when a change adds structure, states, or workflows that should be
+  visible in the running application
 - tests covering the changed behavior
 
 Avoid broad repository scans unless the task is unclear.
@@ -89,6 +91,10 @@ For example, a new user-facing resource may require:
 - Rails tests
 - Playwright workflow coverage
 - README or design-doc updates when behavior becomes a reusable rule
+
+When a feature adds fields, states, associations, or workflows to existing
+models, update demo seed data in the same change so the running application
+shows the new behavior with meaningful records.
 
 Still provide short progress updates during longer work.
 
@@ -123,6 +129,17 @@ Use documentation layers for their specific purpose:
 
 Do not create new issues for every plausible idea. Keep GitHub focused on work
 that is likely to be implemented soon.
+
+## Keep Issue Links And Branches Stable
+
+New GitHub issues should link to repository files on `main`, not feature
+branches, unless the issue explicitly documents work against an unmerged branch.
+This keeps issue descriptions stable after feature branches are merged or
+deleted.
+
+Do not begin implementation on a new issue until its prerequisite issues have
+been merged into `main`, unless the reason for parallel or delayed sequencing is
+documented in the issue, roadmap, or decision note.
 
 ## Current Phase
 

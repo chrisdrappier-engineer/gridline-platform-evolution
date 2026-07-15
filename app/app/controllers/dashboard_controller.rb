@@ -67,6 +67,7 @@ class DashboardController < ApplicationController
   def load_service_provider_dashboard
     @service_providers = authorized_scope("service_providers", "read", ServiceProvider.order(:name))
     @response_queue = @readable_requests.where(status: %w[triaged scheduled in_progress])
+    @performance_summary = ProviderPerformanceSummary.new(@readable_requests)
   end
 
   def load_admin_dashboard

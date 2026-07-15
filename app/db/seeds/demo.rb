@@ -404,6 +404,59 @@ demo_sites.each_with_index do |site, site_index|
 end
 
 ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
+  assigned_at = nil
+  provider_responded_at = nil
+  scheduled_at = nil
+  provider_work_completed_at = nil
+  completion_verified_at = nil
+  completion_verified_by = nil
+  resolved_at = nil
+  canceled_at = nil
+  provider_response_summary = nil
+  follow_up_notes = nil
+
+  unless request.status == "new"
+    assigned_at = request.reported_at + (15 + (index % 6) * 5).minutes
+  end
+
+  if %w[scheduled in_progress resolved canceled].include?(request.status) || (request.status == "triaged" && index % 3 != 0)
+    provider_responded_at = assigned_at + (20 + (index % 8) * 10).minutes
+    provider_response_summary = "Provider acknowledged the request and confirmed the initial service plan."
+  end
+
+  if %w[scheduled in_progress resolved].include?(request.status)
+    scheduled_at = provider_responded_at + (1 + (index % 4)).hours
+  end
+
+  if request.status == "resolved"
+    provider_work_completed_at = scheduled_at + (2 + (index % 5)).hours
+    resolved_at = provider_work_completed_at + (15 + (index % 4) * 10).minutes
+    follow_up_notes = "Work completed; monitor site conditions during the next operating cycle."
+
+    if index.even?
+      completion_verified_at = resolved_at + (30 + (index % 5) * 15).minutes
+      completion_verified_by = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
+    end
+  elsif request.status == "canceled"
+    canceled_at = assigned_at + (45 + (index % 6) * 15).minutes
+    follow_up_notes = "Canceled after customer or dispatcher review."
+  end
+
+  request.update!(
+    assigned_at: assigned_at,
+    provider_responded_at: provider_responded_at,
+    scheduled_at: scheduled_at,
+    provider_work_completed_at: provider_work_completed_at,
+    completion_verified_at: completion_verified_at,
+    completion_verified_by: completion_verified_by,
+    resolved_at: resolved_at,
+    canceled_at: canceled_at,
+    provider_response_summary: provider_response_summary,
+    follow_up_notes: follow_up_notes
+  )
+end
+
+ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
   threshold_cents = request.quote_approval_threshold_cents
   quoted_amount_cents = if index % 5 == 0
                           threshold_cents + 35_000 + (index * 1_250)

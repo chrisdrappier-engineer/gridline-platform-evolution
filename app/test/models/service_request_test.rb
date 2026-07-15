@@ -56,4 +56,45 @@ class ServiceRequestTest < ActiveSupport::TestCase
     assert_equal 22_500, request.actual_cost_total_cents
     assert_equal(-17_500, request.quote_to_actual_variance_cents)
   end
+
+  test "refreshes lifecycle metric snapshots from timestamps" do
+    request = service_requests(:one)
+    reported_at = Time.zone.parse("2026-07-10 08:00:00")
+    assigned_at = reported_at + 30.minutes
+    provider_responded_at = assigned_at + 20.minutes
+    provider_work_completed_at = assigned_at + 3.hours
+    resolved_at = provider_work_completed_at + 15.minutes
+    completion_verified_at = provider_work_completed_at + 45.minutes
+
+    request.update!(
+      reported_at: reported_at,
+      assigned_at: assigned_at,
+      provider_responded_at: provider_responded_at,
+      provider_work_completed_at: provider_work_completed_at,
+      status: "resolved",
+      resolved_at: resolved_at,
+      completion_verified_at: completion_verified_at,
+      completion_verified_by: users(:one)
+    )
+
+    assert_equal 20.minutes.to_i, request.provider_response_seconds
+    assert_equal 3.hours.to_i, request.provider_completion_seconds
+    assert_equal 3.hours.to_i + 45.minutes.to_i, request.resolution_seconds
+    assert_equal 45.minutes.to_i, request.verification_lag_seconds
+  end
+
+  test "populates lifecycle timestamps from status and response changes" do
+    request = service_requests(:one)
+
+    request.update!(
+      assigned_dispatcher: users(:one),
+      provider_response_summary: "Provider acknowledged the request.",
+      status: "scheduled"
+    )
+
+    assert request.assigned_at.present?
+    assert request.provider_responded_at.present?
+    assert request.scheduled_at.present?
+    assert request.provider_response_seconds.present?
+  end
 end
