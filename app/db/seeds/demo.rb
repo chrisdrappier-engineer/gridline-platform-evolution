@@ -403,6 +403,108 @@ demo_sites.each_with_index do |site, site_index|
   end
 end
 
+ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
+  threshold_cents = request.quote_approval_threshold_cents
+  quoted_amount_cents = if index % 5 == 0
+                          threshold_cents + 35_000 + (index * 1_250)
+                        elsif index % 7 == 0
+                          threshold_cents + 10_000 + (index * 900)
+                        else
+                          18_000 + (index * 1_175)
+                        end
+  quoted_amount_cents = [quoted_amount_cents, 225_000].min
+  approval_required = quoted_amount_cents > threshold_cents
+  submitted_at = request.reported_at + 30.minutes
+  facility_manager_for_site = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
+  status_sequence = index % 8
+
+  quote_attributes = {
+    created_by: dispatcher,
+    amount_cents: quoted_amount_cents,
+    currency: "USD",
+    description: "Quoted service scope for #{request.title.downcase}.",
+    status: "approved",
+    approval_required: approval_required,
+    submitted_at: submitted_at,
+    approved_by: nil,
+    approved_at: nil,
+    rejected_by: nil,
+    rejected_at: nil,
+    approval_notes: ServiceRequestQuote::AUTO_APPROVAL_NOTE,
+    amendment_reason: nil,
+    amended_by: nil,
+    amended_at: nil,
+    original_amount_cents: nil
+  }
+
+  if approval_required
+    case status_sequence
+    when 0, 5
+      quote_attributes.merge!(
+        status: "approved",
+        approved_by: facility_manager_for_site,
+        approved_at: submitted_at + 2.hours,
+        approval_notes: "Approved for scheduled service under the customer maintenance policy."
+      )
+    when 7
+      quote_attributes.merge!(
+        status: "rejected",
+        rejected_by: facility_manager_for_site,
+        rejected_at: submitted_at + 90.minutes,
+        approval_notes: "Rejected pending additional clarification from Gridline dispatch."
+      )
+    else
+      quote_attributes.merge!(
+        status: "pending_approval",
+        approval_notes: nil
+      )
+    end
+  end
+
+  if index % 9 == 0
+    quote_attributes.merge!(
+      amount_cents: quoted_amount_cents + 18_000,
+      original_amount_cents: quoted_amount_cents,
+      amendment_reason: "Provider discovered additional site conditions requiring amended scope.",
+      amended_by: dispatcher,
+      amended_at: submitted_at + 45.minutes
+    )
+
+    if quote_attributes[:amount_cents] > threshold_cents
+      quote_attributes[:approval_required] = true
+      unless quote_attributes[:approved_by]
+        quote_attributes[:status] = "pending_approval"
+        quote_attributes[:approved_at] = nil
+        quote_attributes[:approval_notes] = nil
+      end
+    end
+  end
+
+  SeedData.upsert(ServiceRequestQuote, { service_request: request }, quote_attributes)
+
+  labor_cents = (quote_attributes[:amount_cents] * (82 + (index % 9)) / 100.0).round
+  SeedData.upsert(
+    ServiceRequestCost,
+    { service_request: request, category: "labor", description: "Labor and dispatch time for #{request.title.downcase}." },
+    recorded_by: dispatcher,
+    amount_cents: [labor_cents, 12_000].max,
+    currency: "USD",
+    incurred_on: request.reported_at.to_date
+  )
+
+  next unless index.even?
+
+  parts_cents = 4_500 + ((index % 6) * 2_750)
+  SeedData.upsert(
+    ServiceRequestCost,
+    { service_request: request, category: "parts", description: "Parts and materials for #{request.title.downcase}." },
+    recorded_by: dispatcher,
+    amount_cents: parts_cents,
+    currency: "USD",
+    incurred_on: request.reported_at.to_date
+  )
+end
+
 RbacSeedData.assign_role(dispatcher, "dispatcher")
 RbacSeedData.assign_role(admin, "admin")
 demo_sites.select { |site| site.site_status == "active" }.each do |site|
