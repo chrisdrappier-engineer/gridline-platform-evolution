@@ -1,6 +1,7 @@
 class CustomerSitesController < ApplicationController
   before_action :set_customer_site, only: %i[show edit update]
   before_action :set_customer_options, only: %i[new create edit update]
+  before_action :set_facility_manager_options, only: %i[new create edit update]
 
   def index
     relation = authorized_scope(
@@ -42,7 +43,7 @@ class CustomerSitesController < ApplicationController
     @customer_site = CustomerSite.new(customer_site_params)
     @customer_site.created_by = current_user
 
-    if @customer_site.save
+    if save_customer_site(@customer_site)
       redirect_to @customer_site, notice: "Site created."
     else
       render :new, status: :unprocessable_entity
@@ -51,12 +52,14 @@ class CustomerSitesController < ApplicationController
 
   def edit
     authorize!("customer_sites", "update", @customer_site)
+    @customer_site.facility_manager_id = @customer_site.facility_managers.order(:name).first&.id
   end
 
   def update
     authorize!("customer_sites", "update", @customer_site)
+    @customer_site.assign_attributes(customer_site_params)
 
-    if @customer_site.update(customer_site_params)
+    if save_customer_site(@customer_site)
       redirect_to @customer_site, notice: "Site updated."
     else
       render :edit, status: :unprocessable_entity
@@ -66,11 +69,15 @@ class CustomerSitesController < ApplicationController
   private
 
   def set_customer_site
-    @customer_site = CustomerSite.includes(:customer, :created_by).find(params[:id])
+    @customer_site = CustomerSite.includes(:customer, :created_by, :facility_managers).find(params[:id])
   end
 
   def set_customer_options
     @customer_options = authorized_scope("customers", "read", Customer.order(:name))
+  end
+
+  def set_facility_manager_options
+    @facility_manager_options = User.where(active: true, role: "facility_manager").order(:name)
   end
 
   def customer_sites_table_params
@@ -86,7 +93,29 @@ class CustomerSitesController < ApplicationController
       :city,
       :state,
       :postal_code,
-      :site_status
+      :site_status,
+      :facility_manager_id
+    )
+  end
+
+  def save_customer_site(customer_site)
+    CustomerSite.transaction do
+      return false unless customer_site.save
+
+      assign_facility_manager(customer_site)
+    end
+
+    true
+  end
+
+  def assign_facility_manager(customer_site)
+    return if customer_site.facility_manager_id.blank?
+
+    role = Role.find_by!(key: "facility_manager")
+    UserRoleAssignment.find_or_create_by!(
+      user_id: customer_site.facility_manager_id,
+      role: role,
+      resource: customer_site
     )
   end
 end

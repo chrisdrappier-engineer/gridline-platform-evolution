@@ -30,6 +30,22 @@ facility_manager = SeedData.upsert(
   active: true
 )
 
+red_clay_facility_manager = SeedData.upsert(
+  User,
+  { email: "facility.manager@redclaylogistics.test" },
+  name: "Jordan Dock Manager",
+  role: "facility_manager",
+  active: true
+)
+
+harbor_pine_facility_manager = SeedData.upsert(
+  User,
+  { email: "facility.manager@harborpine.test" },
+  name: "Harper Market Manager",
+  role: "facility_manager",
+  active: true
+)
+
 customer_contact = SeedData.upsert(
   User,
   { email: "customer.contact@magnoliaproperty.test" },
@@ -94,6 +110,12 @@ harbor_pine = SeedData.upsert(
   created_by: manager
 )
 
+facility_managers_by_customer_name = {
+  magnolia.name => facility_manager,
+  red_clay.name => red_clay_facility_manager,
+  harbor_pine.name => harbor_pine_facility_manager
+}
+
 magnolia_midtown = SeedData.upsert(
   CustomerSite,
   { customer: magnolia, name: "Magnolia Midtown Atlanta" },
@@ -103,6 +125,7 @@ magnolia_midtown = SeedData.upsert(
   state: "GA",
   postal_code: "30309",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(magnolia.name).id,
   created_by: dispatcher
 )
 
@@ -115,6 +138,7 @@ magnolia_buckhead = SeedData.upsert(
   state: "GA",
   postal_code: "30326",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(magnolia.name).id,
   created_by: dispatcher
 )
 
@@ -127,6 +151,7 @@ red_clay_dock = SeedData.upsert(
   state: "GA",
   postal_code: "31216",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(red_clay.name).id,
   created_by: dispatcher
 )
 
@@ -139,6 +164,7 @@ red_clay_cold_storage = SeedData.upsert(
   state: "GA",
   postal_code: "31408",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(red_clay.name).id,
   created_by: dispatcher
 )
 
@@ -151,6 +177,7 @@ harbor_pine_market = SeedData.upsert(
   state: "GA",
   postal_code: "31401",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(harbor_pine.name).id,
   created_by: dispatcher
 )
 
@@ -262,6 +289,16 @@ additional_customers = additional_customer_specs.map do |name, industry, account
   )
 end
 
+additional_customers.each do |customer|
+  facility_managers_by_customer_name[customer.name] = SeedData.upsert(
+    User,
+    { email: "facility.manager@#{customer.name.parameterize}.test" },
+    name: "#{customer.name.split.first} Facility Manager",
+    role: "facility_manager",
+    active: true
+  )
+end
+
 site_specs = [
   ["Palmetto Ridge Communities", "Palmetto Ridge Lakewood", "410 Lakewood Dr", nil, "Orlando", "FL", "32803"],
   ["Palmetto Ridge Communities", "Palmetto Ridge Winter Park", "620 Park Ave N", "Clubhouse", "Winter Park", "FL", "32789"],
@@ -312,6 +349,7 @@ additional_sites = site_specs.each_with_index.map do |(customer_name, name, addr
     state: state,
     postal_code: postal_code,
     site_status: site_status,
+    facility_manager_id: site_status == "active" ? facility_managers_by_customer_name.fetch(customer_name).id : nil,
     created_by: dispatcher
   )
 end
@@ -367,7 +405,12 @@ end
 
 RbacSeedData.assign_role(dispatcher, "dispatcher")
 RbacSeedData.assign_role(admin, "admin")
-RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_midtown)
-RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_buckhead)
+demo_sites.select { |site| site.site_status == "active" }.each do |site|
+  RbacSeedData.assign_role(
+    facility_managers_by_customer_name.fetch(site.customer.name),
+    "facility_manager",
+    resource: site
+  )
+end
 RbacSeedData.assign_role(customer_contact, "customer_contact", resource: magnolia)
 RbacSeedData.assign_role(provider_user, "service_provider_user", resource: cold_chain_provider)

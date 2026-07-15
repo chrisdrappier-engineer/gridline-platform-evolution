@@ -35,3 +35,9 @@ six:
   name: Avery Admin
   role: admin
   active: true
+
+seven:
+  email: secondary.facility.manager@example.com
+  name: Jordan Facility Manager
+  role: facility_manager
+  active: true

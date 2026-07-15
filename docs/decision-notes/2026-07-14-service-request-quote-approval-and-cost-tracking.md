@@ -126,6 +126,34 @@ The initial permission model is:
 This keeps the customer-side approval path scoped to the facility where work
 will happen.
 
+## Facility Manager Accountability For Active Sites
+
+After the first quote approval slice was implemented, the user noticed an
+important domain gap: a facility manager cannot approve customer-side work for
+a site unless that site has a clearly assigned facility manager.
+
+Codex initially treated this as technically separable from issue 16 because it
+is a broader site-accountability rule rather than quote-specific behavior. The
+user decided to include it in issue 16 anyway because the implementation risk
+was low and creating a separate administrative work item would add more
+overhead than value at this stage.
+
+The selected rule is:
+
+- active customer sites require at least one assigned facility manager
+- the assignment is represented through the existing scoped RBAC model
+- one facility manager may cover multiple active sites
+- inactive and temporarily closed sites may exist without a facility manager
+- admin site create and update workflows must provide a normal path to assign
+  the facility manager
+
+This rule supports quote approvals because the application can now assume that
+an active site has a customer-side accountable party before service work and
+cost authorization are modeled around it.
+
+Demo and development seeds were updated so every active seeded site has a
+facility manager assignment.
+
 ## Amendment Language
 
 The user asked for legalistic language allowing a vendor quote to be amended if
@@ -193,6 +221,7 @@ The implementation added:
 - RBAC permissions and authorization coverage for service request child records
 - quote and cost UI on the service request detail page
 - customer threshold display and maintenance
+- active-site facility manager enforcement
 - demo data updates
 - Rails model/controller tests
 - Playwright browser workflow coverage
@@ -219,6 +248,9 @@ Codex contributed by:
 - implementing the first Rails slice on an issue branch
 - adding tests and browser workflow coverage
 - updating README, roadmap, and user stories to reflect the new feature
+- identifying that facility manager assignment could technically be separated
+  from issue 16, then implementing it in issue 16 after the user weighed the
+  low risk against the administrative overhead
 
 The user made the decisive product calls:
 
@@ -228,3 +260,5 @@ The user made the decisive product calls:
 - one quote per request is enough for the first implementation
 - quotes should include amendment language for changed site conditions
 - approval thresholds should determine whether explicit approval is required
+- active customer sites should require an accountable facility manager now,
+  without creating a separate issue for that enforcement

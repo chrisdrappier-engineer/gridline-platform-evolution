@@ -50,6 +50,8 @@ end
 
 sites = customers.flat_map.with_index do |customer, customer_index|
   2.times.map do |site_index|
+    site_status = CustomerSite::SITE_STATUSES[(customer_index + site_index) % CustomerSite::SITE_STATUSES.length]
+
     SeedData.upsert(
       CustomerSite,
       { customer: customer, name: "#{customer.name} Site #{site_index + 1}" },
@@ -58,7 +60,8 @@ sites = customers.flat_map.with_index do |customer, customer_index|
       city: Faker::Address.city,
       state: Faker::Address.state_abbr,
       postal_code: Faker::Address.zip_code,
-      site_status: CustomerSite::SITE_STATUSES[(customer_index + site_index) % CustomerSite::SITE_STATUSES.length],
+      site_status: site_status,
+      facility_manager_id: site_status == "active" ? users.fetch("facility_manager").id : nil,
       created_by: users.fetch("dispatcher")
     )
   end
@@ -89,6 +92,8 @@ end
 
 RbacSeedData.assign_role(users.fetch("dispatcher"), "dispatcher")
 RbacSeedData.assign_role(users.fetch("admin"), "admin")
-RbacSeedData.assign_role(users.fetch("facility_manager"), "facility_manager", resource: sites.first)
+sites.select { |site| site.site_status == "active" }.each do |site|
+  RbacSeedData.assign_role(users.fetch("facility_manager"), "facility_manager", resource: site)
+end
 RbacSeedData.assign_role(users.fetch("customer_contact"), "customer_contact", resource: customers.first)
 RbacSeedData.assign_role(users.fetch("service_provider_user"), "service_provider_user", resource: providers.last)

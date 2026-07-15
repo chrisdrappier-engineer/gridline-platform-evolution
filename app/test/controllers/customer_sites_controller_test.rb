@@ -32,6 +32,7 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", customer_sites(:one).name
     assert_select "a[href='#{new_service_request_path(customer_site_id: customer_sites(:one).id)}']", text: "Create Service Request"
     assert_select "a", text: service_requests(:one).title
+    assert_select "dd", text: users(:three).name
   end
 
   test "rejects site outside user assignment scope" do
@@ -54,7 +55,8 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
           city: "Chicago",
           state: "IL",
           postal_code: "60610",
-          site_status: "active"
+          site_status: "active",
+          facility_manager_id: users(:three).id
         }
       }
     end
@@ -62,6 +64,28 @@ class CustomerSitesControllerTest < ActionDispatch::IntegrationTest
     site = CustomerSite.order(:created_at).last
     assert_redirected_to customer_site_path(site)
     assert_equal users(:six), site.created_by
+    assert_includes site.facility_managers, users(:three)
+  end
+
+  test "admin cannot create active customer site without facility manager" do
+    sign_in_as users(:six)
+
+    assert_no_difference "CustomerSite.count" do
+      post customer_sites_path, params: {
+        customer_site: {
+          customer_id: customers(:one).id,
+          name: "Northstar Unmanaged",
+          address_line_1: "300 North Ave",
+          city: "Chicago",
+          state: "IL",
+          postal_code: "60611",
+          site_status: "active"
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /Facility manager can't be blank/
   end
 
   test "admin updates customer site" do
