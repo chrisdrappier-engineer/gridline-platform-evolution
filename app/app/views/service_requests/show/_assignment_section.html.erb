@@ -1,0 +1,10 @@
+<section class="section-block">
+  <h2>Assign Service Provider</h2>
+  <%= form_with model: page.service_request, url: assign_service_request_path(page.service_request), method: :patch, class: "inline-form" do |form| %>
+    <div class="field">
+      <%= form.label :service_provider_id, "Service Provider" %>
+      <%= form.collection_select :service_provider_id, page.assignable_service_providers, :id, :name, {}, required: true %>
+    </div>
+    <%= form.submit "Assign Provider", class: "primary-button" %>
+  <% end %>
+</section>

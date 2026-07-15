@@ -1,0 +1,4 @@
+<div class="field">
+  <%= form.label :service_provider_id, "Service Provider" %>
+  <%= form.collection_select :service_provider_id, page.service_providers, :id, :name, { prompt: "Select a provider" }, required: true %>
+</div>

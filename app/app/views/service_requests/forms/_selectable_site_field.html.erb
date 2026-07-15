@@ -1,0 +1,5 @@
+<div class="field">
+  <%= form.label :customer_site_id, "Site" %>
+  <%= form.collection_select :customer_site_id, page.customer_sites, :id, ->(site) { page.site_choice_label(site) }, { prompt: "Select a site" }, required: true %>
+  <%= optional_tag(:p, page.site_field_hint, class: "field-hint") %>
+</div>

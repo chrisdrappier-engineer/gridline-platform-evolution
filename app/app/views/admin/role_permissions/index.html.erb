@@ -32,11 +32,7 @@
             </th>
             <% @roles.each do |role| %>
               <td>
-                <% if role.permissions.any? { |role_permission| role_permission.id == permission.id } %>
-                  <span class="matrix-allowed" aria-label="<%= role.name %> can <%= permission.action %> <%= permission.resource %>">Allowed</span>
-                <% else %>
-                  <span class="matrix-denied" aria-label="<%= role.name %> cannot <%= permission.action %> <%= permission.resource %>">Not allowed</span>
-                <% end %>
+                <%= permission_matrix_badge(role, permission) %>
               </td>
             <% end %>
           </tr>

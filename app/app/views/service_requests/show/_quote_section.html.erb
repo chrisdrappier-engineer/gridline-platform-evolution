@@ -1,0 +1,8 @@
+<section class="section-block">
+  <h2>Quote Approval</h2>
+  <p class="section-intro">
+    Customer approval threshold:
+    <strong><%= format_money_cents(page.service_request.quote_approval_threshold_cents) %></strong>
+  </p>
+  <%= render page.quote_state_partial, page: page %>
+</section>

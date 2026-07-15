@@ -1,0 +1,27 @@
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <%= service_request_table_headers(table) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% service_requests.each do |request| %>
+        <tr>
+          <td>
+            <%= link_to request.title, service_request_path(request), class: "table-link" %>
+            <%= link_to request.service_provider.name, service_provider_path(request.service_provider), class: "muted-link" %>
+          </td>
+          <td>
+            <%= link_to request.customer_site.customer.name, customer_path(request.customer_site.customer), class: "table-link" %>
+            <%= link_to request.customer_site.name, customer_site_path(request.customer_site), class: "muted-link" %>
+          </td>
+          <td><span class="status-pill status-<%= request.status %>"><%= request.status.humanize %></span></td>
+          <td><span class="priority-pill priority-<%= request.priority %>"><%= request.priority.humanize %></span></td>
+          <td><%= service_request_dispatcher_cell(request) %></td>
+          <td><%= l request.reported_at, format: :short %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

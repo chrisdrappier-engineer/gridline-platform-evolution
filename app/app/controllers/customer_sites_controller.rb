@@ -17,16 +17,33 @@ class CustomerSitesController < ApplicationController
       paginator: ->(scope, limit:, page:) { pagy(:offset, scope, limit: limit, page: page) }
     )
     @customer_sites = @customer_sites_table.rows
+    @page_actions = [
+      ViewAction.link("View Requests", service_requests_path),
+      new_site_action
+    ].compact
+    @site_row_actions = @customer_sites.index_with do |site|
+      [
+        create_request_for_site_action(site),
+        edit_site_action(site)
+      ].compact
+    end
   end
 
   def show
     authorize!("customer_sites", "read", @customer_site)
+    @page_actions = [
+      ViewAction.link("Back to Sites", customer_sites_path),
+      edit_site_action(@customer_site)
+    ].compact
 
     @service_requests = authorized_scope(
       "service_requests",
       "read",
       @customer_site.service_requests.includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
     ).order(reported_at: :desc)
+    @service_request_actions = [
+      create_request_for_site_action(@customer_site)
+    ].compact
   end
 
   def new
@@ -96,6 +113,24 @@ class CustomerSitesController < ApplicationController
       :site_status,
       :facility_manager_id
     )
+  end
+
+  def new_site_action
+    return unless permitted?("customer_sites", "create")
+
+    ViewAction.link("New Site", new_customer_site_path, style: "primary-button")
+  end
+
+  def create_request_for_site_action(site)
+    return unless can?("service_requests", "create", site)
+
+    ViewAction.link("Create Service Request", new_service_request_path(customer_site_id: site.id), style: "table-link")
+  end
+
+  def edit_site_action(site)
+    return unless can?("customer_sites", "update", site)
+
+    ViewAction.link("Edit", edit_customer_site_path(site), style: "table-link")
   end
 
   def save_customer_site(customer_site)

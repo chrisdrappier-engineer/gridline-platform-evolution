@@ -1,0 +1,10 @@
+<section class="context-panel" aria-label="Selected site context">
+  <span>Selected Site</span>
+  <strong><%= page.service_request.customer_site.customer.name %> - <%= page.service_request.customer_site.name %></strong>
+  <p>
+    <%= page.service_request.customer_site.address_line_1 %>,
+    <%= page.service_request.customer_site.city %>,
+    <%= page.service_request.customer_site.state %>
+    <%= page.service_request.customer_site.postal_code %>
+  </p>
+</section>

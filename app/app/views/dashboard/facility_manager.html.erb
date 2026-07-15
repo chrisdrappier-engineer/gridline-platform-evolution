@@ -5,11 +5,7 @@
     <p class="eyebrow">Facility Manager</p>
     <h1>Facility Manager Dashboard</h1>
   </div>
-  <% if @managed_sites.one? %>
-    <%= link_to "Create Request", new_service_request_path(customer_site_id: @managed_sites.first.id), class: "primary-button" %>
-  <% else %>
-    <%= link_to "Choose Site", customer_sites_path, class: "secondary-button" %>
-  <% end %>
+  <%= render "shared/action", action: facility_manager_dashboard_action(@managed_sites) %>
 </section>
 
 <%= render "request_summary", open_requests: @open_requests, urgent_requests: @urgent_requests, recent_requests: @recent_requests %>

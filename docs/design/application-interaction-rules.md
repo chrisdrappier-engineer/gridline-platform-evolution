@@ -23,10 +23,11 @@ rules, authorization decisions, record queries, table construction, or complex
 attribute assembly.
 
 Move non-trivial presentation preparation into helpers, table objects,
-controller setup, or focused view-facing objects before rendering. This keeps
-templates readable, makes role and permission behavior easier to test outside
-the browser, and reduces the risk that view-only changes quietly introduce
-workflow logic.
+controller setup, or focused view-facing objects before rendering. See
+[ADR 0007](../adr/0007-render-rails-views-from-prepared-view-models.md) for the
+accepted architecture boundary. This keeps templates readable, makes role and
+permission behavior easier to test outside the browser, and reduces the risk
+that view-only changes quietly introduce workflow logic.
 
 ## Contextual Create Forms
 

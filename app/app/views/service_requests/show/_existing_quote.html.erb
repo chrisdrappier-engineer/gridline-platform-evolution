@@ -1,0 +1,12 @@
+<%= render "shared/detail_list", rows: page.quote_rows %>
+
+<section class="context-panel">
+  <span>Quote Terms</span>
+  <p><%= page.quote_terms %></p>
+</section>
+
+<div class="action-row">
+  <%= render "shared/actions", actions: page.quote_actions %>
+</div>
+
+<%= render page.amend_quote_partial, page: page %>

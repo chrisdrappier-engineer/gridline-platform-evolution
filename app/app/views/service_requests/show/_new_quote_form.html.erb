@@ -1,0 +1,13 @@
+<%= form_with model: page.quote_form, url: service_request_service_request_quote_path(page.service_request), class: "form-panel embedded-form" do |form| %>
+  <div class="field">
+    <%= form.label :amount_dollars, "Quoted Amount" %>
+    <%= form.number_field :amount_dollars, step: "0.01", min: "0.01", required: true %>
+  </div>
+  <div class="field">
+    <%= form.label :description, "Quote Description" %>
+    <%= form.text_area :description, rows: 3, required: true %>
+  </div>
+  <div class="form-actions">
+    <%= form.submit "Submit Quote", class: "primary-button" %>
+  </div>
+<% end %>

@@ -1,0 +1,17 @@
+<aside
+  id="primary-navigation-panel"
+  class="side-navigation"
+  data-navigation-panel-target="panel">
+  <nav class="side-navigation-inner" aria-label="Primary navigation">
+    <% navigation_sections.each do |section| %>
+      <section class="nav-section">
+        <h2 class="nav-heading"><%= section.fetch(:label) %></h2>
+        <div class="nav-links">
+          <% section.fetch(:links).each do |label, path, _visible| %>
+            <%= link_to label, path %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </nav>
+</aside>

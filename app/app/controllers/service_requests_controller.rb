@@ -34,6 +34,13 @@ class ServiceRequestsController < ApplicationController
     authorize!("service_requests", "read", @service_request)
     @quote = @service_request.service_request_quote || ServiceRequestQuote.new
     @service_request_cost = ServiceRequestCost.new(incurred_on: Date.current, currency: "USD")
+    @service_request_page = ServiceRequestShowPage.new(
+      service_request: @service_request,
+      quote_form: @quote,
+      cost_form: @service_request_cost,
+      assignable_service_providers: @assignable_service_providers,
+      view_context: view_context
+    )
   end
 
   def edit
@@ -57,6 +64,7 @@ class ServiceRequestsController < ApplicationController
       priority: "normal",
       customer_site: selected_site
     )
+    set_form_page
   end
 
   def create
@@ -72,6 +80,7 @@ class ServiceRequestsController < ApplicationController
     if @service_request.save
       redirect_to @service_request, notice: "Service request created."
     else
+      set_form_page
       render :new, status: :unprocessable_entity
     end
   end
@@ -170,6 +179,15 @@ class ServiceRequestsController < ApplicationController
       "read",
       ServiceProvider.where(status: "active").order(:name)
     ).to_a
+  end
+
+  def set_form_page
+    @service_request_form_page = ServiceRequestFormPage.new(
+      service_request: @service_request,
+      customer_sites: @customer_sites,
+      service_providers: @service_providers,
+      context_customer: @context_customer
+    )
   end
 
   def set_assign_options
