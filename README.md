@@ -111,6 +111,9 @@ The Rails app currently implements the first operational baseline:
 - role-specific dashboards
 - backend-driven searchable, filterable, sortable, paginated tables
 - seeded development and demo data
+- RuboCop linting for Ruby and Rails code
+- Stylelint linting for Rails CSS assets
+- ERB linting for Rails templates
 - Minitest controller/model/service coverage
 - Playwright browser workflow coverage
 
@@ -119,6 +122,10 @@ Run the baseline checks with:
 ```bash
 bin/ci
 ```
+
+This lints CSS assets with Stylelint, builds the app image, prepares the
+development and test databases, runs RuboCop, runs ERB lint, runs the Rails
+test suite, starts the app service, and verifies the container health check.
 
 Or run the services directly:
 

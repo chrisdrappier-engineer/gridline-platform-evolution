@@ -34,8 +34,7 @@
               aria-controls="primary-navigation-panel"
               aria-expanded="false"
               data-navigation-panel-target="button"
-              data-action="navigation-panel#toggle"
-            >
+              data-action="navigation-panel#toggle">
               <span aria-hidden="true">☰</span>
               <span>Menu</span>
             </button>
@@ -52,13 +51,12 @@
       </div>
     </header>
 
-    <div class="app-frame<%= " app-frame-with-navigation" if signed_in? %>"<%= " data-navigation-panel-target=\"frame\"".html_safe if signed_in? %>>
+    <%= tag.div(**application_frame_options) do %>
       <% if signed_in? %>
         <aside
           id="primary-navigation-panel"
           class="side-navigation"
-          data-navigation-panel-target="panel"
-        >
+          data-navigation-panel-target="panel">
           <nav class="side-navigation-inner" aria-label="Primary navigation">
             <% navigation_sections.each do |section| %>
               <section class="nav-section">
@@ -82,8 +80,7 @@
               type="button"
               class="flash-dismiss"
               aria-label="Dismiss notification"
-              data-action="dismissible-flash#dismiss"
-            >
+              data-action="dismissible-flash#dismiss">
               ×
             </button>
           </div>
@@ -91,6 +88,6 @@
 
         <%= yield %>
       </main>
-    </div>
+    <% end %>
   </body>
 </html>

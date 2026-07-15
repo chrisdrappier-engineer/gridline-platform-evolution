@@ -14,6 +14,20 @@ Navigation should link to resource pages when a permission grants visibility to
 that resource. Friendly labels are encouraged, but the underlying page should
 still represent the relevant resource and action.
 
+## Dumb ERB Templates
+
+ERB templates should stay as close to declarative markup as practical. They may
+render instance variables, call small formatting helpers, render partials, and
+choose between already-prepared branches, but they should not own business
+rules, authorization decisions, record queries, table construction, or complex
+attribute assembly.
+
+Move non-trivial presentation preparation into helpers, table objects,
+controller setup, or focused view-facing objects before rendering. This keeps
+templates readable, makes role and permission behavior easier to test outside
+the browser, and reduces the risk that view-only changes quietly introduce
+workflow logic.
+
 ## Contextual Create Forms
 
 Create actions should begin from the richest safe workflow context available.

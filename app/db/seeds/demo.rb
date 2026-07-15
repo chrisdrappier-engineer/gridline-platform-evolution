@@ -333,12 +333,12 @@ customers_by_name = ([magnolia, red_clay, harbor_pine] + additional_customers).i
 
 additional_sites = site_specs.each_with_index.map do |(customer_name, name, address_line_1, address_line_2, city, state, postal_code), index|
   site_status = if index % 11 == 0
-                  "inactive"
-                elsif index % 7 == 0
-                  "temporarily_closed"
-                else
-                  "active"
-                end
+    "inactive"
+  elsif index % 7 == 0
+    "temporarily_closed"
+  else
+    "active"
+  end
 
   SeedData.upsert(
     CustomerSite,
@@ -459,12 +459,12 @@ end
 ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
   threshold_cents = request.quote_approval_threshold_cents
   quoted_amount_cents = if index % 5 == 0
-                          threshold_cents + 35_000 + (index * 1_250)
-                        elsif index % 7 == 0
-                          threshold_cents + 10_000 + (index * 900)
-                        else
-                          18_000 + (index * 1_175)
-                        end
+    threshold_cents + 35_000 + (index * 1_250)
+  elsif index % 7 == 0
+    threshold_cents + 10_000 + (index * 900)
+  else
+    18_000 + (index * 1_175)
+  end
   quoted_amount_cents = [quoted_amount_cents, 225_000].min
   approval_required = quoted_amount_cents > threshold_cents
   submitted_at = request.reported_at + 30.minutes

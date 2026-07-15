@@ -7,9 +7,12 @@ cleanup() {
 
 trap cleanup EXIT
 
+npm run lint:css
 docker compose build
 docker compose up -d db
 docker compose run --rm app bin/rails db:prepare
+docker compose run --rm app bin/rubocop
+docker compose run --rm app bin/erblint
 docker compose run --rm -e RAILS_ENV=test app bin/rails db:prepare
 docker compose run --rm -e RAILS_ENV=test app bin/rails test
 docker compose up -d app

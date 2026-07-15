@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require "rubygems"
+require "bundler/setup"
+
+ARGV.unshift("--lint-all") if ARGV.empty?
+ARGV.unshift("--config", File.expand_path("../.erb_lint.yml", __dir__))
+
+load Gem.bin_path("erb_lint", "erb_lint")

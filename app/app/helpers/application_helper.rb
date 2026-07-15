@@ -39,4 +39,13 @@ module ApplicationHelper
       section.merge(links: links)
     end
   end
+
+  def application_frame_options
+    return { class: "app-frame" } unless signed_in?
+
+    {
+      class: "app-frame app-frame-with-navigation",
+      data: { navigation_panel_target: "frame" }
+    }
+  end
 end
