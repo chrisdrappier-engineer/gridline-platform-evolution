@@ -25,3 +25,4 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-10: Scoped RBAC Authorization](2026-07-10-scoped-rbac-authorization.md)
 - [2026-07-13: Rails Baseline Implementation And Scaling Breakpoint](2026-07-13-rails-baseline-implementation-and-scaling-breakpoint.md)
 - [2026-07-14: Service Request Quote Approval And Cost Tracking](2026-07-14-service-request-quote-approval-and-cost-tracking.md)
+- [2026-07-15: Lifecycle And Provider Performance Metrics](2026-07-15-lifecycle-and-provider-performance-metrics.md)

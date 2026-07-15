@@ -147,7 +147,19 @@ test("admin can maintain customer records through visible UI", async ({ page }) 
 test("external users track lifecycle without request mutation controls", async ({ page }) => {
   await signIn(page, "provider.user@coastalcoldchain.test", "Service Provider Dashboard");
 
-  await page.getByRole("link", { name: "View Assigned Requests" }).click();
+  await expect(page.getByText("Avg Response Time")).toBeVisible();
+  await expect(page.getByText("Resolution Rate")).toBeVisible();
+
+  await page.getByRole("link", { name: "View Service Providers" }).click();
+  await expect(page.getByRole("heading", { name: "Service Providers" })).toBeVisible();
+  const providerRow = page.getByRole("row", { name: /Coastal Cold Chain Services/ });
+  await expect(providerRow).toBeVisible();
+  await providerRow.getByRole("link", { name: "Coastal Cold Chain Services", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Coastal Cold Chain Services" })).toBeVisible();
+  await expect(page.getByText("Avg Response Time")).toBeVisible();
+  await expect(page.getByText("Avg Completion Time")).toBeVisible();
+
+  await page.getByRole("link", { name: "Back to Requests" }).click();
   await expect(page.getByRole("heading", { name: "Service Requests" })).toBeVisible();
   await page.getByRole("searchbox", { name: "Search" }).fill("Freezer temperature alarm");
   const requestRow = page.getByRole("row", { name: /Freezer temperature alarm/ });

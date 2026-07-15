@@ -30,6 +30,37 @@
     <span>Related Requests</span>
     <strong><%= @service_requests.count %></strong>
   </article>
+
+  <article class="metric-card">
+    <span>Open Requests</span>
+    <strong><%= @performance_summary.open_count %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Resolution Rate</span>
+    <strong>
+      <% if @performance_summary.resolution_percentage %>
+        <%= @performance_summary.resolution_percentage %>%
+      <% else %>
+        Not enough data
+      <% end %>
+    </strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Avg Response Time</span>
+    <strong><%= format_duration_seconds(@performance_summary.average_provider_response_seconds) %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Avg Completion Time</span>
+    <strong><%= format_duration_seconds(@performance_summary.average_provider_completion_seconds) %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Avg Resolution Time</span>
+    <strong><%= format_duration_seconds(@performance_summary.average_resolution_seconds) %></strong>
+  </article>
 </section>
 
 <section class="section-block">

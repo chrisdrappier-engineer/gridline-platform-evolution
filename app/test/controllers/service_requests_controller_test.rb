@@ -212,6 +212,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", service_requests(:one).title
     assert_select "form[action='#{triage_service_request_path(service_requests(:one))}']"
     assert_select "a[href='#{edit_service_request_path(service_requests(:one))}']", text: "Edit Request"
+    assert_select ".metric-card", text: /Provider Response Time/
   end
 
   test "rejects unreadable service request detail" do
@@ -322,6 +323,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     request.reload
     assert_equal "triaged", request.status
     assert_equal users(:one), request.assigned_dispatcher
+    assert request.assigned_at.present?
   end
 
   test "assigns service provider and dispatcher" do
@@ -339,6 +341,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal service_providers(:two), request.service_provider
     assert_equal users(:one), request.assigned_dispatcher
     assert_equal "triaged", request.status
+    assert request.assigned_at.present?
   end
 
   test "rejects provider assignment without assign permission" do
@@ -358,6 +361,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
   test "dispatcher records provider response" do
     sign_in_as users(:one)
     request = service_requests(:two)
+    request.update!(assigned_at: 1.hour.ago)
 
     patch respond_service_request_path(request), params: {
       service_request: {
@@ -371,11 +375,14 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Adjusted the door sensor and confirmed normal operation.", request.provider_response_summary
     assert_equal "Replace the sensor if the alarm returns.", request.follow_up_notes
     assert_equal "triaged", request.status
+    assert request.provider_responded_at.present?
+    assert request.provider_response_seconds.present?
   end
 
   test "dispatcher marks provider work complete" do
     sign_in_as users(:one)
     request = service_requests(:two)
+    request.update!(assigned_at: 1.hour.ago)
 
     patch respond_service_request_path(request), params: {
       service_request: {
@@ -387,7 +394,11 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_request_path(request)
     request.reload
     assert_equal "resolved", request.status
+    assert request.provider_responded_at.present?
     assert request.provider_work_completed_at.present?
+    assert request.resolved_at.present?
+    assert request.provider_completion_seconds.present?
+    assert request.resolution_seconds.present?
   end
 
   test "rejects provider user response because providers track lifecycle only" do
@@ -415,6 +426,7 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     request.reload
     assert request.completion_verified_at.present?
     assert_equal users(:one), request.completion_verified_by
+    assert request.verification_lag_seconds.present?
   end
 
   test "rejects completion verification before provider work is resolved" do

@@ -5,6 +5,12 @@ module ApplicationHelper
     number_to_currency(amount_cents / 100.0, unit: currency == "USD" ? "$" : "#{currency} ")
   end
 
+  def format_duration_seconds(seconds)
+    return "Not enough data" if seconds.nil?
+
+    distance_of_time_in_words(seconds.seconds)
+  end
+
   def navigation_sections
     [
       {

@@ -198,7 +198,17 @@ An issue should usually include:
 - the workflow or data model change
 - authorization and visibility expectations
 - test expectations
+- demo data expectations when the feature adds fields, states, associations, or
+  workflows to existing models
 - how the work supports the scaling narrative, if relevant
+
+Issue descriptions should link to repository files on `main`, not feature
+branches, unless the issue is explicitly about work that must happen against an
+unmerged branch.
+
+Implementation should generally wait until prerequisite issues have been merged
+into `main`. If work must proceed in parallel or an earlier issue is delayed,
+document that sequencing decision in the issue, roadmap, or a decision note.
 
 Avoid creating issues for every deferred idea. A smaller, intentional backlog is
 more useful for this project than a very large speculative one.

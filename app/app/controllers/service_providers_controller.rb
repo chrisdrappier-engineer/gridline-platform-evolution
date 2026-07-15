@@ -25,6 +25,7 @@ class ServiceProvidersController < ApplicationController
       "read",
       @service_provider.service_requests.includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
     ).order(reported_at: :desc)
+    @performance_summary = ProviderPerformanceSummary.new(@service_requests)
   end
 
   def new

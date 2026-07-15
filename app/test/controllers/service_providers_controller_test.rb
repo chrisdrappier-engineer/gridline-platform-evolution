@@ -25,12 +25,15 @@ class ServiceProvidersControllerTest < ActionDispatch::IntegrationTest
 
   test "shows service provider details and service requests" do
     sign_in_as users(:one)
+    create_metric_request
 
     get service_provider_path(service_providers(:one))
 
     assert_response :success
     assert_select "h1", service_providers(:one).name
     assert_select "a", text: service_requests(:one).title
+    assert_select ".metric-card", text: /Avg Response Time/
+    assert_select ".metric-card", text: /Resolution Rate/
   end
 
   test "service provider user can see assigned provider only" do
@@ -96,5 +99,31 @@ class ServiceProvidersControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to dashboard_path
+  end
+
+  private
+
+  def create_metric_request
+    reported_at = Time.zone.parse("2026-07-10 08:00:00")
+    assigned_at = reported_at + 15.minutes
+    provider_responded_at = assigned_at + 30.minutes
+    provider_work_completed_at = assigned_at + 3.hours
+    resolved_at = provider_work_completed_at + 15.minutes
+
+    ServiceRequest.create!(
+      customer_site: customer_sites(:one),
+      service_provider: service_providers(:one),
+      created_by: users(:one),
+      assigned_dispatcher: users(:one),
+      title: "Provider metric request",
+      description: "Created for provider summary coverage.",
+      priority: "normal",
+      status: "resolved",
+      reported_at: reported_at,
+      assigned_at: assigned_at,
+      provider_responded_at: provider_responded_at,
+      provider_work_completed_at: provider_work_completed_at,
+      resolved_at: resolved_at
+    )
   end
 end

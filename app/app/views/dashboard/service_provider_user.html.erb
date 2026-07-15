@@ -21,6 +21,20 @@
     <span>Visible Providers</span>
     <strong><%= @service_providers.count %></strong>
   </article>
+  <article class="metric-card">
+    <span>Avg Response Time</span>
+    <strong><%= format_duration_seconds(@performance_summary.average_provider_response_seconds) %></strong>
+  </article>
+  <article class="metric-card">
+    <span>Resolution Rate</span>
+    <strong>
+      <% if @performance_summary.resolution_percentage %>
+        <%= @performance_summary.resolution_percentage %>%
+      <% else %>
+        Not enough data
+      <% end %>
+    </strong>
+  </article>
 </section>
 
 <section class="section-block">

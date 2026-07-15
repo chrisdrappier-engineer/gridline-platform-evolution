@@ -33,17 +33,31 @@
       <dd><%= @service_request.assigned_dispatcher&.name || "Unassigned" %></dd>
       <dt>Provider</dt>
       <dd><%= @service_request.service_provider.name %></dd>
+      <dt>Assigned</dt>
+      <dd><%= @service_request.assigned_at.present? ? l(@service_request.assigned_at, format: :long) : "Not assigned" %></dd>
+      <dt>Provider Responded</dt>
+      <dd><%= @service_request.provider_responded? ? l(@service_request.provider_responded_at, format: :long) : "No response recorded" %></dd>
+      <dt>Scheduled</dt>
+      <dd><%= @service_request.scheduled_at.present? ? l(@service_request.scheduled_at, format: :long) : "Not scheduled" %></dd>
       <dt>Provider Work Complete</dt>
       <dd><%= @service_request.provider_work_complete? ? l(@service_request.provider_work_completed_at, format: :long) : "No" %></dd>
+      <dt>Resolved</dt>
+      <dd><%= @service_request.resolved_at.present? ? l(@service_request.resolved_at, format: :long) : "Not resolved" %></dd>
       <dt>Completion Verified</dt>
       <dd>
         <% if @service_request.completion_verified? %>
           <%= l @service_request.completion_verified_at, format: :long %>
-          by <%= @service_request.completion_verified_by.name %>
+          <% if @service_request.completion_verified_by.present? %>
+            by <%= @service_request.completion_verified_by.name %>
+          <% end %>
         <% else %>
           Not verified
         <% end %>
       </dd>
+      <% if @service_request.canceled_at.present? %>
+        <dt>Canceled</dt>
+        <dd><%= l @service_request.canceled_at, format: :long %></dd>
+      <% end %>
     </dl>
   </article>
 
@@ -63,6 +77,28 @@
       <dt>Created By</dt>
       <dd><%= @service_request.created_by.name %></dd>
     </dl>
+  </article>
+</section>
+
+<section class="detail-grid">
+  <article class="metric-card">
+    <span>Provider Response Time</span>
+    <strong><%= format_duration_seconds(@service_request.provider_response_seconds) %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Provider Completion Time</span>
+    <strong><%= format_duration_seconds(@service_request.provider_completion_seconds) %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Resolution Time</span>
+    <strong><%= format_duration_seconds(@service_request.resolution_seconds) %></strong>
+  </article>
+
+  <article class="metric-card">
+    <span>Verification Lag</span>
+    <strong><%= format_duration_seconds(@service_request.verification_lag_seconds) %></strong>
   </article>
 </section>
 
