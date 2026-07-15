@@ -40,6 +40,54 @@ service_requests_verify_completion:
   name: Verify service request completion
   description: Verify completed service requests.
 
+service_request_quotes_read:
+  resource: service_request_quotes
+  action: read
+  name: Read service request quotes
+  description: View service request quote details.
+
+service_request_quotes_create:
+  resource: service_request_quotes
+  action: create
+  name: Create service request quotes
+  description: Create and submit service request quotes.
+
+service_request_quotes_update:
+  resource: service_request_quotes
+  action: update
+  name: Update service request quotes
+  description: Amend service request quotes.
+
+service_request_quotes_approve:
+  resource: service_request_quotes
+  action: approve
+  name: Approve service request quotes
+  description: Approve service request quotes.
+
+service_request_quotes_reject:
+  resource: service_request_quotes
+  action: reject
+  name: Reject service request quotes
+  description: Reject service request quotes.
+
+service_request_costs_read:
+  resource: service_request_costs
+  action: read
+  name: Read service request costs
+  description: View actual service request costs.
+
+service_request_costs_create:
+  resource: service_request_costs
+  action: create
+  name: Create service request costs
+  description: Record actual service request costs.
+
+service_request_costs_update:
+  resource: service_request_costs
+  action: update
+  name: Update service request costs
+  description: Update actual service request costs.
+
 customers_read:
   resource: customers
   action: read

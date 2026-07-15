@@ -48,3 +48,15 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-10
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model UserRoleAssignment user:references role:references resource:references\{polymorphic\}`
+
+### 2026-07-14
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate migration AddQuoteApprovalThresholdToCustomers quote_approval_threshold_cents:integer`
+
+### 2026-07-14
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestCost service_request:references recorded_by:references category:string amount_cents:integer currency:string incurred_on:date description:text`
+
+### 2026-07-14
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestQuote service_request:references created_by:references amount_cents:integer currency:string description:text status:string approval_required:boolean submitted_at:datetime approved_by:references approved_at:datetime rejected_by:references rejected_at:datetime approval_notes:text amendment_reason:text amended_by:references amended_at:datetime original_amount_cents:integer`

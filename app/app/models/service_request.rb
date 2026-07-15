@@ -15,6 +15,9 @@ class ServiceRequest < ApplicationRecord
              class_name: "User",
              optional: true
 
+  has_one :service_request_quote, dependent: :restrict_with_error
+  has_many :service_request_costs, dependent: :restrict_with_error
+
   validates :title, presence: true
   validates :priority, presence: true, inclusion: { in: PRIORITIES }
   validates :status, presence: true, inclusion: { in: STATUSES }
@@ -30,5 +33,19 @@ class ServiceRequest < ApplicationRecord
 
   def completion_verified?
     completion_verified_at.present?
+  end
+
+  def quote_approval_threshold_cents
+    customer_site.customer.quote_approval_threshold_cents
+  end
+
+  def actual_cost_total_cents
+    service_request_costs.sum(:amount_cents)
+  end
+
+  def quote_to_actual_variance_cents
+    return unless service_request_quote&.approved?
+
+    actual_cost_total_cents - service_request_quote.amount_cents
   end
 end

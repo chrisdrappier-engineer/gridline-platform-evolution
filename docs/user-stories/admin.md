@@ -27,12 +27,12 @@ assignments so the operational baseline can be maintained.
 
 Status: Implemented
 
-### Manage Service Cost Entries
+### Manage Service Quotes And Cost Entries
 
-As an admin, I can create, review, update, or correct service cost entries so
-financial reporting remains accurate.
+As an admin, I can create, review, update, or correct service quotes and cost
+entries so financial reporting and approval workflows remain accurate.
 
-Status: Proposed
+Status: In Progress
 
 ### Audit Request Notes And Files
 

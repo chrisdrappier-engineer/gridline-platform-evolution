@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  service_request: one
+  recorded_by: one
+  category: labor
+  amount_cents: 22500
+  currency: USD
+  incurred_on: 2026-07-10
+  description: Initial HVAC diagnosis and thermostat controller replacement.
+
+two:
+  service_request: two
+  recorded_by: two
+  category: parts
+  amount_cents: 64000
+  currency: USD
+  incurred_on: 2026-07-10
+  description: Dock sensor assembly.

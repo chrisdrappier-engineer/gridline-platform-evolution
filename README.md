@@ -94,6 +94,14 @@ The Rails app currently implements the first operational baseline:
 - customers, customer sites, service providers, users, roles, and permissions
 - dispatcher-owned service request intake, triage, assignment, update, provider
   work recording, and completion verification
+- customer-level quote approval thresholds
+- one service request quote per request, with automatic approval under the
+  customer threshold and facility-manager approval above the threshold
+- quote amendment support when material site conditions, concealed damage,
+  parts requirements, safety constraints, or other facts change the approved
+  scope
+- actual service cost entries by category, with quote-to-actual variance shown
+  on request detail pages
 - scoped read access for facility managers, customer contacts, and service
   provider users
 - admin maintenance screens for customers, sites, providers, users, role
@@ -154,6 +162,15 @@ Run headed browser smoke tests with:
 npm run test:e2e:headed
 ```
 
+Run the full browser workflow suite with:
+
+```bash
+npm run test:e2e
+```
+
+The E2E suite runs with one worker because the browser workflows intentionally
+mutate shared demo data while exercising realistic user paths.
+
 Additional browser test details live in [`e2e/README.md`](e2e/README.md).
 
 ## Rails Generator Tooling
@@ -210,6 +227,8 @@ The baseline application includes:
 - Service providers
 - Dispatcher-owned request intake, triage, assignment, provider update capture,
   and completion verification
+- Quote approval workflow with customer thresholds, facility-manager approval
+  for above-threshold quotes, amendment language, and actual cost capture
 - Scoped RBAC with role assignments that may be global or tied to customers,
   sites, or providers
 - Role-specific dashboards for dispatchers, facility managers, customer
@@ -232,8 +251,9 @@ Known limitations at this stage:
 - No background job processor
 - No read replica
 - Limited operational visibility
-- Cost tracking, notes, file uploads, ratings, SLA reporting, and provider
-  performance reporting are captured as user stories but not yet implemented
+- Cost reporting is still limited to request-level quote and actual-cost data
+- Notes, file uploads, ratings, SLA reporting, and provider performance
+  reporting are captured as user stories but not yet implemented
 
 These limitations motivate the later scenarios.
 
@@ -244,9 +264,10 @@ The initial facilities operations domain is defined in
 
 The current implementation is intentionally narrower than the original domain
 sketch. The app currently centers on customers, sites, service providers,
-service requests, users, and scoped RBAC. Cost tracking, notes, files, ratings,
-SLA reporting, and provider performance reporting are captured in
-[`docs/user-stories`](docs/user-stories/README.md) for future feature work.
+service requests, users, scoped RBAC, service request quotes, and actual service
+costs. Notes, files, ratings, SLA reporting, and provider performance reporting
+are captured in [`docs/user-stories`](docs/user-stories/README.md) for future
+feature work.
 
 ## Repository Structure
 

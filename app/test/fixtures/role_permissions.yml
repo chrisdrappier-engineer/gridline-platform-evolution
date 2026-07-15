@@ -26,6 +26,30 @@ dispatcher_service_requests_verify_completion:
   role: dispatcher
   permission: service_requests_verify_completion
 
+dispatcher_service_request_quotes_read:
+  role: dispatcher
+  permission: service_request_quotes_read
+
+dispatcher_service_request_quotes_create:
+  role: dispatcher
+  permission: service_request_quotes_create
+
+dispatcher_service_request_quotes_update:
+  role: dispatcher
+  permission: service_request_quotes_update
+
+dispatcher_service_request_costs_read:
+  role: dispatcher
+  permission: service_request_costs_read
+
+dispatcher_service_request_costs_create:
+  role: dispatcher
+  permission: service_request_costs_create
+
+dispatcher_service_request_costs_update:
+  role: dispatcher
+  permission: service_request_costs_update
+
 dispatcher_customers_read:
   role: dispatcher
   permission: customers_read
@@ -42,6 +66,22 @@ facility_manager_service_requests_read:
   role: facility_manager
   permission: service_requests_read
 
+facility_manager_service_request_quotes_read:
+  role: facility_manager
+  permission: service_request_quotes_read
+
+facility_manager_service_request_quotes_approve:
+  role: facility_manager
+  permission: service_request_quotes_approve
+
+facility_manager_service_request_quotes_reject:
+  role: facility_manager
+  permission: service_request_quotes_reject
+
+facility_manager_service_request_costs_read:
+  role: facility_manager
+  permission: service_request_costs_read
+
 facility_manager_customer_sites_read:
   role: facility_manager
   permission: customer_sites_read
@@ -49,6 +89,14 @@ facility_manager_customer_sites_read:
 customer_contact_service_requests_read:
   role: customer_contact
   permission: service_requests_read
+
+customer_contact_service_request_quotes_read:
+  role: customer_contact
+  permission: service_request_quotes_read
+
+customer_contact_service_request_costs_read:
+  role: customer_contact
+  permission: service_request_costs_read
 
 customer_contact_customers_read:
   role: customer_contact
@@ -93,6 +141,38 @@ admin_service_requests_respond:
 admin_service_requests_verify_completion:
   role: admin
   permission: service_requests_verify_completion
+
+admin_service_request_quotes_read:
+  role: admin
+  permission: service_request_quotes_read
+
+admin_service_request_quotes_create:
+  role: admin
+  permission: service_request_quotes_create
+
+admin_service_request_quotes_update:
+  role: admin
+  permission: service_request_quotes_update
+
+admin_service_request_quotes_approve:
+  role: admin
+  permission: service_request_quotes_approve
+
+admin_service_request_quotes_reject:
+  role: admin
+  permission: service_request_quotes_reject
+
+admin_service_request_costs_read:
+  role: admin
+  permission: service_request_costs_read
+
+admin_service_request_costs_create:
+  role: admin
+  permission: service_request_costs_create
+
+admin_service_request_costs_update:
+  role: admin
+  permission: service_request_costs_update
 
 admin_customers_read:
   role: admin

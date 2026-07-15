@@ -1,4 +1,10 @@
 module ApplicationHelper
+  def format_money_cents(amount_cents, currency: "USD")
+    return "Not recorded" if amount_cents.nil?
+
+    number_to_currency(amount_cents / 100.0, unit: currency == "USD" ? "$" : "#{currency} ")
+  end
+
   def navigation_sections
     [
       {

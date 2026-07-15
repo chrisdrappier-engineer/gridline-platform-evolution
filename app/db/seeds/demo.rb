@@ -294,7 +294,15 @@ site_specs = [
 
 customers_by_name = ([magnolia, red_clay, harbor_pine] + additional_customers).index_by(&:name)
 
-additional_sites = site_specs.map do |customer_name, name, address_line_1, address_line_2, city, state, postal_code|
+additional_sites = site_specs.each_with_index.map do |(customer_name, name, address_line_1, address_line_2, city, state, postal_code), index|
+  site_status = if index % 11 == 0
+                  "inactive"
+                elsif index % 7 == 0
+                  "temporarily_closed"
+                else
+                  "active"
+                end
+
   SeedData.upsert(
     CustomerSite,
     { customer: customers_by_name.fetch(customer_name), name: name },
@@ -303,7 +311,7 @@ additional_sites = site_specs.map do |customer_name, name, address_line_1, addre
     city: city,
     state: state,
     postal_code: postal_code,
-    site_status: "active",
+    site_status: site_status,
     created_by: dispatcher
   )
 end

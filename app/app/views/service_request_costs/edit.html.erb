@@ -1,0 +1,48 @@
+<% content_for :title, "Edit Service Cost" %>
+
+<section class="page-header">
+  <div>
+    <p class="eyebrow"><%= @service_request.title %></p>
+    <h1>Edit Service Cost</h1>
+  </div>
+  <div class="action-row">
+    <%= link_to "Back to Request", service_request_path(@service_request), class: "secondary-button" %>
+  </div>
+</section>
+
+<%= form_with model: [@service_request, @cost], class: "form-panel wide-form" do |form| %>
+  <% if @cost.errors.any? %>
+    <div class="error-summary">
+      <h2><%= pluralize(@cost.errors.count, "error") %> prevented this cost from being saved</h2>
+      <ul>
+        <% @cost.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :category %>
+    <%= form.select :category, ServiceRequestCost::CATEGORIES.map { |category| [category.humanize, category] }, {}, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :amount_dollars, "Amount" %>
+    <%= form.number_field :amount_dollars, step: "0.01", min: "0.01", required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :incurred_on, "Incurred On" %>
+    <%= form.date_field :incurred_on, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 4 %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Update Cost", class: "primary-button" %>
+  </div>
+<% end %>

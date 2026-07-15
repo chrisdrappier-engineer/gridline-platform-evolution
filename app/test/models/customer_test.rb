@@ -21,6 +21,14 @@ class CustomerTest < ActiveSupport::TestCase
     assert_includes customer.errors[:account_status], "is not included in the list"
   end
 
+  test "requires non-negative quote approval threshold" do
+    customer = customers(:one)
+    customer.quote_approval_threshold_cents = -1
+
+    assert_not customer.valid?
+    assert_includes customer.errors[:quote_approval_threshold_cents], "must be greater than or equal to 0"
+  end
+
   test "requires creator" do
     customer = customers(:one)
     customer.created_by = nil

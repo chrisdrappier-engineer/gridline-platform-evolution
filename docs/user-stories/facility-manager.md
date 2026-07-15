@@ -43,7 +43,15 @@ Status: Implemented
 As a facility manager, I can view service costs for requests tied to facilities
 I manage so I can understand spend at the site level.
 
-Status: Proposed
+Status: In Progress
+
+### Approve Service Quote
+
+As a facility manager, I can approve or reject a quote above the customer's
+approval threshold for a facility I manage so work proceeds only after the
+customer-side cost approval is captured.
+
+Status: In Progress
 
 ### View Request Lifecycle Timing
 

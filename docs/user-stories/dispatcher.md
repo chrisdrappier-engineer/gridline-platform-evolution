@@ -51,12 +51,28 @@ stays accurate even when providers do not update the system directly.
 
 Status: Implemented
 
+### Submit Service Quote
+
+As a dispatcher, I can submit one prescreened vendor quote for a service request
+so the customer can approve work without collecting multiple quotes for the same
+job.
+
+Status: In Progress
+
+### Amend Service Quote
+
+As a dispatcher, I can amend a service quote when material site conditions,
+parts requirements, safety constraints, or concealed damage are discovered so
+the customer can approve the changed scope before additional work proceeds.
+
+Status: In Progress
+
 ### Record Service Cost
 
 As a dispatcher, I can record one or more cost entries for a completed service
 request so Gridline can report charges by request, site, customer, and provider.
 
-Status: Proposed
+Status: In Progress
 
 ### Classify Service Cost
 
@@ -64,7 +80,7 @@ As a dispatcher, I can classify service costs by type such as labor, parts,
 trip charge, emergency fee, or other so later reporting can explain what drove
 spend.
 
-Status: Proposed
+Status: In Progress
 
 ### Add Internal Request Note
 

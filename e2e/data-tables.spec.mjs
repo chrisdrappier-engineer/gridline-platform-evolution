@@ -66,7 +66,8 @@ test("sites table supports search, filters, sorting, pagination, and normal row 
   await frame.getByRole("link", { name: "Clear" }).click();
   await expect(frame.getByRole("searchbox", { name: "Search" })).toHaveValue("");
   await expect(frame.locator("tbody")).toContainText("Atlantic Light Augusta Assembly");
-  await frame.getByRole("link", { name: "Atlantic Light Augusta Assembly", exact: true }).click();
+  const siteRow = frame.getByRole("row", { name: /Atlantic Light Augusta Assembly/ });
+  await siteRow.getByRole("link", { name: "Atlantic Light Augusta Assembly", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Atlantic Light Augusta Assembly" })).toBeVisible();
 });
 
@@ -149,7 +150,9 @@ test("external users track lifecycle without request mutation controls", async (
   await page.getByRole("link", { name: "View Assigned Requests" }).click();
   await expect(page.getByRole("heading", { name: "Service Requests" })).toBeVisible();
   await page.getByRole("searchbox", { name: "Search" }).fill("Freezer temperature alarm");
-  await page.getByRole("link", { name: "Freezer temperature alarm", exact: true }).click();
+  const requestRow = page.getByRole("row", { name: /Freezer temperature alarm/ });
+  await expect(requestRow).toBeVisible();
+  await requestRow.getByRole("link", { name: "Freezer temperature alarm", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Freezer temperature alarm" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Edit Request" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Record Provider Update" })).toHaveCount(0);

@@ -32,6 +32,8 @@ class ServiceRequestsController < ApplicationController
 
   def show
     authorize!("service_requests", "read", @service_request)
+    @quote = @service_request.service_request_quote || ServiceRequestQuote.new
+    @service_request_cost = ServiceRequestCost.new(incurred_on: Date.current, currency: "USD")
   end
 
   def edit
@@ -129,7 +131,14 @@ class ServiceRequestsController < ApplicationController
 
   def set_service_request
     @service_request = ServiceRequest
-                       .includes(:created_by, :assigned_dispatcher, :service_provider, customer_site: :customer)
+                       .includes(
+                         :created_by,
+                         :assigned_dispatcher,
+                         :service_provider,
+                         :service_request_quote,
+                         service_request_costs: :recorded_by,
+                         customer_site: :customer
+                       )
                        .find(params[:id])
   end
 
