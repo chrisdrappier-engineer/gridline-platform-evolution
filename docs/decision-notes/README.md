@@ -26,3 +26,5 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-13: Rails Baseline Implementation And Scaling Breakpoint](2026-07-13-rails-baseline-implementation-and-scaling-breakpoint.md)
 - [2026-07-14: Service Request Quote Approval And Cost Tracking](2026-07-14-service-request-quote-approval-and-cost-tracking.md)
 - [2026-07-15: Lifecycle And Provider Performance Metrics](2026-07-15-lifecycle-and-provider-performance-metrics.md)
+- [2026-07-15: Local Linting Toolchain](2026-07-15-local-linting-toolchain.md)
+- [2026-07-15: Dumb ERB Template Boundary](2026-07-15-dumb-erb-template-boundary.md)

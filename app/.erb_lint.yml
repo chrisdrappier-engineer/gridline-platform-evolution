@@ -1,0 +1,8 @@
+---
+glob: "app/views/**/*.erb"
+EnableDefaultLinters: true
+linters:
+  ErbSafety:
+    enabled: true
+  Rubocop:
+    enabled: false

@@ -46,6 +46,9 @@ Common patterns include:
 - the authorization service for permission checks and scoped records
 - role-scoped controller access
 - shared data table controls
+- RuboCop for Ruby and Rails linting
+- Stylelint for Rails CSS asset linting
+- ERB linting and dumb ERB templates
 - Minitest for Rails model/controller/service coverage
 - Playwright for browser-visible workflow coverage
 - decision notes only for substantial reasoning paths
