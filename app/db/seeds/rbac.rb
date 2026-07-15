@@ -25,6 +25,8 @@ module RbacSeedData
     ["service_request_costs", "read", "Read service request costs", "View actual service request costs."],
     ["service_request_costs", "create", "Create service request costs", "Record actual service request costs."],
     ["service_request_costs", "update", "Update service request costs", "Update actual service request costs."],
+    ["service_request_notes", "read", "Read service request notes", "View service request notes allowed by visibility."],
+    ["service_request_notes", "create", "Create service request notes", "Add service request notes allowed by visibility."],
     ["customers", "read", "Read customers", "View customer records."],
     ["customers", "create", "Create customers", "Create customer records."],
     ["customers", "update", "Update customers", "Update customer records."],
@@ -55,6 +57,8 @@ module RbacSeedData
       ["service_request_costs", "read"],
       ["service_request_costs", "create"],
       ["service_request_costs", "update"],
+      ["service_request_notes", "read"],
+      ["service_request_notes", "create"],
       ["customers", "read"],
       ["customer_sites", "read"],
       ["service_providers", "read"]
@@ -65,17 +69,23 @@ module RbacSeedData
       ["service_request_quotes", "approve"],
       ["service_request_quotes", "reject"],
       ["service_request_costs", "read"],
+      ["service_request_notes", "read"],
+      ["service_request_notes", "create"],
       ["customer_sites", "read"]
     ],
     "customer_contact" => [
       ["service_requests", "read"],
       ["service_request_quotes", "read"],
       ["service_request_costs", "read"],
+      ["service_request_notes", "read"],
+      ["service_request_notes", "create"],
       ["customers", "read"],
       ["customer_sites", "read"]
     ],
     "service_provider_user" => [
       ["service_requests", "read"],
+      ["service_request_notes", "read"],
+      ["service_request_notes", "create"],
       ["service_providers", "read"]
     ],
     "admin" => PERMISSIONS.map { |resource, action, _name, _description| [resource, action] }

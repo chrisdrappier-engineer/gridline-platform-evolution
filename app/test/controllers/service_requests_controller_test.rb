@@ -213,6 +213,32 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{triage_service_request_path(service_requests(:one))}']"
     assert_select "a[href='#{edit_service_request_path(service_requests(:one))}']", text: "Edit Request"
     assert_select ".metric-card", text: /Provider Response Time/
+    assert_select "h2", "Notes"
+    assert_select "form[action='#{service_request_service_request_notes_path(service_requests(:one))}']"
+  end
+
+  test "request detail filters notes for facility manager visibility" do
+    sign_in_as users(:three)
+
+    get service_request_path(service_requests(:one))
+
+    assert_response :success
+    assert_select ".note-card", text: /Facility manager confirmed/
+    assert_select ".note-card", { text: /Caller reported repeated fan cycling/, count: 0 }
+    assert_select "option[value='customer_visible']"
+    assert_select "option[value='internal']", count: 0
+  end
+
+  test "request detail filters notes for provider visibility" do
+    sign_in_as users(:five)
+
+    get service_request_path(service_requests(:two))
+
+    assert_response :success
+    assert_select ".note-card", text: /Provider reviewed sensor alignment/
+    assert_select ".note-card", text: /Shared update visible/
+    assert_select "option[value='provider_visible']"
+    assert_select "option[value='customer_visible']", count: 0
   end
 
   test "rejects unreadable service request detail" do

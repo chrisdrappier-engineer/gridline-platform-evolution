@@ -46,7 +46,7 @@ class Authorization
         resource == target.customer_site ||
           resource == target.customer_site.customer ||
           resource == target.service_provider
-      when ServiceRequestQuote, ServiceRequestCost
+      when ServiceRequestQuote, ServiceRequestCost, ServiceRequestNote
         covers_target?(assignment, target.service_request)
       when CustomerSite
         resource == target || resource == target.customer
@@ -69,7 +69,7 @@ class Authorization
       case relation.klass.name
       when "ServiceRequest"
         service_request_scope(relation, resource_ids)
-      when "ServiceRequestQuote", "ServiceRequestCost"
+      when "ServiceRequestQuote", "ServiceRequestCost", "ServiceRequestNote"
         service_request_child_scope(relation, resource_ids)
       when "CustomerSite"
         customer_site_scope(relation, resource_ids)

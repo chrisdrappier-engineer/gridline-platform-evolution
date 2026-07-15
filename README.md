@@ -104,6 +104,7 @@ The Rails app currently implements the first operational baseline:
   on request detail pages
 - lifecycle timestamps and persisted provider performance metrics for response,
   completion, resolution, and verification timing
+- service request notes with role-aware visibility rules
 - scoped read access for facility managers, customer contacts, and service
   provider users
 - admin maintenance screens for customers, sites, providers, users, role
@@ -265,7 +266,7 @@ Known limitations at this stage:
 - Cost reporting is still limited to request-level quote and actual-cost data
 - Provider performance reporting is limited to request and provider-level
   summaries
-- Notes, file uploads, ratings, SLA policy reporting, and broader management
+- File uploads, ratings, SLA policy reporting, and broader management
   dashboards are captured as user stories but not yet implemented
 
 These limitations motivate the later scenarios.
@@ -277,10 +278,10 @@ The initial facilities operations domain is defined in
 
 The current implementation is intentionally narrower than the original domain
 sketch. The app currently centers on customers, sites, service providers,
-service requests, users, scoped RBAC, service request quotes, and actual service
-costs. Lifecycle timing and provider performance summaries are implemented for
-the baseline workflow. Notes, files, ratings, SLA reporting, and broader
-management reporting are captured in
+service requests, users, scoped RBAC, service request quotes, actual service
+costs, and request notes. Lifecycle timing, provider performance summaries, and
+note visibility rules are implemented for the baseline workflow. Files, ratings,
+SLA reporting, and broader management reporting are captured in
 [`docs/user-stories`](docs/user-stories/README.md) for future feature work.
 
 ## Repository Structure

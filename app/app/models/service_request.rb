@@ -17,6 +17,7 @@ class ServiceRequest < ApplicationRecord
 
   has_one :service_request_quote, dependent: :restrict_with_error
   has_many :service_request_costs, dependent: :restrict_with_error
+  has_many :service_request_notes, dependent: :restrict_with_error
 
   before_save :populate_lifecycle_timestamps
   before_save :refresh_lifecycle_metrics

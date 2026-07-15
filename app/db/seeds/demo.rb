@@ -558,6 +558,49 @@ ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_site
   )
 end
 
+ServiceRequest.includes(:service_provider, customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
+  facility_manager_for_site = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
+
+  SeedData.upsert(
+    ServiceRequestNote,
+    { service_request: request, note_type: "intake", visibility: "internal" },
+    author: dispatcher,
+    body: "Dispatcher intake note for #{request.title.downcase}; confirm site access and customer impact before dispatch."
+  )
+
+  SeedData.upsert(
+    ServiceRequestNote,
+    { service_request: request, note_type: "customer_update", visibility: "customer_visible" },
+    author: facility_manager_for_site,
+    body: "Customer-side note: site contact is aware of the request and can confirm work completion."
+  )
+
+  if request.service_provider == cold_chain_provider
+    SeedData.upsert(
+      ServiceRequestNote,
+      { service_request: request, note_type: "provider_update", visibility: "provider_visible" },
+      author: provider_user,
+      body: "Provider note: technician review is in progress and follow-up details will be recorded after service."
+    )
+  elsif index.even?
+    SeedData.upsert(
+      ServiceRequestNote,
+      { service_request: request, note_type: "provider_update", visibility: "provider_visible" },
+      author: dispatcher,
+      body: "Provider coordination note: Gridline is awaiting a vendor update before sharing customer-facing details."
+    )
+  end
+
+  next unless index % 3 == 0
+
+  SeedData.upsert(
+    ServiceRequestNote,
+    { service_request: request, note_type: "general", visibility: "shared" },
+    author: dispatcher,
+    body: "Shared note: all parties can use this request thread for operational status updates."
+  )
+end
+
 RbacSeedData.assign_role(dispatcher, "dispatcher")
 RbacSeedData.assign_role(admin, "admin")
 demo_sites.select { |site| site.site_status == "active" }.each do |site|

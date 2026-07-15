@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       patch :reject, on: :member
     end
     resources :service_request_costs, only: %i[create edit update]
+    resources :service_request_notes, only: %i[create]
   end
   resources :customers, only: %i[index show new create edit update]
   resources :customer_sites, only: %i[index show new create edit update]

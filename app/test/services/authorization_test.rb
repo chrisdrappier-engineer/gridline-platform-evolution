@@ -85,4 +85,15 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     assert_empty scope
   end
+
+  test "accessible scope filters service request notes through parent request scope" do
+    scope = Authorization.accessible_scope(
+      users(:five),
+      resource: "service_request_notes",
+      action: "read",
+      relation: ServiceRequestNote.order(:body)
+    )
+
+    assert_equal [service_request_notes(:two), service_request_notes(:four)].sort_by(&:body), scope.to_a
+  end
 end

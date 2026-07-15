@@ -1,0 +1,15 @@
+<div class="note-list">
+  <% page.note_rows.each do |note| %>
+    <article class="note-card">
+      <div class="note-meta">
+        <strong><%= note.fetch(:author) %></strong>
+        <span><%= note.fetch(:created_at) %></span>
+      </div>
+      <div class="note-badges">
+        <span><%= note.fetch(:note_type) %></span>
+        <span><%= note.fetch(:visibility) %></span>
+      </div>
+      <div class="note-body"><%= note.fetch(:body) %></div>
+    </article>
+  <% end %>
+</div>

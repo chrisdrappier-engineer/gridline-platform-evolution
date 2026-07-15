@@ -1,0 +1,22 @@
+<%= form_with model: [page.service_request, page.note_form], class: "form-panel embedded-form" do |form| %>
+  <%= form_errors_for(page.note_form) %>
+
+  <div class="filter-form note-form-grid">
+    <div class="field">
+      <%= form.label :note_type, "Type" %>
+      <%= form.select :note_type, page.note_type_options %>
+    </div>
+
+    <div class="field">
+      <%= form.label :visibility %>
+      <%= form.select :visibility, page.note_visibility_options %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, "Note" %>
+    <%= form.textarea :body, rows: 4 %>
+  </div>
+
+  <%= form.submit "Add Note", class: "primary-button" %>
+<% end %>

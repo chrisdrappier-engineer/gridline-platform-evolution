@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  service_request: one
+  author: one
+  note_type: intake
+  visibility: internal
+  body: Caller reported repeated fan cycling before the lobby temperature rose.
+
+two:
+  service_request: two
+  author: five
+  note_type: provider_update
+  visibility: provider_visible
+  body: Provider reviewed sensor alignment photos and is preparing a repair plan.
+
+three:
+  service_request: one
+  author: three
+  note_type: customer_update
+  visibility: customer_visible
+  body: Facility manager confirmed lobby access is available through the east entrance.
+
+four:
+  service_request: two
+  author: one
+  note_type: general
+  visibility: shared
+  body: Shared update visible to all parties tracking this request.

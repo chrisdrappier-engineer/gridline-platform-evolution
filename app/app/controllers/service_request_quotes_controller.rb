@@ -41,7 +41,9 @@ class ServiceRequestQuotesController < ApplicationController
   private
 
   def set_service_request
-    @service_request = ServiceRequest.includes(customer_site: :customer).find(params[:service_request_id])
+    @service_request = ServiceRequest
+                       .includes(:service_request_quote, service_request_notes: :author, customer_site: :customer)
+                       .find(params[:service_request_id])
   end
 
   def set_quote
@@ -64,7 +66,19 @@ class ServiceRequestQuotesController < ApplicationController
 
   def render_quote_error
     @service_request_cost = ServiceRequestCost.new(incurred_on: Date.current)
+    @service_request_note = ServiceRequestNote.new(
+      note_type: "general",
+      visibility: ServiceRequestNote.default_visibility_for(current_user)
+    )
     @assignable_service_providers = ServiceProvider.where(status: "active").order(:name)
+    @service_request_page = ServiceRequestShowPage.new(
+      service_request: @service_request,
+      quote_form: @quote,
+      cost_form: @service_request_cost,
+      note_form: @service_request_note,
+      assignable_service_providers: @assignable_service_providers,
+      view_context: view_context
+    )
     render "service_requests/show", status: :unprocessable_entity
   end
 end

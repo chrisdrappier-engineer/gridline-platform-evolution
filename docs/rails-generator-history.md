@@ -64,3 +64,7 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-15
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate migration AddLifecycleMetricsToServiceRequests assigned_at:datetime provider_responded_at:datetime scheduled_at:datetime resolved_at:datetime canceled_at:datetime provider_response_seconds:integer provider_completion_seconds:integer resolution_seconds:integer verification_lag_seconds:integer`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestNote service_request:references author:references note_type:string visibility:string body:text`

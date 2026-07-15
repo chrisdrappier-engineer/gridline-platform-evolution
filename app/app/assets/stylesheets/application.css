@@ -456,6 +456,55 @@ textarea {
   font-size: 0.9rem;
 }
 
+.note-list {
+  display: grid;
+  gap: 12px;
+}
+
+.note-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.note-meta,
+.note-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.note-meta {
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.note-meta strong {
+  color: var(--text);
+}
+
+.note-badges span {
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(47, 111, 78, 0.1);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.note-body p {
+  margin: 0;
+}
+
+.note-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .context-panel {
   border: 1px solid rgba(47, 111, 78, 0.25);
   border-radius: 8px;

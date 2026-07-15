@@ -5,12 +5,13 @@ class ServiceRequestShowPage
     "If material site conditions, concealed damage, parts requirements, safety constraints, or other facts are discovered during service, Gridline may amend the quote and request approval before proceeding beyond the approved scope."
   ].join(" ")
 
-  attr_reader :service_request, :quote_form, :cost_form, :assignable_service_providers
+  attr_reader :service_request, :quote_form, :cost_form, :note_form, :assignable_service_providers
 
-  def initialize(service_request:, quote_form:, cost_form:, assignable_service_providers:, view_context:)
+  def initialize(service_request:, quote_form:, cost_form:, note_form:, assignable_service_providers:, view_context:)
     @service_request = service_request
     @quote_form = quote_form
     @cost_form = cost_form
+    @note_form = note_form
     @assignable_service_providers = assignable_service_providers
     @view = view_context
   end
@@ -85,6 +86,7 @@ class ServiceRequestShowPage
   def section_partials
     [
       provider_response_section_partial,
+      notes_section_partial,
       quote_section_partial,
       cost_section_partial,
       assignment_section_partial,
@@ -94,6 +96,10 @@ class ServiceRequestShowPage
 
   def provider_response_section_partial
     "service_requests/show/provider_response_section" if render_provider_response?
+  end
+
+  def notes_section_partial
+    "service_requests/show/notes_section" if render_notes_section?
   end
 
   def quote_section_partial
@@ -114,6 +120,46 @@ class ServiceRequestShowPage
 
   def render_quote_section?
     can_read_quotes?
+  end
+
+  def render_notes_section?
+    view.can?("service_request_notes", "read", service_request)
+  end
+
+  def note_rows
+    @note_rows ||= service_request
+      .service_request_notes
+      .visible_to(view.current_user)
+      .chronological
+      .map do |note|
+        {
+          author: note.author.name,
+          created_at: long_time(note.created_at),
+          note_type: note.note_type_label,
+          visibility: note.visibility_label,
+          body: formatted_text(note.body)
+        }
+      end
+  end
+
+  def notes_state_partial
+    note_rows.any? ? "service_requests/show/notes_list" : "service_requests/show/notes_empty"
+  end
+
+  def render_note_form?
+    view.can?("service_request_notes", "create", service_request)
+  end
+
+  def note_form_partial
+    render_note_form? ? "service_requests/show/note_form" : "service_requests/show/empty"
+  end
+
+  def note_type_options
+    ServiceRequestNote.note_type_options
+  end
+
+  def note_visibility_options
+    ServiceRequestNote.visibility_options_for(view.current_user)
   end
 
   def quote
