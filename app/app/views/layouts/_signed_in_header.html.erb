@@ -1,0 +1,18 @@
+<div class="brand-group">
+  <button
+    type="button"
+    class="menu-toggle"
+    aria-controls="primary-navigation-panel"
+    aria-expanded="false"
+    data-navigation-panel-target="button"
+    data-action="navigation-panel#toggle">
+    <span aria-hidden="true">☰</span>
+    <span>Menu</span>
+  </button>
+  <%= link_to "Gridline Operations", root_path, class: "brand" %>
+</div>
+
+<div class="session-summary">
+  <span><%= current_user.name %></span>
+  <%= button_to "Sign out", logout_path, method: :delete, class: "text-button" %>
+</div>

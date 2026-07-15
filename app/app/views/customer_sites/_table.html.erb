@@ -1,0 +1,24 @@
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <% customer_sites_table.columns.each do |column| %>
+          <th><%= data_table_sort_link(customer_sites_table, column) %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% customer_sites.each do |site| %>
+        <tr>
+          <td><%= link_to site.name, customer_site_path(site), class: "table-link" %></td>
+          <td><%= link_to site.customer.name, customer_path(site.customer), class: "table-link" %></td>
+          <td><%= site.site_status.humanize %></td>
+          <td><%= site.city %>, <%= site.state %></td>
+          <td>
+            <%= render "shared/actions", actions: site_row_actions.fetch(site) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

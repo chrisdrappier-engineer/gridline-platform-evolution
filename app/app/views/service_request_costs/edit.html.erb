@@ -11,16 +11,7 @@
 </section>
 
 <%= form_with model: [@service_request, @cost], class: "form-panel wide-form" do |form| %>
-  <% if @cost.errors.any? %>
-    <div class="error-summary">
-      <h2><%= pluralize(@cost.errors.count, "error") %> prevented this cost from being saved</h2>
-      <ul>
-        <% @cost.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= form_errors_for(@cost) %>
 
   <div class="field">
     <%= form.label :category %>

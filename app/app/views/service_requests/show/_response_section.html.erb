@@ -1,0 +1,23 @@
+<section class="section-block">
+  <h2>Record Provider Work Update</h2>
+  <%= form_with model: page.service_request, url: respond_service_request_path(page.service_request), method: :patch, class: "form-panel embedded-form" do |form| %>
+    <div class="field">
+      <%= form.label :provider_response_summary, "Actions Taken" %>
+      <%= form.text_area :provider_response_summary, rows: 4 %>
+    </div>
+
+    <div class="field">
+      <%= form.label :follow_up_notes, "Follow-Up Requirements" %>
+      <%= form.text_area :follow_up_notes, rows: 3 %>
+    </div>
+
+    <label class="checkbox-field">
+      <%= form.check_box :mark_provider_work_complete %>
+      <span>Mark provider work complete</span>
+    </label>
+
+    <div class="form-actions">
+      <%= form.submit "Record Provider Update", class: "primary-button" %>
+    </div>
+  <% end %>
+</section>

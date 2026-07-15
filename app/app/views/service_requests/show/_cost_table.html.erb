@@ -1,0 +1,24 @@
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Amount</th>
+      <th>Incurred</th>
+      <th>Recorded By</th>
+      <th>Description</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% page.cost_rows.each do |cost| %>
+      <tr>
+        <td><%= cost.fetch(:category) %></td>
+        <td><%= cost.fetch(:amount) %></td>
+        <td><%= cost.fetch(:incurred_on) %></td>
+        <td><%= cost.fetch(:recorded_by) %></td>
+        <td><%= cost.fetch(:description) %></td>
+        <td><%= render_optional_action(cost.fetch(:action)) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

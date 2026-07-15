@@ -1,0 +1,8 @@
+<section class="detail-grid">
+  <% metrics.each do |metric| %>
+    <article class="metric-card">
+      <span><%= metric.label %></span>
+      <strong><%= metric.value %></strong>
+    </article>
+  <% end %>
+</section>

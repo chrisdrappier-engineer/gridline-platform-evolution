@@ -1,0 +1,21 @@
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <% customers_table.columns.each do |column| %>
+          <th><%= data_table_sort_link(customers_table, column) %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% customers.each do |customer| %>
+        <tr>
+          <td><%= link_to customer.name, customer_path(customer), class: "table-link" %></td>
+          <td><%= customer.account_status.humanize %></td>
+          <td><%= customer.industry.humanize %></td>
+          <td><%= customer.created_by.name %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

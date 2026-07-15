@@ -1,36 +1,4 @@
 <footer class="table-footer">
   <p class="table-results"><%= table.result_window %></p>
-
-  <% if table.pagination? %>
-    <nav class="pagination" aria-label="Pagination">
-      <% if table.pagy.previous %>
-        <%= link_to "Previous",
-                    data_table_url(table, table.page_params(table.pagy.previous)),
-                    class: "pagination-link",
-                    data: { turbo_frame: table.frame_id, turbo_action: "advance" } %>
-      <% else %>
-        <span class="pagination-link disabled">Previous</span>
-      <% end %>
-
-      <% data_table_page_numbers(table).each do |page_number| %>
-        <% if page_number == table.page %>
-          <span class="pagination-link current" aria-current="page"><%= page_number %></span>
-        <% else %>
-          <%= link_to page_number,
-                      data_table_url(table, table.page_params(page_number)),
-                      class: "pagination-link",
-                      data: { turbo_frame: table.frame_id, turbo_action: "advance" } %>
-        <% end %>
-      <% end %>
-
-      <% if table.pagy.next %>
-        <%= link_to "Next",
-                    data_table_url(table, table.page_params(table.pagy.next)),
-                    class: "pagination-link",
-                    data: { turbo_frame: table.frame_id, turbo_action: "advance" } %>
-      <% else %>
-        <span class="pagination-link disabled">Next</span>
-      <% end %>
-    </nav>
-  <% end %>
+  <%= data_table_pagination(table) %>
 </footer>

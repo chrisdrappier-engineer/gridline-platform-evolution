@@ -1,14 +1,5 @@
 <%= form_with model: customer, class: "form-panel wide-form" do |form| %>
-  <% if customer.errors.any? %>
-    <div class="error-summary">
-      <h2><%= pluralize(customer.errors.count, "error") %> prevented this customer from being saved</h2>
-      <ul>
-        <% customer.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= form_errors_for(customer) %>
 
   <div class="field">
     <%= form.label :name %>
@@ -32,6 +23,6 @@
   </div>
 
   <div class="form-actions">
-    <%= form.submit customer.persisted? ? "Update Customer" : "Create Customer", class: "primary-button" %>
+    <%= form.submit submit_label(customer, create: "Create Customer", update: "Update Customer"), class: "primary-button" %>
   </div>
 <% end %>

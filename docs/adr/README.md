@@ -15,3 +15,4 @@ understand why the system evolved the way it did.
 - [ADR 0004: Define the mature monolith baseline as a reconstructed case study](0004-define-the-mature-monolith-baseline-as-a-reconstructed-case-study.md)
 - [ADR 0005: Simulate the baseline production architecture](0005-simulate-the-baseline-production-architecture.md)
 - [ADR 0006: Use database-backed scoped RBAC for authorization](0006-use-database-backed-scoped-rbac-for-authorization.md)
+- [ADR 0007: Render Rails views from prepared view models](0007-render-rails-views-from-prepared-view-models.md)

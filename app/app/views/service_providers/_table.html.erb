@@ -1,0 +1,21 @@
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <% service_providers_table.columns.each do |column| %>
+          <th><%= data_table_sort_link(service_providers_table, column) %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% service_providers.each do |provider| %>
+        <tr>
+          <td><%= link_to provider.name, service_provider_path(provider), class: "table-link" %></td>
+          <td><%= provider.provider_type.humanize %></td>
+          <td><%= provider.status.humanize %></td>
+          <td><%= provider.created_by.name %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,7 @@
+<section class="section-block">
+  <h2>Provider Response</h2>
+  <% page.provider_response_sections.each do |section| %>
+    <h3><%= section.label %></h3>
+    <div class="request-description"><%= simple_format(section.value) %></div>
+  <% end %>
+</section>

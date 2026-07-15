@@ -15,16 +15,27 @@ class CustomersController < ApplicationController
       paginator: ->(scope, limit:, page:) { pagy(:offset, scope, limit: limit, page: page) }
     )
     @customers = @customers_table.rows
+    @page_actions = [
+      ViewAction.link("View Requests", service_requests_path),
+      new_customer_action
+    ].compact
   end
 
   def show
     authorize!("customers", "read", @customer)
+    @page_actions = [
+      ViewAction.link("Back to Customers", customers_path),
+      edit_customer_action(@customer)
+    ].compact
 
     @customer_sites = authorized_scope(
       "customer_sites",
       "read",
       @customer.customer_sites.order(:name)
     )
+    @customer_site_actions = [
+      new_customer_site_action(@customer)
+    ].compact
     @service_requests = authorized_scope(
       "service_requests",
       "read",
@@ -33,6 +44,9 @@ class CustomersController < ApplicationController
         .where(customer_sites: { customer_id: @customer.id })
         .includes(:assigned_dispatcher, :service_provider, customer_site: :customer)
     ).order(reported_at: :desc)
+    @service_request_actions = [
+      new_service_request_for_customer_action(@customer)
+    ].compact
   end
 
   def new
@@ -79,5 +93,29 @@ class CustomersController < ApplicationController
 
   def customer_params
     params.require(:customer).permit(:name, :account_status, :industry, :quote_approval_threshold_cents)
+  end
+
+  def new_customer_action
+    return unless permitted?("customers", "create")
+
+    ViewAction.link("New Customer", new_customer_path, style: "primary-button")
+  end
+
+  def edit_customer_action(customer)
+    return unless can?("customers", "update", customer)
+
+    ViewAction.link("Edit Customer", edit_customer_path(customer), style: "primary-button")
+  end
+
+  def new_customer_site_action(customer)
+    return unless permitted?("customer_sites", "create")
+
+    ViewAction.link("New Site", new_customer_site_path(customer_id: customer.id))
+  end
+
+  def new_service_request_for_customer_action(customer)
+    return unless can?("service_requests", "create", customer)
+
+    ViewAction.link("Create Service Request", new_service_request_path(customer_id: customer.id))
   end
 end

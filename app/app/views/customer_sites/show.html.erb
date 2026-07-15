@@ -6,10 +6,7 @@
     <h1><%= @customer_site.name %></h1>
   </div>
   <div class="action-row">
-    <%= link_to "Back to Requests", service_requests_path, class: "secondary-button" %>
-    <% if can?("customer_sites", "update", @customer_site) %>
-      <%= link_to "Edit Site", edit_customer_site_path(@customer_site), class: "primary-button" %>
-    <% end %>
+    <%= render "shared/actions", actions: @page_actions %>
   </div>
 </section>
 
@@ -20,23 +17,11 @@
       <dt>Status</dt>
       <dd><%= @customer_site.site_status.humanize %></dd>
       <dt>Address</dt>
-      <dd>
-        <%= @customer_site.address_line_1 %><br>
-        <% if @customer_site.address_line_2.present? %>
-          <%= @customer_site.address_line_2 %><br>
-        <% end %>
-        <%= @customer_site.city %>, <%= @customer_site.state %> <%= @customer_site.postal_code %>
-      </dd>
+      <dd><%= customer_site_address(@customer_site) %></dd>
       <dt>Created By</dt>
       <dd><%= @customer_site.created_by.name %></dd>
       <dt>Facility Managers</dt>
-      <dd>
-        <% if @customer_site.facility_managers.any? %>
-          <%= @customer_site.facility_managers.order(:name).map(&:name).to_sentence %>
-        <% else %>
-          None assigned
-        <% end %>
-      </dd>
+      <dd><%= facility_manager_names(@customer_site) %></dd>
     </dl>
   </article>
 
@@ -56,9 +41,7 @@
 <section class="section-block">
   <div class="section-header">
     <h2>Service Requests</h2>
-    <% if can?("service_requests", "create", @customer_site) %>
-      <%= link_to "Create Service Request", new_service_request_path(customer_site_id: @customer_site.id), class: "secondary-button" %>
-    <% end %>
+    <%= render "shared/actions", actions: @service_request_actions %>
   </div>
 
   <%= render "service_requests/table", service_requests: @service_requests %>

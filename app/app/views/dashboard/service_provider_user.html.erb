@@ -27,13 +27,7 @@
   </article>
   <article class="metric-card">
     <span>Resolution Rate</span>
-    <strong>
-      <% if @performance_summary.resolution_percentage %>
-        <%= @performance_summary.resolution_percentage %>%
-      <% else %>
-        Not enough data
-      <% end %>
-    </strong>
+    <strong><%= resolution_percentage_label(@performance_summary) %></strong>
   </article>
 </section>
 

@@ -30,6 +30,9 @@ Settled direction includes:
 - UUID primary keys
 - database-backed scoped RBAC
 - backend-driven filtering, sorting, and pagination
+- dumb ERB templates: views render prepared data and partials; decision-making
+  belongs in controllers, helpers, table objects, view models, or other
+  view-facing Ruby objects
 - workflow-realistic E2E tests that use visible navigation instead of direct
   URL jumps
 - vertical optimization and measurement before horizontal scaling

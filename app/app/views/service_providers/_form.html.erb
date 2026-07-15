@@ -1,14 +1,5 @@
 <%= form_with model: service_provider, class: "form-panel wide-form" do |form| %>
-  <% if service_provider.errors.any? %>
-    <div class="error-summary">
-      <h2><%= pluralize(service_provider.errors.count, "error") %> prevented this provider from being saved</h2>
-      <ul>
-        <% service_provider.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= form_errors_for(service_provider) %>
 
   <div class="field">
     <%= form.label :name %>
@@ -26,6 +17,6 @@
   </div>
 
   <div class="form-actions">
-    <%= form.submit service_provider.persisted? ? "Update Provider" : "Create Provider", class: "primary-button" %>
+    <%= form.submit submit_label(service_provider, create: "Create Provider", update: "Update Provider"), class: "primary-button" %>
   </div>
 <% end %>

@@ -11,35 +11,13 @@
 <%= turbo_frame_tag @users_table.frame_id, target: "_top", data: { turbo_action: "advance" } do %>
   <%= render "shared/data_tables/controls", table: @users_table, search_placeholder: "Search users, emails, roles" %>
 
-  <% if @users.any? %>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <% @users_table.columns.each do |column| %>
-              <th><%= data_table_sort_link(@users_table, column) %></th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody>
-          <% @users.each do |user| %>
-            <tr>
-              <td><%= user.name %></td>
-              <td><%= user.email %></td>
-              <td><%= user.role.humanize %></td>
-              <td><%= user.roles.map(&:name).sort.join(", ") %></td>
-              <td><%= user.active? ? "Active" : "Inactive" %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-  <% else %>
-    <div class="empty-state">
-      <h2><%= @users_table.empty_title %></h2>
-      <p><%= @users_table.empty_message %></p>
-    </div>
-  <% end %>
+  <%= render_collection_state(
+        @users,
+        present_partial: "admin/users/table",
+        empty_title: @users_table.empty_title,
+        empty_message: @users_table.empty_message,
+        locals: { users: @users, users_table: @users_table }
+      ) %>
 
   <%= render "shared/data_tables/pagination", table: @users_table %>
 <% end %>

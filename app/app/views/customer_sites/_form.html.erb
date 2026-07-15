@@ -1,14 +1,5 @@
 <%= form_with model: customer_site, class: "form-panel wide-form" do |form| %>
-  <% if customer_site.errors.any? %>
-    <div class="error-summary">
-      <h2><%= pluralize(customer_site.errors.count, "error") %> prevented this site from being saved</h2>
-      <ul>
-        <% customer_site.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= form_errors_for(customer_site) %>
 
   <div class="field">
     <%= form.label :customer_id, "Customer" %>
@@ -57,6 +48,6 @@
   </div>
 
   <div class="form-actions">
-    <%= form.submit customer_site.persisted? ? "Update Site" : "Create Site", class: "primary-button" %>
+    <%= form.submit submit_label(customer_site, create: "Create Site", update: "Update Site"), class: "primary-button" %>
   </div>
 <% end %>

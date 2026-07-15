@@ -17,7 +17,7 @@
       <dt>Role</dt>
       <dd><%= @dispatcher.role.humanize %></dd>
       <dt>Status</dt>
-      <dd><%= @dispatcher.active? ? "Active" : "Inactive" %></dd>
+      <dd><%= active_status_label(@dispatcher) %></dd>
     </dl>
   </article>
 
