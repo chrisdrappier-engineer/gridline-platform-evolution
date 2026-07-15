@@ -85,6 +85,187 @@
   </section>
 <% end %>
 
+<% if can?("service_request_quotes", "read", @service_request) %>
+  <section class="section-block">
+    <h2>Quote Approval</h2>
+    <p class="section-intro">
+      Customer approval threshold:
+      <strong><%= format_money_cents(@service_request.quote_approval_threshold_cents) %></strong>
+    </p>
+
+    <% if @service_request.service_request_quote.present? %>
+      <% quote = @service_request.service_request_quote %>
+      <dl class="detail-list">
+        <dt>Status</dt>
+        <dd><span class="status-pill status-<%= quote.status %>"><%= quote.status.humanize %></span></dd>
+        <dt>Quoted Amount</dt>
+        <dd><%= format_money_cents(quote.amount_cents, currency: quote.currency) %></dd>
+        <dt>Approval Required</dt>
+        <dd><%= quote.approval_required? ? "Yes" : "No" %></dd>
+        <dt>Description</dt>
+        <dd><%= simple_format(quote.description) %></dd>
+        <% if quote.approved_at.present? %>
+          <dt>Approved</dt>
+          <dd>
+            <%= l quote.approved_at, format: :long %>
+            <% if quote.approved_by.present? %>
+              by <%= quote.approved_by.name %>
+            <% end %>
+          </dd>
+        <% end %>
+        <% if quote.rejected_at.present? %>
+          <dt>Rejected</dt>
+          <dd><%= l quote.rejected_at, format: :long %> by <%= quote.rejected_by.name %></dd>
+        <% end %>
+        <% if quote.amended_at.present? %>
+          <dt>Amended</dt>
+          <dd>
+            <%= l quote.amended_at, format: :long %> by <%= quote.amended_by.name %>
+            <br>
+            Original amount: <%= format_money_cents(quote.original_amount_cents, currency: quote.currency) %>
+            <br>
+            <%= simple_format(quote.amendment_reason) %>
+          </dd>
+        <% end %>
+        <% if quote.approval_notes.present? %>
+          <dt>Approval Notes</dt>
+          <dd><%= simple_format(quote.approval_notes) %></dd>
+        <% end %>
+      </dl>
+
+      <section class="context-panel">
+        <span>Quote Terms</span>
+        <p>
+          Approval authorizes Gridline and the assigned service provider to proceed with the described work up to the quoted amount.
+          Quotes are based on information available before service begins. If material site conditions, concealed damage, parts
+          requirements, safety constraints, or other facts are discovered during service, Gridline may amend the quote and request
+          approval before proceeding beyond the approved scope.
+        </p>
+      </section>
+
+      <% if quote.pending_approval? && (can?("service_request_quotes", "approve", quote) || can?("service_request_quotes", "reject", quote)) %>
+        <div class="action-row">
+          <% if can?("service_request_quotes", "approve", quote) %>
+            <%= button_to "Approve Quote", approve_service_request_service_request_quote_path(@service_request), method: :patch, class: "primary-button" %>
+          <% end %>
+          <% if can?("service_request_quotes", "reject", quote) %>
+            <%= button_to "Reject Quote", reject_service_request_service_request_quote_path(@service_request), method: :patch, class: "secondary-button" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if can?("service_request_quotes", "update", quote) %>
+        <h3>Amend Quote</h3>
+        <%= form_with model: quote, url: service_request_service_request_quote_path(@service_request), method: :patch, class: "form-panel embedded-form" do |form| %>
+          <div class="field">
+            <%= form.label :amount_dollars, "Quoted Amount" %>
+            <%= form.number_field :amount_dollars, step: "0.01", min: "0.01", required: true %>
+          </div>
+          <div class="field">
+            <%= form.label :description, "Quote Description" %>
+            <%= form.text_area :description, rows: 3, required: true %>
+          </div>
+          <div class="field">
+            <%= form.label :amendment_reason, "Amendment Reason" %>
+            <%= form.text_area :amendment_reason, rows: 3, required: true %>
+          </div>
+          <div class="form-actions">
+            <%= form.submit "Submit Amended Quote", class: "primary-button" %>
+          </div>
+        <% end %>
+      <% end %>
+    <% elsif can?("service_request_quotes", "create", @service_request) %>
+      <%= form_with model: @quote, url: service_request_service_request_quote_path(@service_request), class: "form-panel embedded-form" do |form| %>
+        <div class="field">
+          <%= form.label :amount_dollars, "Quoted Amount" %>
+          <%= form.number_field :amount_dollars, step: "0.01", min: "0.01", required: true %>
+        </div>
+        <div class="field">
+          <%= form.label :description, "Quote Description" %>
+          <%= form.text_area :description, rows: 3, required: true %>
+        </div>
+        <div class="form-actions">
+          <%= form.submit "Submit Quote", class: "primary-button" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p>No quote has been submitted for this request.</p>
+    <% end %>
+  </section>
+<% end %>
+
+<% if can?("service_request_costs", "read", @service_request) %>
+  <section class="section-block">
+    <h2>Actual Costs</h2>
+    <p class="section-intro">
+      Actual total:
+      <strong><%= format_money_cents(@service_request.actual_cost_total_cents) %></strong>
+      <% if @service_request.quote_to_actual_variance_cents %>
+        | Quote variance:
+        <strong><%= format_money_cents(@service_request.quote_to_actual_variance_cents) %></strong>
+      <% end %>
+    </p>
+
+    <% if @service_request.service_request_costs.any? %>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Incurred</th>
+            <th>Recorded By</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @service_request.service_request_costs.each do |cost| %>
+            <tr>
+              <td><%= cost.category.humanize %></td>
+              <td><%= format_money_cents(cost.amount_cents, currency: cost.currency) %></td>
+              <td><%= l cost.incurred_on, format: :long %></td>
+              <td><%= cost.recorded_by.name %></td>
+              <td><%= cost.description.presence || "No description" %></td>
+              <td>
+                <% if can?("service_request_costs", "update", cost) %>
+                  <%= link_to "Edit", edit_service_request_service_request_cost_path(@service_request, cost) %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p>No actual costs have been recorded.</p>
+    <% end %>
+
+    <% if can?("service_request_costs", "create", @service_request) %>
+      <h3>Record Actual Cost</h3>
+      <%= form_with model: [@service_request, @service_request_cost], class: "form-panel embedded-form" do |form| %>
+        <div class="field">
+          <%= form.label :category %>
+          <%= form.select :category, ServiceRequestCost::CATEGORIES.map { |category| [category.humanize, category] }, { prompt: "Select a category" }, required: true %>
+        </div>
+        <div class="field">
+          <%= form.label :amount_dollars, "Amount" %>
+          <%= form.number_field :amount_dollars, step: "0.01", min: "0.01", required: true %>
+        </div>
+        <div class="field">
+          <%= form.label :incurred_on, "Incurred On" %>
+          <%= form.date_field :incurred_on, required: true %>
+        </div>
+        <div class="field">
+          <%= form.label :description %>
+          <%= form.text_area :description, rows: 3 %>
+        </div>
+        <div class="form-actions">
+          <%= form.submit "Record Cost", class: "primary-button" %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>
+
 <% if can?("service_requests", "assign", @service_request) %>
   <section class="section-block">
     <h2>Assign Service Provider</h2>

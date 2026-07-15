@@ -4,10 +4,12 @@ one:
   name: Northstar Property Group
   account_status: active
   industry: property_management
+  quote_approval_threshold_cents: 50000
   created_by: one
 
 two:
   name: Acme Warehouse Network
   account_status: onboarding
   industry: warehousing
+  quote_approval_threshold_cents: 75000
   created_by: two

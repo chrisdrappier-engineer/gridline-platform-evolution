@@ -29,6 +29,14 @@
       </dd>
       <dt>Created By</dt>
       <dd><%= @customer_site.created_by.name %></dd>
+      <dt>Facility Managers</dt>
+      <dd>
+        <% if @customer_site.facility_managers.any? %>
+          <%= @customer_site.facility_managers.order(:name).map(&:name).to_sentence %>
+        <% else %>
+          None assigned
+        <% end %>
+      </dd>
     </dl>
   </article>
 

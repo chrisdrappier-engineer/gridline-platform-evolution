@@ -37,7 +37,7 @@ class CustomersController < ApplicationController
 
   def new
     authorize!("customers", "create")
-    @customer = Customer.new(account_status: "onboarding")
+    @customer = Customer.new(account_status: "onboarding", quote_approval_threshold_cents: 50_000)
   end
 
   def create
@@ -78,6 +78,6 @@ class CustomersController < ApplicationController
   end
 
   def customer_params
-    params.require(:customer).permit(:name, :account_status, :industry)
+    params.require(:customer).permit(:name, :account_status, :industry, :quote_approval_threshold_cents)
   end
 end

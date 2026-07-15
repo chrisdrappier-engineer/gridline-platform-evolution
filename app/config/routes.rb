@@ -12,6 +12,11 @@ Rails.application.routes.draw do
     patch :assign, on: :member
     patch :respond, on: :member
     patch :verify_completion, on: :member
+    resource :service_request_quote, only: %i[create update] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+    end
+    resources :service_request_costs, only: %i[create edit update]
   end
   resources :customers, only: %i[index show new create edit update]
   resources :customer_sites, only: %i[index show new create edit update]

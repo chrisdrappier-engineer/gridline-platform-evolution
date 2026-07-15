@@ -52,7 +52,7 @@ work has believable user, data, and workflow pressure behind it.
 
 Near-term issues:
 
-- [#16 Add service request cost tracking](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/16)
+- [#16 Add service request quote approval and actual cost tracking](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/16)
 - [#17 Add lifecycle timestamps and provider performance metrics](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/17)
 - [#18 Add request notes and visibility rules](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/18)
 - [#19 Add file uploads for request evidence](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/19)

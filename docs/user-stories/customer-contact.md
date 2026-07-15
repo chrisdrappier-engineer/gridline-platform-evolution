@@ -40,7 +40,15 @@ Status: Implemented
 As a customer contact, I can view service costs across all sites for my customer
 so I can understand total spend and compare cost by site.
 
-Status: Proposed
+Status: In Progress
+
+### View Quote Approval Activity
+
+As a customer contact, I can view quote approval status, threshold behavior, and
+quote-to-actual variance across my customer so I can understand how service
+spend is being authorized.
+
+Status: In Progress
 
 ### Filter Cost Reporting
 

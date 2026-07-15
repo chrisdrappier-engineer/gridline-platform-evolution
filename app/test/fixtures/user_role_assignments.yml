@@ -7,6 +7,11 @@ facility_manager_site:
   role: facility_manager
   resource: one (CustomerSite)
 
+secondary_facility_manager_site:
+  user: seven
+  role: facility_manager
+  resource: two (CustomerSite)
+
 customer_contact_customer:
   user: four
   role: customer_contact

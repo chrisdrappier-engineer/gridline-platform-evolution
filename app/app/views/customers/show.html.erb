@@ -21,6 +21,8 @@
       <dd><%= @customer.account_status.humanize %></dd>
       <dt>Industry</dt>
       <dd><%= @customer.industry %></dd>
+      <dt>Quote Approval Threshold</dt>
+      <dd><%= format_money_cents(@customer.quote_approval_threshold_cents) %></dd>
       <dt>Created By</dt>
       <dd><%= @customer.created_by.name %></dd>
     </dl>

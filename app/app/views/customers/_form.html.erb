@@ -25,6 +25,12 @@
     <%= form.text_field :industry, placeholder: "property_management" %>
   </div>
 
+  <div class="field">
+    <%= form.label :quote_approval_threshold_cents, "Quote Approval Threshold" %>
+    <%= form.number_field :quote_approval_threshold_cents, min: 0, step: 100, required: true %>
+    <p class="field-hint">Stored in cents. A value of 50000 means quotes above $500 require approval.</p>
+  </div>
+
   <div class="form-actions">
     <%= form.submit customer.persisted? ? "Update Customer" : "Create Customer", class: "primary-button" %>
   </div>

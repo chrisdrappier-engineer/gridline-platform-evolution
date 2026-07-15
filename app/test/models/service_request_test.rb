@@ -49,4 +49,11 @@ class ServiceRequestTest < ActiveSupport::TestCase
     assert_not request.valid?
     assert_includes request.errors[:status], "is not included in the list"
   end
+
+  test "calculates actual cost total and quote variance" do
+    request = service_requests(:one)
+
+    assert_equal 22_500, request.actual_cost_total_cents
+    assert_equal(-17_500, request.quote_to_actual_variance_cents)
+  end
 end

@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  service_request: one
+  created_by: one
+  amount_cents: 40000
+  currency: USD
+  description: Replace the lobby thermostat controller and test the air handler.
+  status: approved
+  approval_required: false
+  submitted_at: 2026-07-10 09:00:00
+  approved_at: 2026-07-10 09:00:00
+  approval_notes: Auto-approved under customer quote approval threshold.
+
+two:
+  service_request: two
+  created_by: two
+  amount_cents: 120000
+  currency: USD
+  description: Replace dock sensor assembly and recalibrate the control panel.
+  status: pending_approval
+  approval_required: true
+  submitted_at: 2026-07-10 10:00:00

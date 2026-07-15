@@ -7,4 +7,6 @@ class Customer < ApplicationRecord
 
   validates :name, presence: true
   validates :account_status, presence: true, inclusion: { in: ACCOUNT_STATUSES }
+  validates :quote_approval_threshold_cents,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 end

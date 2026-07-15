@@ -30,6 +30,22 @@ facility_manager = SeedData.upsert(
   active: true
 )
 
+red_clay_facility_manager = SeedData.upsert(
+  User,
+  { email: "facility.manager@redclaylogistics.test" },
+  name: "Jordan Dock Manager",
+  role: "facility_manager",
+  active: true
+)
+
+harbor_pine_facility_manager = SeedData.upsert(
+  User,
+  { email: "facility.manager@harborpine.test" },
+  name: "Harper Market Manager",
+  role: "facility_manager",
+  active: true
+)
+
 customer_contact = SeedData.upsert(
   User,
   { email: "customer.contact@magnoliaproperty.test" },
@@ -94,6 +110,12 @@ harbor_pine = SeedData.upsert(
   created_by: manager
 )
 
+facility_managers_by_customer_name = {
+  magnolia.name => facility_manager,
+  red_clay.name => red_clay_facility_manager,
+  harbor_pine.name => harbor_pine_facility_manager
+}
+
 magnolia_midtown = SeedData.upsert(
   CustomerSite,
   { customer: magnolia, name: "Magnolia Midtown Atlanta" },
@@ -103,6 +125,7 @@ magnolia_midtown = SeedData.upsert(
   state: "GA",
   postal_code: "30309",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(magnolia.name).id,
   created_by: dispatcher
 )
 
@@ -115,6 +138,7 @@ magnolia_buckhead = SeedData.upsert(
   state: "GA",
   postal_code: "30326",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(magnolia.name).id,
   created_by: dispatcher
 )
 
@@ -127,6 +151,7 @@ red_clay_dock = SeedData.upsert(
   state: "GA",
   postal_code: "31216",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(red_clay.name).id,
   created_by: dispatcher
 )
 
@@ -139,6 +164,7 @@ red_clay_cold_storage = SeedData.upsert(
   state: "GA",
   postal_code: "31408",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(red_clay.name).id,
   created_by: dispatcher
 )
 
@@ -151,6 +177,7 @@ harbor_pine_market = SeedData.upsert(
   state: "GA",
   postal_code: "31401",
   site_status: "active",
+  facility_manager_id: facility_managers_by_customer_name.fetch(harbor_pine.name).id,
   created_by: dispatcher
 )
 
@@ -262,6 +289,16 @@ additional_customers = additional_customer_specs.map do |name, industry, account
   )
 end
 
+additional_customers.each do |customer|
+  facility_managers_by_customer_name[customer.name] = SeedData.upsert(
+    User,
+    { email: "facility.manager@#{customer.name.parameterize}.test" },
+    name: "#{customer.name.split.first} Facility Manager",
+    role: "facility_manager",
+    active: true
+  )
+end
+
 site_specs = [
   ["Palmetto Ridge Communities", "Palmetto Ridge Lakewood", "410 Lakewood Dr", nil, "Orlando", "FL", "32803"],
   ["Palmetto Ridge Communities", "Palmetto Ridge Winter Park", "620 Park Ave N", "Clubhouse", "Winter Park", "FL", "32789"],
@@ -294,7 +331,15 @@ site_specs = [
 
 customers_by_name = ([magnolia, red_clay, harbor_pine] + additional_customers).index_by(&:name)
 
-additional_sites = site_specs.map do |customer_name, name, address_line_1, address_line_2, city, state, postal_code|
+additional_sites = site_specs.each_with_index.map do |(customer_name, name, address_line_1, address_line_2, city, state, postal_code), index|
+  site_status = if index % 11 == 0
+                  "inactive"
+                elsif index % 7 == 0
+                  "temporarily_closed"
+                else
+                  "active"
+                end
+
   SeedData.upsert(
     CustomerSite,
     { customer: customers_by_name.fetch(customer_name), name: name },
@@ -303,7 +348,8 @@ additional_sites = site_specs.map do |customer_name, name, address_line_1, addre
     city: city,
     state: state,
     postal_code: postal_code,
-    site_status: "active",
+    site_status: site_status,
+    facility_manager_id: site_status == "active" ? facility_managers_by_customer_name.fetch(customer_name).id : nil,
     created_by: dispatcher
   )
 end
@@ -357,9 +403,116 @@ demo_sites.each_with_index do |site, site_index|
   end
 end
 
+ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
+  threshold_cents = request.quote_approval_threshold_cents
+  quoted_amount_cents = if index % 5 == 0
+                          threshold_cents + 35_000 + (index * 1_250)
+                        elsif index % 7 == 0
+                          threshold_cents + 10_000 + (index * 900)
+                        else
+                          18_000 + (index * 1_175)
+                        end
+  quoted_amount_cents = [quoted_amount_cents, 225_000].min
+  approval_required = quoted_amount_cents > threshold_cents
+  submitted_at = request.reported_at + 30.minutes
+  facility_manager_for_site = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
+  status_sequence = index % 8
+
+  quote_attributes = {
+    created_by: dispatcher,
+    amount_cents: quoted_amount_cents,
+    currency: "USD",
+    description: "Quoted service scope for #{request.title.downcase}.",
+    status: "approved",
+    approval_required: approval_required,
+    submitted_at: submitted_at,
+    approved_by: nil,
+    approved_at: nil,
+    rejected_by: nil,
+    rejected_at: nil,
+    approval_notes: ServiceRequestQuote::AUTO_APPROVAL_NOTE,
+    amendment_reason: nil,
+    amended_by: nil,
+    amended_at: nil,
+    original_amount_cents: nil
+  }
+
+  if approval_required
+    case status_sequence
+    when 0, 5
+      quote_attributes.merge!(
+        status: "approved",
+        approved_by: facility_manager_for_site,
+        approved_at: submitted_at + 2.hours,
+        approval_notes: "Approved for scheduled service under the customer maintenance policy."
+      )
+    when 7
+      quote_attributes.merge!(
+        status: "rejected",
+        rejected_by: facility_manager_for_site,
+        rejected_at: submitted_at + 90.minutes,
+        approval_notes: "Rejected pending additional clarification from Gridline dispatch."
+      )
+    else
+      quote_attributes.merge!(
+        status: "pending_approval",
+        approval_notes: nil
+      )
+    end
+  end
+
+  if index % 9 == 0
+    quote_attributes.merge!(
+      amount_cents: quoted_amount_cents + 18_000,
+      original_amount_cents: quoted_amount_cents,
+      amendment_reason: "Provider discovered additional site conditions requiring amended scope.",
+      amended_by: dispatcher,
+      amended_at: submitted_at + 45.minutes
+    )
+
+    if quote_attributes[:amount_cents] > threshold_cents
+      quote_attributes[:approval_required] = true
+      unless quote_attributes[:approved_by]
+        quote_attributes[:status] = "pending_approval"
+        quote_attributes[:approved_at] = nil
+        quote_attributes[:approval_notes] = nil
+      end
+    end
+  end
+
+  SeedData.upsert(ServiceRequestQuote, { service_request: request }, quote_attributes)
+
+  labor_cents = (quote_attributes[:amount_cents] * (82 + (index % 9)) / 100.0).round
+  SeedData.upsert(
+    ServiceRequestCost,
+    { service_request: request, category: "labor", description: "Labor and dispatch time for #{request.title.downcase}." },
+    recorded_by: dispatcher,
+    amount_cents: [labor_cents, 12_000].max,
+    currency: "USD",
+    incurred_on: request.reported_at.to_date
+  )
+
+  next unless index.even?
+
+  parts_cents = 4_500 + ((index % 6) * 2_750)
+  SeedData.upsert(
+    ServiceRequestCost,
+    { service_request: request, category: "parts", description: "Parts and materials for #{request.title.downcase}." },
+    recorded_by: dispatcher,
+    amount_cents: parts_cents,
+    currency: "USD",
+    incurred_on: request.reported_at.to_date
+  )
+end
+
 RbacSeedData.assign_role(dispatcher, "dispatcher")
 RbacSeedData.assign_role(admin, "admin")
-RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_midtown)
-RbacSeedData.assign_role(facility_manager, "facility_manager", resource: magnolia_buckhead)
+demo_sites.select { |site| site.site_status == "active" }.each do |site|
+  RbacSeedData.assign_role(
+    facility_managers_by_customer_name.fetch(site.customer.name),
+    "facility_manager",
+    resource: site
+  )
+end
 RbacSeedData.assign_role(customer_contact, "customer_contact", resource: magnolia)
 RbacSeedData.assign_role(provider_user, "service_provider_user", resource: cold_chain_provider)

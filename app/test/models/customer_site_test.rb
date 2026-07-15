@@ -43,6 +43,55 @@ class CustomerSiteTest < ActiveSupport::TestCase
     assert_includes site.errors[:site_status], "is not included in the list"
   end
 
+  test "requires facility manager for active site without an assignment" do
+    site = CustomerSite.new(
+      customer: customers(:one),
+      created_by: users(:one),
+      name: "Northstar North",
+      address_line_1: "300 North Ave",
+      city: "Chicago",
+      state: "IL",
+      postal_code: "60611",
+      site_status: "active"
+    )
+
+    assert_not site.valid?
+    assert_includes site.errors[:facility_manager_id], "can't be blank"
+  end
+
+  test "accepts active site with selected facility manager" do
+    site = CustomerSite.new(
+      customer: customers(:one),
+      created_by: users(:one),
+      name: "Northstar North",
+      address_line_1: "300 North Ave",
+      city: "Chicago",
+      state: "IL",
+      postal_code: "60611",
+      site_status: "active",
+      facility_manager_id: users(:three).id
+    )
+
+    assert site.valid?
+  end
+
+  test "rejects non facility manager user as selected facility manager" do
+    site = CustomerSite.new(
+      customer: customers(:one),
+      created_by: users(:one),
+      name: "Northstar North",
+      address_line_1: "300 North Ave",
+      city: "Chicago",
+      state: "IL",
+      postal_code: "60611",
+      site_status: "active",
+      facility_manager_id: users(:one).id
+    )
+
+    assert_not site.valid?
+    assert_includes site.errors[:facility_manager_id], "must identify an active facility manager"
+  end
+
   test "cannot be destroyed while it has service requests" do
     site = customer_sites(:one)
 
