@@ -35,6 +35,11 @@ class User < ApplicationRecord
            foreign_key: :assigned_dispatcher_id,
            inverse_of: :assigned_dispatcher,
            dependent: :restrict_with_error
+  has_many :authored_service_request_notes,
+           class_name: "ServiceRequestNote",
+           foreign_key: :author_id,
+           inverse_of: :author,
+           dependent: :restrict_with_error
 
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true

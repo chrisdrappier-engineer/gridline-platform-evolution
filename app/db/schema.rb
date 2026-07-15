@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_094300) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_225159) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -100,6 +100,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_094300) do
     t.index ["recorded_by_id"], name: "index_service_request_costs_on_recorded_by_id"
     t.index ["service_request_id", "incurred_on"], name: "idx_on_service_request_id_incurred_on_94c9d7d212"
     t.index ["service_request_id"], name: "index_service_request_costs_on_service_request_id"
+  end
+
+  create_table "service_request_notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "author_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.string "note_type", null: false
+    t.uuid "service_request_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "visibility", null: false
+    t.index ["author_id"], name: "index_service_request_notes_on_author_id"
+    t.index ["note_type"], name: "index_service_request_notes_on_note_type"
+    t.index ["service_request_id", "created_at"], name: "idx_on_service_request_id_created_at_268f096cc1"
+    t.index ["service_request_id"], name: "index_service_request_notes_on_service_request_id"
+    t.index ["visibility"], name: "index_service_request_notes_on_visibility"
   end
 
   create_table "service_request_quotes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -206,6 +221,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_094300) do
   add_foreign_key "service_providers", "users", column: "created_by_id"
   add_foreign_key "service_request_costs", "service_requests"
   add_foreign_key "service_request_costs", "users", column: "recorded_by_id"
+  add_foreign_key "service_request_notes", "service_requests"
+  add_foreign_key "service_request_notes", "users", column: "author_id"
   add_foreign_key "service_request_quotes", "service_requests"
   add_foreign_key "service_request_quotes", "users", column: "amended_by_id"
   add_foreign_key "service_request_quotes", "users", column: "approved_by_id"

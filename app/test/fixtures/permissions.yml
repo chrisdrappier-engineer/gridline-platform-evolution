@@ -88,6 +88,18 @@ service_request_costs_update:
   name: Update service request costs
   description: Update actual service request costs.
 
+service_request_notes_read:
+  resource: service_request_notes
+  action: read
+  name: Read service request notes
+  description: View service request notes allowed by visibility.
+
+service_request_notes_create:
+  resource: service_request_notes
+  action: create
+  name: Create service request notes
+  description: Add service request notes allowed by visibility.
+
 customers_read:
   resource: customers
   action: read

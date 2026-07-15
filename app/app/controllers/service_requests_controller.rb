@@ -34,10 +34,15 @@ class ServiceRequestsController < ApplicationController
     authorize!("service_requests", "read", @service_request)
     @quote = @service_request.service_request_quote || ServiceRequestQuote.new
     @service_request_cost = ServiceRequestCost.new(incurred_on: Date.current, currency: "USD")
+    @service_request_note = ServiceRequestNote.new(
+      note_type: "general",
+      visibility: ServiceRequestNote.default_visibility_for(current_user)
+    )
     @service_request_page = ServiceRequestShowPage.new(
       service_request: @service_request,
       quote_form: @quote,
       cost_form: @service_request_cost,
+      note_form: @service_request_note,
       assignable_service_providers: @assignable_service_providers,
       view_context: view_context
     )
@@ -148,6 +153,7 @@ class ServiceRequestsController < ApplicationController
                          :service_provider,
                          :service_request_quote,
                          service_request_costs: :recorded_by,
+                         service_request_notes: :author,
                          customer_site: :customer
                        )
                        .find(params[:id])
