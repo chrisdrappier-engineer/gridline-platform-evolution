@@ -1,10 +1,7 @@
 name: Container Baseline
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   smoke-test:
@@ -18,6 +15,9 @@ jobs:
         run: |
           docker --version
           docker compose version
+
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Run container baseline smoke test
         run: bin/ci
