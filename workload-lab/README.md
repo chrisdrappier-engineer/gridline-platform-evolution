@@ -81,11 +81,32 @@ The smoke runner uses:
 - `TARGET_BASE_URL`, defaulting to `http://host.docker.internal:3001` from the
   k6 container
 - `PROFILE_PATH`, defaulting to `/workload-lab/profiles/baseline-smoke.json`
-- `WORKLOAD_SEED`, defaulting to `2026071601`
+- `WORKLOAD_SEED`, defaulting to `018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a`
 - `RESOURCE_ENVELOPE`, defaulting to `local-small`
 
 Generated smoke summaries are written under `workload-lab/archive/`, which is
 ignored by Git except for the archive README.
+
+## Seed Convention
+
+Workload seeds are strings. UUIDs are the preferred convention because they are
+easy to generate, copy, and distinguish in evidence metadata. The workload lab
+does not require UUID format, so human-readable seeds can still be used for
+exploratory work.
+
+Seeds must be non-empty and no more than 128 characters.
+
+Generate a UUID seed with:
+
+```bash
+bin/workload-seed
+```
+
+Run the smoke profile with a generated seed:
+
+```bash
+WORKLOAD_SEED="$(bin/workload-seed)" bin/workload-smoke
+```
 
 ## Repository Boundary
 

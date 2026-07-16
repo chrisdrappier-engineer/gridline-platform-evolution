@@ -35,6 +35,11 @@ The workload lab foundation includes:
 - a Docker-backed workload smoke command
 - ignored archive output for generated run summaries
 
+UUID-formatted strings are the preferred seed convention, but the generator
+accepts any non-empty string up to 128 characters. This keeps promoted evidence
+seeds easy to identify while preserving flexibility for human-readable
+exploratory seeds.
+
 ## Rationale
 
 The main project story depends on evidence credibility. If a seed is promoted

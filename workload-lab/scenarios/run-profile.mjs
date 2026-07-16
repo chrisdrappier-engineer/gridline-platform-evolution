@@ -5,7 +5,7 @@ import { eventFor } from "../lib/traffic-plan.mjs";
 import { pathForEvent, firstServiceRequestPath } from "../workflows/requests.mjs";
 
 const profile = JSON.parse(open(__ENV.PROFILE_PATH || "/workload-lab/profiles/baseline-smoke.json"));
-const seed = __ENV.WORKLOAD_SEED || "2026071601";
+const seed = __ENV.WORKLOAD_SEED || "018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a";
 const targetBaseUrl = (__ENV.TARGET_BASE_URL || "http://host.docker.internal:3001").replace(/\/$/, "");
 const actor = profile.actors.dispatcher[0];
 

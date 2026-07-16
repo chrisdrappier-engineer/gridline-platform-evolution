@@ -3,7 +3,7 @@ set -euo pipefail
 
 export TARGET_BASE_URL="${TARGET_BASE_URL:-http://host.docker.internal:3001}"
 export PROFILE_PATH="${PROFILE_PATH:-/workload-lab/profiles/baseline-smoke.json}"
-export WORKLOAD_SEED="${WORKLOAD_SEED:-2026071601}"
+export WORKLOAD_SEED="${WORKLOAD_SEED:-018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a}"
 export RESOURCE_ENVELOPE="${RESOURCE_ENVELOPE:-local-small}"
 export APP_COMMIT="${APP_COMMIT:-$(git rev-parse HEAD)}"
 

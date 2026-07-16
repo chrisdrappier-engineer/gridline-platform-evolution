@@ -221,6 +221,12 @@ with:
 bin/workload-smoke
 ```
 
+Generate a UUID-formatted workload seed with:
+
+```bash
+bin/workload-seed
+```
+
 ## Production-Like Runtime
 
 The repository also includes a production-like local runtime for workload-lab

@@ -4,8 +4,11 @@ import {
 } from "./deterministic-random.mjs";
 import { assertValidProfile } from "./profile.mjs";
 
+export const MAX_SEED_LENGTH = 128;
+
 export function generatePlan(profile, { seed, vus, iterations }) {
   assertValidProfile(profile);
+  assertValidSeed(seed);
 
   const events = [];
   const vuCount = vus || profile.k6.vus;
@@ -22,6 +25,7 @@ export function generatePlan(profile, { seed, vus, iterations }) {
 
 export function eventFor(profile, { seed, vu, iteration }) {
   assertValidProfile(profile);
+  assertValidSeed(seed);
 
   const bucket = bucketForIteration(profile, iteration);
   const workflowName = deterministicWeightedChoice(bucket.workflowMix, seed, vu, iteration, "workflow");
@@ -38,6 +42,18 @@ export function eventFor(profile, { seed, vu, iteration }) {
     type: workflow.type,
     params: paramsForWorkflow(workflow, seed, vu, iteration, workflowName)
   };
+}
+
+export function assertValidSeed(seed) {
+  if (typeof seed !== "string" || seed.trim().length === 0) {
+    throw new Error("Workload seed must be a non-empty string.");
+  }
+
+  if (seed.length > MAX_SEED_LENGTH) {
+    throw new Error(`Workload seed must be ${MAX_SEED_LENGTH} characters or fewer.`);
+  }
+
+  return seed;
 }
 
 export function bucketForIteration(profile, iteration) {
