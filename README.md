@@ -204,14 +204,20 @@ evidence-generation foundation for future vertical optimization and scaling
 scenario work.
 
 The current foundation includes a deterministic traffic generator, profile
-validation, a tiny baseline smoke profile, and a k6 runner. The smoke profile
-is intentionally small; it proves the lab framework works, but it is not a full
-Scenario 00 scaling evidence run.
+validation for selected profiles, a tiny baseline smoke profile, and a k6
+runner. The smoke profile is intentionally small; it proves the lab framework
+works, but it is not a full Scenario 00 scaling evidence run.
 
 Run fast workload-lab checks with:
 
 ```bash
 bin/workload-ci
+```
+
+Validate a selected workload profile with:
+
+```bash
+bin/workload-validate-profile workload-lab/profiles/baseline-smoke.json
 ```
 
 Run the Docker-backed k6 smoke profile against the production-like runtime

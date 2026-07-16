@@ -7,12 +7,12 @@ import { validateProfile } from "../lib/profile.mjs";
 import { pathForEvent, withQuery } from "../workflows/requests.mjs";
 
 const profile = JSON.parse(
-  await readFile(new URL("../profiles/baseline-smoke.json", import.meta.url), "utf8")
+  await readFile(new URL("fixtures/valid-profile.json", import.meta.url), "utf8")
 );
 const seedA = "018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a";
 const seedB = "018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1b";
 
-test("baseline smoke profile is valid", () => {
+test("fixture profile is valid", () => {
   assert.deepEqual(validateProfile(profile), []);
 });
 

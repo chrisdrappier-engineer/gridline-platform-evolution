@@ -2,5 +2,4 @@
 set -euo pipefail
 
 npm run lint:workload
-npm run validate:workload
 npm run test:workload

@@ -50,10 +50,18 @@ bin/workload-ci
 This command runs:
 
 - JavaScript syntax and randomness linting
-- profile validation
-- Node tests for deterministic event generation and request-path construction
+- Node tests for deterministic event generation, fixture profile validation,
+  seed validation, and request-path construction
 
 The normal repository CI also runs these fast workload checks through `bin/ci`.
+
+Profile files are workload inputs, so the fast CI path does not validate every
+tracked profile. Validate a selected profile when it is created, changed, or
+used:
+
+```bash
+bin/workload-validate-profile workload-lab/profiles/baseline-smoke.json
+```
 
 ## Docker Smoke
 
@@ -75,6 +83,8 @@ Then run the workload smoke profile:
 ```bash
 bin/workload-smoke
 ```
+
+The smoke command validates the selected profile before starting k6.
 
 The smoke runner uses:
 

@@ -26,7 +26,7 @@ execute k6 smoke runs, and capture metadata consistently.
 The workload lab foundation includes:
 
 - a generic deterministic traffic generator
-- profile validation
+- selected-profile validation
 - deterministic event-plan tests
 - workflow request/path helpers
 - a baseline smoke profile
@@ -39,6 +39,11 @@ UUID-formatted strings are the preferred seed convention, but the generator
 accepts any non-empty string up to 128 characters. This keeps promoted evidence
 seeds easy to identify while preserving flexibility for human-readable
 exploratory seeds.
+
+Profile validation is treated as input validation rather than core build
+validation. The workload lab fast CI path tests the validator using controlled
+fixtures, while selected real profiles are validated when they are created,
+changed, or used by a workload command.
 
 ## Rationale
 
