@@ -480,6 +480,62 @@ ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_site
   )
 end
 
+follow_up_original = ServiceRequest
+                     .includes(:service_provider, customer_site: :customer)
+                     .where(customer_site: demo_sites, status: "resolved")
+                     .order(:reported_at, :title)
+                     .first
+
+if follow_up_original
+  [
+    [
+      "Follow-up: #{follow_up_original.title} - access panel repair",
+      "Follow-up work identified during completion review: repair the access panel affected by the original service.",
+      "high",
+      "triaged"
+    ],
+    [
+      "Follow-up: #{follow_up_original.title} - finish inspection",
+      "Follow-up work identified during completion review: inspect finish conditions after the original repair.",
+      "normal",
+      "new"
+    ]
+  ].each_with_index do |(title, description, priority, status), index|
+    SeedData.upsert(
+      ServiceRequest,
+      { customer_site: follow_up_original.customer_site, title: title },
+      service_provider: follow_up_original.service_provider,
+      created_by: dispatcher,
+      assigned_dispatcher: status == "triaged" ? dispatcher : nil,
+      follow_up_to_service_request: follow_up_original,
+      description: description,
+      priority: priority,
+      status: status,
+      reported_at: follow_up_original.resolved_at + (index + 1).hours
+    )
+  end
+end
+
+ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites, status: "resolved").order(:reported_at, :title).each_with_index do |request, index|
+  facility_manager_for_site = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
+  follow_up_needed = request == follow_up_original || index % 4 == 0
+  rating = follow_up_needed ? 3 : 4 + (index % 2)
+  feedback = if follow_up_needed
+    "Service restored operations, but site review identified follow-up work that should be tracked separately."
+  else
+    "Service was completed cleanly and the site contact verified normal operation."
+  end
+
+  SeedData.upsert(
+    ServiceRequestFeedback,
+    { service_request: request },
+    submitted_by: facility_manager_for_site,
+    rating: rating,
+    follow_up_needed: follow_up_needed,
+    feedback: feedback
+  )
+end
+
 ServiceRequest.includes(customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
   threshold_cents = request.quote_approval_threshold_cents
   quoted_amount_cents = if index % 5 == 0

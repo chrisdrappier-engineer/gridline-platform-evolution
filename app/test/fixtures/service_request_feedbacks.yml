@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  service_request: one
+  submitted_by: one
+  rating: 1
+  follow_up_needed: false
+  feedback: MyText
+
+two:
+  service_request: two
+  submitted_by: two
+  rating: 1
+  follow_up_needed: false
+  feedback: MyText

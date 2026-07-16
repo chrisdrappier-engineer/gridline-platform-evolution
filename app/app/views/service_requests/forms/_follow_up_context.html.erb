@@ -1,0 +1,6 @@
+<section class="context-panel" aria-label="Follow-up request context">
+  <p class="eyebrow">Follow-Up Request</p>
+  <h2>Follow-up to <%= link_to page.follow_up_to_service_request.title, page.follow_up_original_path %></h2>
+  <p>This request will use the same customer site context and keep a link back to the original request.</p>
+  <%= form.hidden_field :follow_up_to_service_request_id, value: page.follow_up_to_service_request.id %>
+</section>

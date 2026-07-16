@@ -1,6 +1,6 @@
 class ServiceRequestsController < ApplicationController
-  before_action :set_service_request, only: %i[show edit update triage assign respond verify_completion]
-  before_action :set_form_options, only: %i[new create]
+  before_action :set_service_request, only: %i[show edit update new_follow_up triage assign respond verify_completion]
+  before_action :set_form_options, only: %i[new create new_follow_up]
   before_action :set_assign_options, only: %i[show assign]
 
   def index
@@ -38,11 +38,13 @@ class ServiceRequestsController < ApplicationController
       note_type: "general",
       visibility: ServiceRequestNote.default_visibility_for(current_user)
     )
+    @service_request_feedback = @service_request.service_request_feedback || ServiceRequestFeedback.new(follow_up_needed: false)
     @service_request_page = ServiceRequestShowPage.new(
       service_request: @service_request,
       quote_form: @quote,
       cost_form: @service_request_cost,
       note_form: @service_request_note,
+      feedback_form: @service_request_feedback,
       assignable_service_providers: @assignable_service_providers,
       view_context: view_context
     )
@@ -67,9 +69,20 @@ class ServiceRequestsController < ApplicationController
 
     @service_request = ServiceRequest.new(
       priority: "normal",
-      customer_site: selected_site
+      customer_site: selected_site,
+      service_provider: @follow_up_to_service_request&.service_provider,
+      follow_up_to_service_request: @follow_up_to_service_request
     )
+    apply_follow_up_defaults
     set_form_page
+  end
+
+  def new_follow_up
+    authorize!("service_requests", "read", @service_request)
+    authorize!("service_requests", "create", @service_request.customer_site)
+
+    new
+    render :new
   end
 
   def create
@@ -152,6 +165,9 @@ class ServiceRequestsController < ApplicationController
                          :assigned_dispatcher,
                          :service_provider,
                          :service_request_quote,
+                         :service_request_feedback,
+                         follow_up_to_service_request: [:service_provider, { customer_site: :customer }],
+                         follow_up_service_requests: [:assigned_dispatcher, :service_provider],
                          service_request_costs: :recorded_by,
                          service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
                          customer_site: :customer
@@ -160,8 +176,11 @@ class ServiceRequestsController < ApplicationController
   end
 
   def set_form_options
+    @follow_up_to_service_request = action_name == "new_follow_up" ? @service_request : preselected_follow_up_to_service_request
     @context_customer_site = preselected_customer_site
     @context_customer = preselected_customer || @context_customer_site&.customer
+    @context_customer_site ||= @follow_up_to_service_request&.customer_site
+    @context_customer ||= @follow_up_to_service_request&.customer_site&.customer
 
     site_scope = authorized_scope(
       "service_requests",
@@ -192,7 +211,8 @@ class ServiceRequestsController < ApplicationController
       service_request: @service_request,
       customer_sites: @customer_sites,
       service_providers: @service_providers,
-      context_customer: @context_customer
+      context_customer: @context_customer,
+      follow_up_to_service_request: @follow_up_to_service_request
     )
   end
 
@@ -229,7 +249,14 @@ class ServiceRequestsController < ApplicationController
   end
 
   def service_request_params
-    params.require(:service_request).permit(:customer_site_id, :service_provider_id, :title, :description, :priority)
+    params.require(:service_request).permit(
+      :customer_site_id,
+      :service_provider_id,
+      :title,
+      :description,
+      :priority,
+      :follow_up_to_service_request_id
+    )
   end
 
   def service_request_attributes
@@ -261,6 +288,13 @@ class ServiceRequestsController < ApplicationController
     params.require(:service_request).permit(:title, :description, :priority, :status)
   end
 
+  def apply_follow_up_defaults
+    return unless @follow_up_to_service_request
+
+    @service_request.title = "Follow-up: #{@follow_up_to_service_request.title}"
+    @service_request.description = "Follow-up to #{@follow_up_to_service_request.title}."
+  end
+
   def preselected_customer_site
     return if params[:customer_site_id].blank?
 
@@ -271,5 +305,15 @@ class ServiceRequestsController < ApplicationController
     return if params[:customer_id].blank?
 
     Customer.find(params[:customer_id])
+  end
+
+  def preselected_follow_up_to_service_request
+    follow_up_id = params[:follow_up_to_service_request_id].presence ||
+                   params.dig(:service_request, :follow_up_to_service_request_id).presence
+    return if follow_up_id.blank?
+
+    request = ServiceRequest.includes(customer_site: :customer).find(follow_up_id)
+    authorize!("service_requests", "read", request)
+    request
   end
 end

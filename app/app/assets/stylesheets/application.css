@@ -393,6 +393,10 @@ textarea {
   width: auto;
 }
 
+.filter-form .checkbox-field {
+  padding-top: 30px;
+}
+
 .permission-matrix th,
 .permission-matrix td {
   text-align: center;
@@ -846,6 +850,15 @@ textarea {
 .request-description {
   max-width: 760px;
   color: var(--muted);
+}
+
+.relationship-group {
+  margin-top: 18px;
+}
+
+.relationship-group h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
 }
 
 .error-summary {

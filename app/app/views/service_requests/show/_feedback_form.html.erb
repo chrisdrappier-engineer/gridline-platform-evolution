@@ -1,0 +1,25 @@
+<%= form_with model: page.feedback_form,
+              url: page.feedback_form_path,
+              method: page.feedback_form_method,
+              class: "form-panel embedded-form" do |form| %>
+  <%= form_errors_for(page.feedback_form) %>
+
+  <div class="filter-form note-form-grid">
+    <div class="field">
+      <%= form.label :rating %>
+      <%= form.select :rating, page.feedback_rating_options, { include_blank: "Choose rating" }, required: true %>
+    </div>
+
+    <div class="field checkbox-field">
+      <%= form.check_box :follow_up_needed %>
+      <%= form.label :follow_up_needed, "Follow-up work needed" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :feedback, "Completion feedback" %>
+    <%= form.text_area :feedback, rows: 4, required: true %>
+  </div>
+
+  <%= form.submit "Submit Feedback", class: "primary-button" %>
+<% end %>

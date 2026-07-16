@@ -217,6 +217,32 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{service_request_service_request_notes_path(service_requests(:one))}']"
   end
 
+  test "shows related follow up requests on service request detail" do
+    sign_in_as users(:one)
+    original = service_requests(:one)
+    follow_up = service_requests(:two)
+    follow_up.update!(follow_up_to_service_request: original)
+
+    get service_request_path(original)
+
+    assert_response :success
+    assert_select "h2", text: "Related Requests"
+    assert_select "a", text: follow_up.title
+  end
+
+  test "shows follow up parent on follow up detail" do
+    sign_in_as users(:one)
+    original = service_requests(:one)
+    follow_up = service_requests(:two)
+    follow_up.update!(follow_up_to_service_request: original)
+
+    get service_request_path(follow_up)
+
+    assert_response :success
+    assert_select "h3", text: "Follow-Up To"
+    assert_select "a", text: original.title
+  end
+
   test "request detail filters notes for facility manager visibility" do
     sign_in_as users(:three)
 
@@ -278,6 +304,43 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_request_path(request)
     assert_equal users(:one), request.created_by
     assert_equal "new", request.status
+  end
+
+  test "shows new follow up request form with original context" do
+    sign_in_as users(:one)
+    original = service_requests(:one)
+    original.update!(status: "resolved", resolved_at: Time.current)
+
+    get new_follow_up_service_request_path(original)
+
+    assert_response :success
+    assert_select "h2", text: /Follow-up to #{Regexp.escape(original.title)}/
+    assert_select "input[name='service_request[follow_up_to_service_request_id]'][value='#{original.id}']"
+    assert_select "input[name='service_request[customer_site_id]'][value='#{original.customer_site_id}']"
+  end
+
+  test "creates follow up service request linked to original" do
+    sign_in_as users(:one)
+    original = service_requests(:one)
+    original.update!(status: "resolved", resolved_at: Time.current)
+
+    assert_difference -> { ServiceRequest.count }, 1 do
+      post service_requests_path, params: {
+        service_request: {
+          customer_site_id: original.customer_site_id,
+          service_provider_id: original.service_provider_id,
+          follow_up_to_service_request_id: original.id,
+          title: "Follow-up service request",
+          description: "Follow-up created from original request.",
+          priority: "high"
+        }
+      }
+    end
+
+    follow_up = ServiceRequest.order(:created_at).last
+    assert_redirected_to service_request_path(follow_up)
+    assert_equal original, follow_up.follow_up_to_service_request
+    assert_equal original.customer_site, follow_up.customer_site
   end
 
   test "dispatcher updates service request details" do

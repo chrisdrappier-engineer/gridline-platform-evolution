@@ -45,6 +45,11 @@ class User < ApplicationRecord
            foreign_key: :uploaded_by_id,
            inverse_of: :uploaded_by,
            dependent: :restrict_with_error
+  has_many :submitted_service_request_feedbacks,
+           class_name: "ServiceRequestFeedback",
+           foreign_key: :submitted_by_id,
+           inverse_of: :submitted_by,
+           dependent: :restrict_with_error
 
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true

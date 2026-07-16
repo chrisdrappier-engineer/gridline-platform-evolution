@@ -14,10 +14,20 @@ class ServiceRequest < ApplicationRecord
   belongs_to :completion_verified_by,
              class_name: "User",
              optional: true
+  belongs_to :follow_up_to_service_request,
+             class_name: "ServiceRequest",
+             optional: true,
+             inverse_of: :follow_up_service_requests
 
   has_one :service_request_quote, dependent: :restrict_with_error
+  has_one :service_request_feedback, dependent: :restrict_with_error
   has_many :service_request_costs, dependent: :restrict_with_error
   has_many :service_request_notes, dependent: :restrict_with_error
+  has_many :follow_up_service_requests,
+           class_name: "ServiceRequest",
+           foreign_key: :follow_up_to_service_request_id,
+           dependent: :restrict_with_error,
+           inverse_of: :follow_up_to_service_request
 
   before_save :populate_lifecycle_timestamps
   before_save :refresh_lifecycle_metrics
@@ -26,6 +36,7 @@ class ServiceRequest < ApplicationRecord
   validates :priority, presence: true, inclusion: { in: PRIORITIES }
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :reported_at, presence: true
+  validate :follow_up_cannot_reference_self
 
   def open?
     !%w[resolved canceled].include?(status)
@@ -45,6 +56,10 @@ class ServiceRequest < ApplicationRecord
 
   def quote_approval_threshold_cents
     customer_site.customer.quote_approval_threshold_cents
+  end
+
+  def follow_up?
+    follow_up_to_service_request_id.present?
   end
 
   def actual_cost_total_cents
@@ -107,5 +122,11 @@ class ServiceRequest < ApplicationRecord
     self.resolved_at = nil if status != "resolved"
     self.completion_verified_at = nil
     self.completion_verified_by = nil
+  end
+
+  def follow_up_cannot_reference_self
+    return if follow_up_to_service_request_id.blank? || follow_up_to_service_request_id != id
+
+    errors.add(:follow_up_to_service_request, "cannot be the same request")
   end
 end

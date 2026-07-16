@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -142,6 +142,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
     t.index ["uploaded_by_id"], name: "index_service_request_evidence_files_on_uploaded_by_id"
   end
 
+  create_table "service_request_feedbacks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "feedback", null: false
+    t.boolean "follow_up_needed", default: false, null: false
+    t.integer "rating", null: false
+    t.uuid "service_request_id", null: false
+    t.uuid "submitted_by_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_request_id"], name: "index_service_request_feedbacks_on_service_request_id", unique: true
+    t.index ["submitted_by_id"], name: "index_service_request_feedbacks_on_submitted_by_id"
+  end
+
   create_table "service_request_notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "author_id", null: false
     t.text "body", null: false
@@ -197,6 +209,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
     t.uuid "customer_site_id", null: false
     t.text "description"
     t.text "follow_up_notes"
+    t.uuid "follow_up_to_service_request_id"
     t.string "priority", null: false
     t.integer "provider_completion_seconds"
     t.datetime "provider_responded_at"
@@ -217,6 +230,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
     t.index ["completion_verified_by_id"], name: "index_service_requests_on_completion_verified_by_id"
     t.index ["created_by_id"], name: "index_service_requests_on_created_by_id"
     t.index ["customer_site_id"], name: "index_service_requests_on_customer_site_id"
+    t.index ["follow_up_to_service_request_id"], name: "index_service_requests_on_follow_up_to_service_request_id"
     t.index ["priority"], name: "index_service_requests_on_priority"
     t.index ["provider_completion_seconds"], name: "index_service_requests_on_provider_completion_seconds"
     t.index ["provider_responded_at"], name: "index_service_requests_on_provider_responded_at"
@@ -265,6 +279,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
   add_foreign_key "service_request_costs", "users", column: "recorded_by_id"
   add_foreign_key "service_request_evidence_files", "service_request_notes"
   add_foreign_key "service_request_evidence_files", "users", column: "uploaded_by_id"
+  add_foreign_key "service_request_feedbacks", "service_requests"
+  add_foreign_key "service_request_feedbacks", "users", column: "submitted_by_id"
   add_foreign_key "service_request_notes", "service_requests"
   add_foreign_key "service_request_notes", "users", column: "author_id"
   add_foreign_key "service_request_quotes", "service_requests"
@@ -274,6 +290,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
   add_foreign_key "service_request_quotes", "users", column: "rejected_by_id"
   add_foreign_key "service_requests", "customer_sites"
   add_foreign_key "service_requests", "service_providers"
+  add_foreign_key "service_requests", "service_requests", column: "follow_up_to_service_request_id"
   add_foreign_key "service_requests", "users", column: "assigned_dispatcher_id"
   add_foreign_key "service_requests", "users", column: "completion_verified_by_id"
   add_foreign_key "service_requests", "users", column: "created_by_id"

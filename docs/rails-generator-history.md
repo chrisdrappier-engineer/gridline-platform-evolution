@@ -76,3 +76,11 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-15
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestEvidenceFile service_request_note:references uploaded_by:references category:string`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestFeedback service_request:references submitted_by:references rating:integer follow_up_needed:boolean feedback:text`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate migration AddFollowUpToServiceRequests follow_up_to_service_request:references`
