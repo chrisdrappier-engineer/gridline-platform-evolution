@@ -40,6 +40,11 @@ class User < ApplicationRecord
            foreign_key: :author_id,
            inverse_of: :author,
            dependent: :restrict_with_error
+  has_many :uploaded_service_request_evidence_files,
+           class_name: "ServiceRequestEvidenceFile",
+           foreign_key: :uploaded_by_id,
+           inverse_of: :uploaded_by,
+           dependent: :restrict_with_error
 
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true

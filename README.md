@@ -88,6 +88,7 @@ The baseline includes:
 - stdout logging from the app container
 - Rails database preparation, test, and health smoke-check scripts
 - a named Postgres volume for durable database state
+- a named app storage volume for local Active Storage uploads
 
 The Rails app currently implements the first operational baseline:
 
@@ -104,7 +105,8 @@ The Rails app currently implements the first operational baseline:
   on request detail pages
 - lifecycle timestamps and persisted provider performance metrics for response,
   completion, resolution, and verification timing
-- service request notes with role-aware visibility rules
+- service request notes with role-aware visibility rules and evidence file
+  attachments
 - scoped read access for facility managers, customer contacts, and service
   provider users
 - admin maintenance screens for customers, sites, providers, users, role
@@ -266,8 +268,8 @@ Known limitations at this stage:
 - Cost reporting is still limited to request-level quote and actual-cost data
 - Provider performance reporting is limited to request and provider-level
   summaries
-- File uploads, ratings, SLA policy reporting, and broader management
-  dashboards are captured as user stories but not yet implemented
+- Ratings, SLA policy reporting, and broader management dashboards are captured
+  as user stories but not yet implemented
 
 These limitations motivate the later scenarios.
 
@@ -279,9 +281,10 @@ The initial facilities operations domain is defined in
 The current implementation is intentionally narrower than the original domain
 sketch. The app currently centers on customers, sites, service providers,
 service requests, users, scoped RBAC, service request quotes, actual service
-costs, and request notes. Lifecycle timing, provider performance summaries, and
-note visibility rules are implemented for the baseline workflow. Files, ratings,
-SLA reporting, and broader management reporting are captured in
+costs, request notes, and request evidence files. Lifecycle timing, provider
+performance summaries, note visibility rules, and local evidence-file storage
+are implemented for the baseline workflow. Ratings, SLA reporting, and broader
+management reporting are captured in
 [`docs/user-stories`](docs/user-stories/README.md) for future feature work.
 
 ## Repository Structure

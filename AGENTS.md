@@ -54,6 +54,9 @@ Common patterns include:
 - ERB linting and custom dumb ERB template checks
 - Minitest for Rails model/controller/service coverage
 - Playwright for browser-visible workflow coverage
+- E2E coverage is part of the definition of done for tickets that change
+  user-facing workflows; update or intentionally document why Playwright
+  coverage is not needed before closing the ticket
 - decision notes only for substantial reasoning paths
 
 Discuss alternatives only when the current pattern does not fit the task.

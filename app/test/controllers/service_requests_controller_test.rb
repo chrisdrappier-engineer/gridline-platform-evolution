@@ -231,12 +231,22 @@ class ServiceRequestsControllerTest < ActionDispatch::IntegrationTest
 
   test "request detail filters notes for provider visibility" do
     sign_in_as users(:five)
+    evidence_file = ServiceRequestEvidenceFile.new(
+      service_request_note: service_request_notes(:two),
+      uploaded_by: users(:five),
+      category: "diagnostic_report"
+    )
+    File.open(Rails.root.join("db/demo_files/diagnostic-report.txt"), "rb") do |file|
+      evidence_file.file.attach(io: file, filename: "diagnostic-report.txt", content_type: "text/plain")
+      evidence_file.save!
+    end
 
     get service_request_path(service_requests(:two))
 
     assert_response :success
     assert_select ".note-card", text: /Provider reviewed sensor alignment/
     assert_select ".note-card", text: /Shared update visible/
+    assert_select ".evidence-card", text: /diagnostic-report.txt/
     assert_select "option[value='provider_visible']"
     assert_select "option[value='customer_visible']", count: 0
   end

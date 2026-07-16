@@ -1,0 +1,5 @@
+<div class="evidence-list">
+  <% evidence_files.each do |evidence_file| %>
+    <%= render evidence_file.fetch(:partial), evidence_file: evidence_file %>
+  <% end %>
+</div>

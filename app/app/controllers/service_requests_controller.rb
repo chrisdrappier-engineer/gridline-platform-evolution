@@ -153,7 +153,7 @@ class ServiceRequestsController < ApplicationController
                          :service_provider,
                          :service_request_quote,
                          service_request_costs: :recorded_by,
-                         service_request_notes: :author,
+                         service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
                          customer_site: :customer
                        )
                        .find(params[:id])

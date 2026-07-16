@@ -10,10 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_225159) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_233520) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.uuid "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "customer_sites", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "address_line_1", null: false
@@ -100,6 +128,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_225159) do
     t.index ["recorded_by_id"], name: "index_service_request_costs_on_recorded_by_id"
     t.index ["service_request_id", "incurred_on"], name: "idx_on_service_request_id_incurred_on_94c9d7d212"
     t.index ["service_request_id"], name: "index_service_request_costs_on_service_request_id"
+  end
+
+  create_table "service_request_evidence_files", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.uuid "service_request_note_id", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "uploaded_by_id", null: false
+    t.index ["category"], name: "index_service_request_evidence_files_on_category"
+    t.index ["service_request_note_id", "created_at"], name: "idx_on_service_request_note_id_created_at_5eb6f44745"
+    t.index ["service_request_note_id"], name: "idx_on_service_request_note_id_9eed47dd3f"
+    t.index ["uploaded_by_id"], name: "index_service_request_evidence_files_on_uploaded_by_id"
   end
 
   create_table "service_request_notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -213,6 +253,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_225159) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "customer_sites", "customers"
   add_foreign_key "customer_sites", "users", column: "created_by_id"
   add_foreign_key "customers", "users", column: "created_by_id"
@@ -221,6 +263,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_225159) do
   add_foreign_key "service_providers", "users", column: "created_by_id"
   add_foreign_key "service_request_costs", "service_requests"
   add_foreign_key "service_request_costs", "users", column: "recorded_by_id"
+  add_foreign_key "service_request_evidence_files", "service_request_notes"
+  add_foreign_key "service_request_evidence_files", "users", column: "uploaded_by_id"
   add_foreign_key "service_request_notes", "service_requests"
   add_foreign_key "service_request_notes", "users", column: "author_id"
   add_foreign_key "service_request_quotes", "service_requests"

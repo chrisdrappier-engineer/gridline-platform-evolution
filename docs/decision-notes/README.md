@@ -29,3 +29,4 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-15: Local Linting Toolchain](2026-07-15-local-linting-toolchain.md)
 - [2026-07-15: Dumb ERB Template Boundary](2026-07-15-dumb-erb-template-boundary.md)
 - [2026-07-15: Dumb ERB View Model Refactor](2026-07-15-dumb-erb-view-model-refactor.md)
+- [2026-07-15: Request Evidence File Boundaries](2026-07-15-request-evidence-file-boundaries.md)

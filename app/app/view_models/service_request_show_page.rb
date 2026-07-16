@@ -137,7 +137,8 @@ class ServiceRequestShowPage
           created_at: long_time(note.created_at),
           note_type: note.note_type_label,
           visibility: note.visibility_label,
-          body: formatted_text(note.body)
+          body: formatted_text(note.body),
+          evidence_files: evidence_file_rows(note)
         }
       end
   end
@@ -160,6 +161,24 @@ class ServiceRequestShowPage
 
   def note_visibility_options
     ServiceRequestNote.visibility_options_for(view.current_user)
+  end
+
+  def evidence_category_options
+    ServiceRequestEvidenceFile.category_options
+  end
+
+  def evidence_accept_attribute
+    ServiceRequestEvidenceFile.accept_attribute
+  end
+
+  def evidence_upload_limits
+    {
+      max_files: ServiceRequestEvidenceFile::MAX_FILES_PER_NOTE,
+      max_total_bytes: ServiceRequestEvidenceFile::MAX_TOTAL_BYTES_PER_NOTE,
+      image_bytes: ServiceRequestEvidenceFile::MAX_IMAGE_SIZE,
+      pdf_bytes: ServiceRequestEvidenceFile::MAX_PDF_SIZE,
+      text_bytes: ServiceRequestEvidenceFile::MAX_TEXT_SIZE
+    }
   end
 
   def quote
@@ -390,5 +409,20 @@ class ServiceRequestShowPage
     return unless view.can?("service_request_costs", "update", cost)
 
     ViewAction.link("Edit", view.edit_service_request_service_request_cost_path(service_request, cost), style: nil)
+  end
+
+  def evidence_file_rows(note)
+    note.evidence_files_visible_to(view.current_user).map do |evidence_file|
+      {
+        category: evidence_file.category.humanize,
+        filename: evidence_file.filename,
+        size: view.number_to_human_size(evidence_file.byte_size),
+        uploaded_by: evidence_file.uploaded_by.name,
+        uploaded_at: long_time(evidence_file.created_at),
+        path: view.service_request_evidence_file_path(evidence_file),
+        thumbnail_path: evidence_file.image? ? view.thumbnail_service_request_evidence_file_path(evidence_file) : nil,
+        partial: evidence_file.image? ? "service_requests/show/evidence_image" : "service_requests/show/evidence_link"
+      }
+    end
   end
 end

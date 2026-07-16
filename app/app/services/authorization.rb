@@ -48,6 +48,8 @@ class Authorization
           resource == target.service_provider
       when ServiceRequestQuote, ServiceRequestCost, ServiceRequestNote
         covers_target?(assignment, target.service_request)
+      when ServiceRequestEvidenceFile
+        covers_target?(assignment, target.service_request_note)
       when CustomerSite
         resource == target || resource == target.customer
       when Customer

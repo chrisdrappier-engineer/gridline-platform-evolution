@@ -1,0 +1,4 @@
+<%= link_to evidence_file.fetch(:path), class: "evidence-card evidence-card-image" do %>
+  <%= image_tag evidence_file.fetch(:thumbnail_path), alt: evidence_file.fetch(:filename), class: "evidence-thumbnail" %>
+  <%= render "service_requests/show/evidence_metadata", evidence_file: evidence_file %>
+<% end %>

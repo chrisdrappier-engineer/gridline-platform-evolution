@@ -5,8 +5,11 @@ class ServiceRequestNote < ApplicationRecord
   CUSTOMER_ROLE_KEYS = %w[facility_manager customer_contact].freeze
   PROVIDER_ROLE_KEYS = %w[service_provider_user].freeze
 
+  attr_accessor :evidence_category, :evidence_files
+
   belongs_to :service_request
   belongs_to :author, class_name: "User"
+  has_many :service_request_evidence_files, dependent: :restrict_with_error
 
   validates :note_type, presence: true, inclusion: { in: NOTE_TYPES }
   validates :visibility, presence: true, inclusion: { in: VISIBILITIES }
@@ -52,6 +55,12 @@ class ServiceRequestNote < ApplicationRecord
 
   def note_type_label
     note_type.humanize
+  end
+
+  def evidence_files_visible_to(user)
+    return ServiceRequestEvidenceFile.none unless self.class.visible_to(user).exists?(id: id)
+
+    service_request_evidence_files.includes(:uploaded_by, file_attachment: :blob).order(:created_at, :id)
   end
 
   private

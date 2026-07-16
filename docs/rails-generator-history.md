@@ -68,3 +68,11 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-15
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestNote service_request:references author:references note_type:string visibility:string body:text`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `docker compose run --rm app bin/rails active_storage:install`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate model ServiceRequestEvidenceFile service_request_note:references uploaded_by:references category:string`
