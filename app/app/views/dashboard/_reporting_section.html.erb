@@ -1,0 +1,13 @@
+<section class="section-block reporting-section">
+  <div class="section-header">
+    <div>
+      <h2><%= title %></h2>
+      <p class="section-note"><%= reporting.freshness_label %></p>
+    </div>
+  </div>
+
+  <%= render "dashboard/metric_cards", cards: reporting.operations_cards, label: "#{title} operations" %>
+  <%= render "dashboard/metric_cards", cards: reporting.financial_cards, label: "#{title} financials" %>
+  <%= render "dashboard/metric_cards", cards: reporting.quality_cards, label: "#{title} quality" %>
+  <%= render "dashboard/metric_cards", cards: reporting.performance_cards, label: "#{title} performance" %>
+</section>

@@ -1,0 +1,8 @@
+<section class="metric-grid" aria-label="<%= label %>">
+  <% cards.each do |card| %>
+    <article class="<%= card.css_class %>">
+      <span><%= card.label %></span>
+      <strong><%= card.value %></strong>
+    </article>
+  <% end %>
+</section>

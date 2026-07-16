@@ -31,3 +31,4 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-15: Dumb ERB View Model Refactor](2026-07-15-dumb-erb-view-model-refactor.md)
 - [2026-07-15: Request Evidence File Boundaries](2026-07-15-request-evidence-file-boundaries.md)
 - [2026-07-16: Service Feedback And Follow-Up Requests](2026-07-16-service-feedback-and-follow-up-requests.md)
+- [2026-07-16: Live Reporting Dashboard Metrics](2026-07-16-live-reporting-dashboard-metrics.md)

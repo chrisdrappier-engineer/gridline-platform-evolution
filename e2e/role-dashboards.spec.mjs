@@ -6,17 +6,17 @@ const users = [
   {
     email: "dispatcher@gridline.test",
     dashboard: "Dispatcher Dashboard",
-    visibleText: "New Queue"
+    visibleText: "Operations Reporting"
   },
   {
     email: "facility.manager@magnoliaproperty.test",
     dashboard: "Facility Manager Dashboard",
-    visibleText: "Facility Views"
+    visibleText: "Facility Reporting"
   },
   {
     email: "customer.contact@magnoliaproperty.test",
     dashboard: "Customer Contact Dashboard",
-    visibleText: "Account Views"
+    visibleText: "Account Reporting"
   },
   {
     email: "provider.user@coastalcoldchain.test",
@@ -26,7 +26,7 @@ const users = [
   {
     email: "admin@gridline.test",
     dashboard: "Admin Dashboard",
-    visibleText: "Administration Views"
+    visibleText: "Management Reporting"
   }
 ];
 
@@ -44,5 +44,6 @@ for (const user of users) {
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole("heading", { name: user.dashboard })).toBeVisible();
     await expect(page.getByText(user.visibleText)).toBeVisible();
+    await expect(page.getByText("Calculated live from authorized operational records").first()).toBeVisible();
   });
 }

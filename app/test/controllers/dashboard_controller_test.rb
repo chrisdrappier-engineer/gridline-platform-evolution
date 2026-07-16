@@ -14,6 +14,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Dispatcher Dashboard"
+    assert_select "h2", "Operations Reporting"
+    assert_select ".section-note", text: /Calculated live from authorized operational records/
     assert_select "a", text: service_requests(:one).title
   end
 
@@ -34,6 +36,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Facility Manager Dashboard"
+    assert_select "h2", "Facility Reporting"
+    assert_select ".metric-card", text: /Completed Without Feedback/
     assert_select "a[href='#{customer_sites_path}']", text: "View Managed Sites"
     assert_select "a", text: service_requests(:one).title
   end
@@ -45,6 +49,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Customer Contact Dashboard"
+    assert_select "h2", "Account Reporting"
+    assert_select ".section-note", text: /Calculated live from authorized operational records/
+    assert_select ".metric-card", text: /Approved Quotes/
+    assert_select ".metric-card", text: /Average Rating/
     assert_select "a[href='#{customers_path}']", text: "View Customers"
     assert_select "a[href='#{customer_sites_path}']", text: "View Sites"
   end
@@ -57,6 +65,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Service Provider Dashboard"
     assert_select "a[href='#{service_providers_path}']", text: "View Service Providers"
+    assert_select "h2", "Provider Reporting"
     assert_select ".metric-card", text: /Avg Response Time/
     assert_select ".metric-card", text: /Resolution Rate/
     assert_select "a", text: service_requests(:two).title
@@ -69,7 +78,11 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Admin Dashboard"
-    assert_select ".metric-card", count: 3
+    assert_select "h2", "Management Reporting"
+    assert_select ".section-note", text: /Calculated live from authorized operational records/
+    assert_select ".metric-card", minimum: 15
+    assert_select ".metric-card", text: /Follow-Ups Needed/
+    assert_select ".metric-card", text: /Quote Variance/
     assert_select "a[href='#{admin_role_permissions_path}']", text: "Permission Matrix"
     assert_select "a[href='#{admin_role_assignments_path}']", text: "Role Assignments"
     assert_select "a[href='#{admin_users_path}']", text: "Users"
