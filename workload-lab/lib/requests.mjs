@@ -1,15 +1,11 @@
-export function pathForEvent(event) {
-  switch (event.type) {
-    case "dashboard":
-      return "/dashboard";
-    case "service-request-index":
-    case "service-request-detail":
-      return withQuery("/service_requests", event.params);
-    case "site-index":
-      return withQuery("/customer_sites", event.params);
-    default:
-      throw new Error(`No request path is registered for workflow type: ${event.type}`);
+export function pathForEvent(event, workflowPaths) {
+  const path = workflowPaths?.[event.type];
+
+  if (!path) {
+    throw new Error(`No request path is registered for workflow type: ${event.type}`);
   }
+
+  return withQuery(path, event.params);
 }
 
 export function withQuery(path, params = {}) {

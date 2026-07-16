@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PROFILE_PATH="${PROFILE_PATH:-/workload-lab/profiles/scenario-00-normal-operations.json}"
+export WORKLOAD_SEED="${WORKLOAD_SEED:-01981f6d-89a0-7b2c-9c45-5d8df49f5e40}"
+
+bin/workload-run

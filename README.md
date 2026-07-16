@@ -205,9 +205,10 @@ scenario work.
 
 The current foundation includes a deterministic traffic generator, profile
 validation for selected profiles, ESLint-backed workload-lab checks with a
-`Math.random()` ban, a tiny baseline smoke profile, and a k6 runner. The smoke
-profile is intentionally small; it proves the lab framework works, but it is
-not a full Scenario 00 scaling evidence run.
+`Math.random()` ban, a tiny baseline smoke profile, a first Scenario 00
+normal-operations profile, and a k6 runner. The smoke profile is intentionally
+small; it proves the lab framework works. The Scenario 00 profile is the first
+business-texture baseline for later scaling evidence.
 
 Run fast workload-lab checks with:
 
@@ -226,6 +227,12 @@ with:
 
 ```bash
 bin/workload-smoke
+```
+
+Run the first normal-operations profile with:
+
+```bash
+bin/workload-scenario-00
 ```
 
 Generate a UUID-formatted workload seed with:

@@ -10,14 +10,7 @@ const REQUIRED_TOP_LEVEL_FIELDS = [
   "workflows"
 ];
 
-export const REGISTERED_WORKFLOW_TYPES = new Set([
-  "dashboard",
-  "service-request-index",
-  "service-request-detail",
-  "site-index"
-]);
-
-export function validateProfile(profile) {
+export function validateProfile(profile, { workflowPaths } = {}) {
   const errors = [];
 
   for (const field of REQUIRED_TOP_LEVEL_FIELDS) {
@@ -32,7 +25,7 @@ export function validateProfile(profile) {
 
   validateK6(profile.k6, errors);
   validateActors(profile.actors, errors);
-  validateWorkflows(profile.workflows, errors);
+  validateWorkflows(profile.workflows, profile.actors, workflowPaths, errors);
   validateTimeBuckets(profile.timeBuckets, profile.workflows, errors);
 
   return errors;
@@ -87,19 +80,24 @@ function validateActors(actors, errors) {
   }
 }
 
-function validateWorkflows(workflows, errors) {
+function validateWorkflows(workflows, actors, workflowPaths, errors) {
   if (!isObject(workflows)) {
     errors.push("workflows must be an object.");
     return;
   }
 
   for (const [name, workflow] of Object.entries(workflows)) {
-    if (!REGISTERED_WORKFLOW_TYPES.has(workflow.type)) {
+    if (workflowPaths && !workflowPaths[workflow.type]) {
       errors.push(`workflows.${name}.type is not registered: ${workflow.type}`);
     }
 
     if (workflow.bounds !== undefined && !isObject(workflow.bounds)) {
       errors.push(`workflows.${name}.bounds must be an object when present.`);
+    }
+
+    const actorRole = workflow.actorRole || "dispatcher";
+    if (!actors?.[actorRole]) {
+      errors.push(`workflows.${name}.actorRole is not registered in actors: ${actorRole}`);
     }
   }
 }
