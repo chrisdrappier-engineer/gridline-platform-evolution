@@ -220,7 +220,7 @@ scaling roadmap lives in [`docs/roadmap`](docs/roadmap/README.md).
 | Scenario | Focus | Status |
 |---|---|---|
 | 00 Vertical Scaling Limit | Pre-history: why vertical scaling is no longer enough | Planned |
-| 01 Mature Monolith Baseline | Single-instance Rails operations platform | In Progress |
+| 01 Mature Monolith Baseline | Single-instance Rails operations platform | Baseline Complete |
 | 02 Load-Balanced Web Tier | Multiple Rails web workers behind a load balancer | Planned |
 | 03 Shared Redis Sessions | Stateless web containers and shared session state | Planned |
 | 04 Persistent Postgres State | Shared durable database state | Planned |
@@ -236,6 +236,13 @@ scaling roadmap lives in [`docs/roadmap`](docs/roadmap/README.md).
 The first runnable stage is a mature single-instance Rails monolith.
 
 It represents Gridline after the product has already proven useful in one operating region. The monolith supports core dispatch workflows, but it has not yet been adapted for horizontal scaling.
+
+The mature monolith baseline is now considered feature complete for the
+purposes of this case study. It is not a complete facilities management
+product, but it has enough operational depth to create believable reporting,
+performance, and scaling pressure. Future work should generally shift from
+adding domain features toward measuring vertical limits, tuning live queries,
+and documenting optimization tradeoffs before introducing horizontal scaling.
 
 The baseline application includes:
 
