@@ -153,6 +153,13 @@ container for changes that Rails does not reload automatically, and rebuild only
 when image-level inputs change, such as `app/Gemfile`, `app/Gemfile.lock`, or
 `app/Dockerfile`.
 
+The repository currently has paths such as `app/app/models` because the outer
+`app/` directory is the Rails application root inside this portfolio repository,
+while the inner `app/` directory is the normal Rails framework directory. The
+project is expected to remain a single Rails monolith, so the outer directory is
+planned to be renamed for clarity in
+[#33](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/33).
+
 Then visit:
 
 ```text
@@ -303,7 +310,7 @@ management drilldowns remain future feature work.
 ```text
 gridline-platform-evolution/
   app/
-    # Rails monolith shared by scenarios
+    # Rails monolith root; contains Rails' own app/, config/, db/, and Gemfile
 
   generator/
     # Container image for Rails file generation
