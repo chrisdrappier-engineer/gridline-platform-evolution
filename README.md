@@ -287,7 +287,6 @@ Known limitations at this stage:
 - Limited operational visibility
 - Reporting is still live-query based and intentionally not cached or
   precomputed
-- SLA policy reporting and richer management drilldowns are not yet implemented
 
 These limitations motivate the later scenarios.
 
