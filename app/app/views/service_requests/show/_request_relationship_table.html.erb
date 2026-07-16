@@ -1,0 +1,29 @@
+<section class="relationship-group">
+  <h3><%= title %></h3>
+  <div class="responsive-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Request</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Provider</th>
+          <th>Reported</th>
+          <th>Dispatcher</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.each do |row| %>
+          <tr>
+            <td><%= link_to row.fetch(:title), row.fetch(:path), class: "table-link" %></td>
+            <td><%= row.fetch(:status) %></td>
+            <td><%= row.fetch(:priority) %></td>
+            <td><%= row.fetch(:provider) %></td>
+            <td><%= row.fetch(:reported) %></td>
+            <td><%= row.fetch(:dispatcher) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,14 +1,16 @@
 class ServiceRequestFormPage
-  attr_reader :service_request, :customer_sites, :service_providers, :context_customer
+  attr_reader :service_request, :customer_sites, :service_providers, :context_customer, :follow_up_to_service_request
 
-  def initialize(service_request:, customer_sites:, service_providers:, context_customer:)
+  def initialize(service_request:, customer_sites:, service_providers:, context_customer:, follow_up_to_service_request: nil)
     @service_request = service_request
     @customer_sites = customer_sites
     @service_providers = service_providers
     @context_customer = context_customer
+    @follow_up_to_service_request = follow_up_to_service_request
   end
 
   def context_partial
+    return "service_requests/forms/follow_up_context" if follow_up_to_service_request
     return "service_requests/forms/selected_site_context" if service_request.customer_site
     return "service_requests/forms/selected_customer_context" if context_customer
 
@@ -31,6 +33,10 @@ class ServiceRequestFormPage
     return unless context_customer
 
     "Site choices are limited to the selected customer."
+  end
+
+  def follow_up_original_path
+    Rails.application.routes.url_helpers.service_request_path(follow_up_to_service_request)
   end
 
   private

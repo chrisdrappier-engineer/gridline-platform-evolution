@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#show"
 
   resources :service_requests, only: %i[index show new create edit update] do
+    get :new_follow_up, on: :member
     patch :triage, on: :member
     patch :assign, on: :member
     patch :respond, on: :member
@@ -18,6 +19,7 @@ Rails.application.routes.draw do
     end
     resources :service_request_costs, only: %i[create edit update]
     resources :service_request_notes, only: %i[create]
+    resource :service_request_feedback, only: %i[create update]
   end
   resources :service_request_evidence_files, only: %i[show] do
     get :thumbnail, on: :member

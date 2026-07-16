@@ -1,0 +1,6 @@
+<section class="section-block">
+  <h2>Related Requests</h2>
+  <% page.relationship_groups.each do |group| %>
+    <%= render "service_requests/show/request_relationship_table", title: group.fetch(:title), rows: group.fetch(:rows) %>
+  <% end %>
+</section>

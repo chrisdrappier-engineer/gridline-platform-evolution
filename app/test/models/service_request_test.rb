@@ -83,6 +83,25 @@ class ServiceRequestTest < ActiveSupport::TestCase
     assert_equal 45.minutes.to_i, request.verification_lag_seconds
   end
 
+  test "tracks follow up service requests" do
+    original = service_requests(:one)
+    follow_up = service_requests(:two)
+
+    follow_up.update!(follow_up_to_service_request: original)
+
+    assert follow_up.follow_up?
+    assert_equal original, follow_up.follow_up_to_service_request
+    assert_includes original.follow_up_service_requests, follow_up
+  end
+
+  test "cannot follow up to itself" do
+    request = service_requests(:one)
+    request.follow_up_to_service_request = request
+
+    assert_not request.valid?
+    assert_includes request.errors[:follow_up_to_service_request], "cannot be the same request"
+  end
+
   test "populates lifecycle timestamps from status and response changes" do
     request = service_requests(:one)
 

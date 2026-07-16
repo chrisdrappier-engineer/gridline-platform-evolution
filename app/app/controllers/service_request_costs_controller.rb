@@ -18,12 +18,14 @@ class ServiceRequestCostsController < ApplicationController
       note_type: "general",
       visibility: ServiceRequestNote.default_visibility_for(current_user)
     )
+    @service_request_feedback = @service_request.service_request_feedback || ServiceRequestFeedback.new(follow_up_needed: false)
     @assignable_service_providers = ServiceProvider.where(status: "active").order(:name)
     @service_request_page = ServiceRequestShowPage.new(
       service_request: @service_request,
       quote_form: @quote,
       cost_form: @service_request_cost,
       note_form: @service_request_note,
+      feedback_form: @service_request_feedback,
       assignable_service_providers: @assignable_service_providers,
       view_context: view_context
     )
@@ -50,6 +52,7 @@ class ServiceRequestCostsController < ApplicationController
     @service_request = ServiceRequest
                        .includes(
                          :service_request_quote,
+                         :service_request_feedback,
                          service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
                          customer_site: :customer
                        )

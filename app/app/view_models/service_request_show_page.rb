@@ -5,13 +5,14 @@ class ServiceRequestShowPage
     "If material site conditions, concealed damage, parts requirements, safety constraints, or other facts are discovered during service, Gridline may amend the quote and request approval before proceeding beyond the approved scope."
   ].join(" ")
 
-  attr_reader :service_request, :quote_form, :cost_form, :note_form, :assignable_service_providers
+  attr_reader :service_request, :quote_form, :cost_form, :note_form, :feedback_form, :assignable_service_providers
 
-  def initialize(service_request:, quote_form:, cost_form:, note_form:, assignable_service_providers:, view_context:)
+  def initialize(service_request:, quote_form:, cost_form:, note_form:, feedback_form:, assignable_service_providers:, view_context:)
     @service_request = service_request
     @quote_form = quote_form
     @cost_form = cost_form
     @note_form = note_form
+    @feedback_form = feedback_form
     @assignable_service_providers = assignable_service_providers
     @view = view_context
   end
@@ -27,6 +28,7 @@ class ServiceRequestShowPage
   def header_actions
     actions = [ViewAction.link("Back to Requests", view.service_requests_path)]
     actions << ViewAction.link("Edit Request", view.edit_service_request_path(service_request)) if can_update_request?
+    actions << ViewAction.link("Create Follow-Up Request", view.new_follow_up_service_request_path(service_request), style: "primary-button") if can_create_follow_up?
     actions << ViewAction.button("Triage", view.triage_service_request_path(service_request), method: :patch) if can_triage_request?
     actions << ViewAction.button("Verify Completion", view.verify_completion_service_request_path(service_request), method: :patch) if can_verify_completion?
     actions
@@ -86,6 +88,8 @@ class ServiceRequestShowPage
   def section_partials
     [
       provider_response_section_partial,
+      request_relationships_section_partial,
+      feedback_section_partial,
       notes_section_partial,
       quote_section_partial,
       cost_section_partial,
@@ -96,6 +100,14 @@ class ServiceRequestShowPage
 
   def provider_response_section_partial
     "service_requests/show/provider_response_section" if render_provider_response?
+  end
+
+  def request_relationships_section_partial
+    "service_requests/show/request_relationships_section" if render_request_relationships?
+  end
+
+  def feedback_section_partial
+    "service_requests/show/feedback_section" if render_feedback_section?
   end
 
   def notes_section_partial
@@ -124,6 +136,64 @@ class ServiceRequestShowPage
 
   def render_notes_section?
     view.can?("service_request_notes", "read", service_request)
+  end
+
+  def render_request_relationships?
+    follow_up_parent_rows.any? || follow_up_request_rows.any?
+  end
+
+  def render_feedback_section?
+    view.can?("service_request_feedbacks", "read", service_request)
+  end
+
+  def follow_up_parent_rows
+    return [] unless service_request.follow_up_to_service_request
+
+    [request_relationship_row(service_request.follow_up_to_service_request)]
+  end
+
+  def follow_up_request_rows
+    service_request.follow_up_service_requests.map { |follow_up| request_relationship_row(follow_up) }
+  end
+
+  def relationship_groups
+    [
+      { title: "Follow-Up To", rows: follow_up_parent_rows },
+      { title: "Follow-Up Requests", rows: follow_up_request_rows }
+    ].select { |group| group.fetch(:rows).any? }
+  end
+
+  def feedback_rows
+    return [] unless service_request.service_request_feedback
+
+    feedback = service_request.service_request_feedback
+    [
+      DetailRow.new("Rating", "#{feedback.rating} - #{feedback.rating_label}"),
+      DetailRow.new("Follow-Up Needed", feedback.follow_up_needed? ? "Yes" : "No"),
+      DetailRow.new("Submitted By", feedback.submitted_by.name),
+      DetailRow.new("Submitted", long_time(feedback.created_at)),
+      DetailRow.new("Feedback", formatted_text(feedback.feedback))
+    ]
+  end
+
+  def feedback_rating_options
+    ServiceRequestFeedback.rating_options
+  end
+
+  def feedback_state_partial
+    feedback_rows.any? ? "service_requests/show/feedback_details" : "service_requests/show/feedback_empty"
+  end
+
+  def feedback_form_partial
+    render_feedback_form? ? "service_requests/show/feedback_form" : "service_requests/show/empty"
+  end
+
+  def feedback_form_path
+    view.service_request_service_request_feedback_path(service_request)
+  end
+
+  def feedback_form_method
+    service_request.service_request_feedback ? :patch : :post
   end
 
   def note_rows
@@ -303,8 +373,20 @@ class ServiceRequestShowPage
       view.can?("service_requests", "verify_completion", service_request)
   end
 
+  def can_create_follow_up?
+    service_request.status == "resolved" &&
+      view.can?("service_requests", "create", service_request.customer_site)
+  end
+
   def can_read_quotes?
     view.can?("service_request_quotes", "read", service_request)
+  end
+
+  def render_feedback_form?
+    return false unless service_request.status == "resolved"
+
+    action = service_request.service_request_feedback ? "update" : "create"
+    view.can?("service_request_feedbacks", action, service_request)
   end
 
   def status_pill(status)
@@ -355,6 +437,18 @@ class ServiceRequestShowPage
 
   def money(amount_cents, currency: "USD")
     view.format_money_cents(amount_cents, currency: currency)
+  end
+
+  def request_relationship_row(request)
+    {
+      title: request.title,
+      path: view.service_request_path(request),
+      status: status_pill(request.status),
+      priority: priority_pill(request.priority),
+      provider: request.service_provider.name,
+      reported: long_time(request.reported_at),
+      dispatcher: request.assigned_dispatcher&.name || "Unassigned"
+    }
   end
 
   def approved_quote_row

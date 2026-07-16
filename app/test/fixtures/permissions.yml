@@ -88,6 +88,24 @@ service_request_costs_update:
   name: Update service request costs
   description: Update actual service request costs.
 
+service_request_feedbacks_read:
+  resource: service_request_feedbacks
+  action: read
+  name: Read service request feedback
+  description: View service request ratings and completion feedback.
+
+service_request_feedbacks_create:
+  resource: service_request_feedbacks
+  action: create
+  name: Create service request feedback
+  description: Submit service request ratings and completion feedback.
+
+service_request_feedbacks_update:
+  resource: service_request_feedbacks
+  action: update
+  name: Update service request feedback
+  description: Update service request ratings and completion feedback.
+
 service_request_notes_read:
   resource: service_request_notes
   action: read

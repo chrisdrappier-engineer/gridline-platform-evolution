@@ -22,6 +22,7 @@ class ServiceRequestNotesController < ApplicationController
                          :assigned_dispatcher,
                          :service_provider,
                          :service_request_quote,
+                         :service_request_feedback,
                          service_request_costs: :recorded_by,
                          service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
                          customer_site: :customer
@@ -80,6 +81,7 @@ class ServiceRequestNotesController < ApplicationController
     @quote = @service_request.service_request_quote || ServiceRequestQuote.new
     @service_request_cost = ServiceRequestCost.new(incurred_on: Date.current, currency: "USD")
     @service_request_note = @note
+    @service_request_feedback = @service_request.service_request_feedback || ServiceRequestFeedback.new(follow_up_needed: false)
     @assignable_service_providers = authorized_scope(
       "service_providers",
       "read",
@@ -90,6 +92,7 @@ class ServiceRequestNotesController < ApplicationController
       quote_form: @quote,
       cost_form: @service_request_cost,
       note_form: @service_request_note,
+      feedback_form: @service_request_feedback,
       assignable_service_providers: @assignable_service_providers,
       view_context: view_context
     )
