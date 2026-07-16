@@ -16,8 +16,10 @@ end
 load Rails.root.join("db/seeds/rbac.rb")
 RbacSeedData.seed_definitions
 
-if SeedData.enabled?("SEED_DEMO_DATA")
-  load Rails.root.join("db/seeds/demo.rb")
-else
-  load Rails.root.join("db/seeds/development.rb")
+unless SeedData.enabled?("SEED_BASELINE_ONLY")
+  if SeedData.enabled?("SEED_DEMO_DATA")
+    load Rails.root.join("db/seeds/demo.rb")
+  else
+    load Rails.root.join("db/seeds/development.rb")
+  end
 end

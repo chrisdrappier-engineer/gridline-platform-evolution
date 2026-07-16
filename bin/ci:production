@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+compose() {
+  docker compose -p gridline-production-ci -f compose.production.yml "$@"
+}
+
+cleanup() {
+  compose down --volumes --remove-orphans
+}
+
+trap cleanup EXIT
+
+export PRODUCTION_APP_PORT="${PRODUCTION_APP_PORT:-3001}"
+
+cleanup
+compose build
+compose up -d db
+compose run --rm -e SEED_DEMO_DATA=true app bin/rails db:prepare
+compose run --rm -e SEED_DEMO_DATA=true app bin/rails db:seed
+compose up -d app
+
+TARGET_BASE_URL="http://localhost:${PRODUCTION_APP_PORT}" bin/production-smoke

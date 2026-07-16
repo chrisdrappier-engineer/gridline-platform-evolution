@@ -1,6 +1,8 @@
 .bundle
 .git
+config/master.key
 log/*
+node_modules
 tmp/*
 storage/*
 vendor/bundle
