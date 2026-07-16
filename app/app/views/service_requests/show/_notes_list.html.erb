@@ -10,6 +10,7 @@
         <span><%= note.fetch(:visibility) %></span>
       </div>
       <div class="note-body"><%= note.fetch(:body) %></div>
+      <%= render "service_requests/show/evidence_files", evidence_files: note.fetch(:evidence_files) %>
     </article>
   <% end %>
 </div>

@@ -159,9 +159,6 @@ test("external users track lifecycle without request mutation controls", async (
   await expect(page.getByText("Avg Response Time")).toBeVisible();
   await expect(page.getByText("Avg Completion Time")).toBeVisible();
 
-  await page.getByRole("link", { name: "Back to Requests" }).click();
-  await expect(page.getByRole("heading", { name: "Service Requests" })).toBeVisible();
-  await page.getByRole("searchbox", { name: "Search" }).fill("Freezer temperature alarm");
   const requestRow = page.getByRole("row", { name: /Freezer temperature alarm/ });
   await expect(requestRow).toBeVisible();
   await requestRow.getByRole("link", { name: "Freezer temperature alarm", exact: true }).click();

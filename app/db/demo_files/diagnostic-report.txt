@@ -1,0 +1,7 @@
+Gridline demo diagnostic report
+
+Observed condition:
+  Intermittent sensor fault reproduced during service window.
+
+Recommended action:
+  Replace affected component and monitor for recurrence.

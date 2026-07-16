@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  service_request_note: one
+  uploaded_by: one
+  category: site_photo
+
+two:
+  service_request_note: two
+  uploaded_by: five
+  category: diagnostic_report

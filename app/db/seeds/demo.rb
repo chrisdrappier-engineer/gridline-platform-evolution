@@ -62,6 +62,30 @@ provider_user = SeedData.upsert(
   active: true
 )
 
+def attach_demo_evidence!(note, category:, uploaded_by:, filename:, content_type:)
+  path = Rails.root.join("db/demo_files/#{filename}")
+  evidence_file = ServiceRequestEvidenceFile.find_or_initialize_by(
+    service_request_note: note,
+    category: category
+  )
+  evidence_file.uploaded_by = uploaded_by
+
+  unless evidence_file.file.attached?
+    File.open(path, "rb") do |file|
+      evidence_file.file.attach(
+        io: file,
+        filename: filename,
+        content_type: content_type
+      )
+      evidence_file.save!
+    end
+  else
+    evidence_file.save!
+  end
+
+  evidence_file
+end
+
 internal_provider = SeedData.upsert(
   ServiceProvider,
   { name: "Gridline Internal Dispatch Team" },
@@ -561,14 +585,14 @@ end
 ServiceRequest.includes(:service_provider, customer_site: :customer).where(customer_site: demo_sites).order(:reported_at, :title).each_with_index do |request, index|
   facility_manager_for_site = facility_managers_by_customer_name.fetch(request.customer_site.customer.name)
 
-  SeedData.upsert(
+  internal_note = SeedData.upsert(
     ServiceRequestNote,
     { service_request: request, note_type: "intake", visibility: "internal" },
     author: dispatcher,
     body: "Dispatcher intake note for #{request.title.downcase}; confirm site access and customer impact before dispatch."
   )
 
-  SeedData.upsert(
+  customer_note = SeedData.upsert(
     ServiceRequestNote,
     { service_request: request, note_type: "customer_update", visibility: "customer_visible" },
     author: facility_manager_for_site,
@@ -576,29 +600,38 @@ ServiceRequest.includes(:service_provider, customer_site: :customer).where(custo
   )
 
   if request.service_provider == cold_chain_provider
-    SeedData.upsert(
+    provider_note = SeedData.upsert(
       ServiceRequestNote,
       { service_request: request, note_type: "provider_update", visibility: "provider_visible" },
       author: provider_user,
       body: "Provider note: technician review is in progress and follow-up details will be recorded after service."
     )
+    attach_demo_evidence!(provider_note, category: "diagnostic_report", uploaded_by: provider_user, filename: "diagnostic-report.txt", content_type: "text/plain")
   elsif index.even?
-    SeedData.upsert(
+    provider_note = SeedData.upsert(
       ServiceRequestNote,
       { service_request: request, note_type: "provider_update", visibility: "provider_visible" },
       author: dispatcher,
       body: "Provider coordination note: Gridline is awaiting a vendor update before sharing customer-facing details."
     )
+    attach_demo_evidence!(provider_note, category: "work_order", uploaded_by: dispatcher, filename: "sensor-log.csv", content_type: "text/csv")
   end
+
+  attach_demo_evidence!(internal_note, category: "site_photo", uploaded_by: dispatcher, filename: "before-photo.png", content_type: "image/png") if index % 4 == 0
+  attach_demo_evidence!(internal_note, category: "before_photo", uploaded_by: dispatcher, filename: "before-photo.png", content_type: "image/png") if index % 4 == 1
+  attach_demo_evidence!(customer_note, category: "after_photo", uploaded_by: facility_manager_for_site, filename: "after-photo.png", content_type: "image/png") if index % 5 == 0
+  attach_demo_evidence!(customer_note, category: "approval_document", uploaded_by: facility_manager_for_site, filename: "approval-document.pdf", content_type: "application/pdf") if index % 6 == 0
+  attach_demo_evidence!(internal_note, category: "invoice", uploaded_by: dispatcher, filename: "invoice-sample.pdf", content_type: "application/pdf") if index % 7 == 0
 
   next unless index % 3 == 0
 
-  SeedData.upsert(
+  shared_note = SeedData.upsert(
     ServiceRequestNote,
     { service_request: request, note_type: "general", visibility: "shared" },
     author: dispatcher,
     body: "Shared note: all parties can use this request thread for operational status updates."
   )
+  attach_demo_evidence!(shared_note, category: "other", uploaded_by: dispatcher, filename: "sensor-log.csv", content_type: "text/csv")
 end
 
 RbacSeedData.assign_role(dispatcher, "dispatcher")

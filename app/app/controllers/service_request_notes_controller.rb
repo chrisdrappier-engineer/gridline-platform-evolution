@@ -4,11 +4,12 @@ class ServiceRequestNotesController < ApplicationController
   def create
     authorize!("service_request_notes", "create", @service_request)
 
-    @note = @service_request.service_request_notes.build(note_params.merge(author: current_user))
-    @note.save!
+    @note = @service_request.service_request_notes.build(note_attributes.merge(author: current_user))
+    attach_evidence_files!
 
     redirect_to @service_request, notice: "Service request note added.", status: :see_other
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => error
+    copy_evidence_errors(error.record)
     render_service_request_show
   end
 
@@ -22,14 +23,57 @@ class ServiceRequestNotesController < ApplicationController
                          :service_provider,
                          :service_request_quote,
                          service_request_costs: :recorded_by,
-                         service_request_notes: :author,
+                         service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
                          customer_site: :customer
                        )
                        .find(params[:service_request_id])
   end
 
   def note_params
-    params.require(:service_request_note).permit(:note_type, :visibility, :body)
+    params.require(:service_request_note).permit(:note_type, :visibility, :body, :evidence_category, evidence_files: [])
+  end
+
+  def note_attributes
+    note_params.except(:evidence_category, :evidence_files)
+  end
+
+  def attach_evidence_files!
+    uploads = evidence_uploads
+    @note.errors.add(:base, "Each note can include up to 5 files. Add another note if you need to upload more evidence.") if uploads.count > ServiceRequestEvidenceFile::MAX_FILES_PER_NOTE
+    @note.errors.add(:base, "Each note can include up to 15 MB of files. Add another note or reduce file sizes before uploading.") if evidence_upload_total(uploads) > ServiceRequestEvidenceFile::MAX_TOTAL_BYTES_PER_NOTE
+    @note.errors.add(:base, "Choose an evidence category before uploading files.") if uploads.any? && note_params[:evidence_category].blank?
+    raise ActiveRecord::RecordInvalid, @note if @note.errors.any?
+
+    ServiceRequestNote.transaction do
+      @note.save!
+      uploads.each { |upload| create_evidence_file!(upload) }
+    end
+  end
+
+  def evidence_uploads
+    Array(note_params[:evidence_files]).compact_blank
+  end
+
+  def evidence_upload_total(uploads)
+    uploads.sum(&:size)
+  end
+
+  def create_evidence_file!(upload)
+    evidence_file = @note.service_request_evidence_files.build(
+      category: note_params[:evidence_category],
+      uploaded_by: current_user
+    )
+    evidence_file.file.attach(upload)
+    evidence_file.save!
+  rescue ActiveRecord::RecordInvalid => error
+    copy_evidence_errors(error.record)
+    raise ActiveRecord::RecordInvalid, @note
+  end
+
+  def copy_evidence_errors(record)
+    return if record == @note || record.blank?
+
+    record.errors.full_messages.each { |message| @note.errors.add(:base, message) }
   end
 
   def render_service_request_show

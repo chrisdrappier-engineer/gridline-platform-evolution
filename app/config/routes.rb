@@ -19,6 +19,9 @@ Rails.application.routes.draw do
     resources :service_request_costs, only: %i[create edit update]
     resources :service_request_notes, only: %i[create]
   end
+  resources :service_request_evidence_files, only: %i[show] do
+    get :thumbnail, on: :member
+  end
   resources :customers, only: %i[index show new create edit update]
   resources :customer_sites, only: %i[index show new create edit update]
   resources :dispatchers, only: %i[show], controller: :users

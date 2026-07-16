@@ -501,6 +501,71 @@ textarea {
   margin: 0;
 }
 
+.evidence-list {
+  display: grid;
+  gap: 10px;
+}
+
+.evidence-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.evidence-card:hover {
+  border-color: rgba(47, 111, 78, 0.4);
+  background: rgba(47, 111, 78, 0.05);
+}
+
+.evidence-card-image {
+  grid-template-columns: 96px minmax(0, 1fr);
+}
+
+.evidence-thumbnail {
+  width: 96px;
+  height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.evidence-file-badge {
+  display: inline-flex;
+  min-width: 72px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(100, 112, 103, 0.12);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.evidence-file-name,
+.evidence-file-meta {
+  display: block;
+}
+
+.evidence-file-name {
+  overflow-wrap: anywhere;
+  font-weight: 900;
+}
+
+.evidence-file-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.upload-validation-message {
+  color: #9c3f30;
+  font-weight: 800;
+}
+
 .note-form-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

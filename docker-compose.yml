@@ -16,6 +16,7 @@ services:
       - "${APP_PORT:-3000}:3000"
     volumes:
       - ./app:/app
+      - app_storage:/app/storage
     depends_on:
       db:
         condition: service_healthy
@@ -47,3 +48,4 @@ services:
 
 volumes:
   postgres_data:
+  app_storage:

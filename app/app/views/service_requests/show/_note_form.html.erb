@@ -1,4 +1,15 @@
-<%= form_with model: [page.service_request, page.note_form], class: "form-panel embedded-form" do |form| %>
+<%= form_with model: [page.service_request, page.note_form],
+              class: "form-panel embedded-form",
+              multipart: true,
+              data: {
+                controller: "evidence-upload",
+                evidence_upload_max_files_value: page.evidence_upload_limits.fetch(:max_files),
+                evidence_upload_max_total_bytes_value: page.evidence_upload_limits.fetch(:max_total_bytes),
+                evidence_upload_image_bytes_value: page.evidence_upload_limits.fetch(:image_bytes),
+                evidence_upload_pdf_bytes_value: page.evidence_upload_limits.fetch(:pdf_bytes),
+                evidence_upload_text_bytes_value: page.evidence_upload_limits.fetch(:text_bytes),
+                action: "submit->evidence-upload#validate"
+              } do |form| %>
   <%= form_errors_for(page.note_form) %>
 
   <div class="filter-form note-form-grid">
@@ -17,6 +28,27 @@
     <%= form.label :body, "Note" %>
     <%= form.textarea :body, rows: 4 %>
   </div>
+
+  <div class="filter-form note-form-grid">
+    <div class="field">
+      <%= form.label :evidence_category, "Evidence category" %>
+      <%= form.select :evidence_category, page.evidence_category_options, include_blank: "Choose category" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :evidence_files, "Evidence files" %>
+      <%= form.file_field :evidence_files,
+                          multiple: true,
+                          accept: page.evidence_accept_attribute,
+                          data: {
+                            evidence_upload_target: "input",
+                            action: "change->evidence-upload#validate"
+                          } %>
+      <p class="field-hint">Images up to 5 MB, PDFs up to 10 MB, text/CSV up to 1 MB. Each note can include up to 5 files and 15 MB total.</p>
+    </div>
+  </div>
+
+  <p class="field-hint upload-validation-message" data-evidence-upload-target="message"></p>
 
   <%= form.submit "Add Note", class: "primary-button" %>
 <% end %>

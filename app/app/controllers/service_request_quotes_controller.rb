@@ -42,7 +42,11 @@ class ServiceRequestQuotesController < ApplicationController
 
   def set_service_request
     @service_request = ServiceRequest
-                       .includes(:service_request_quote, service_request_notes: :author, customer_site: :customer)
+                       .includes(
+                         :service_request_quote,
+                         service_request_notes: [:author, { service_request_evidence_files: [:uploaded_by, { file_attachment: :blob }] }],
+                         customer_site: :customer
+                       )
                        .find(params[:service_request_id])
   end
 

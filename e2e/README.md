@@ -6,6 +6,12 @@ Gridline app.
 They are intended for visual workflow verification while the UI is changing
 quickly. They do not replace the Rails model, controller, and service tests.
 
+## Definition Of Done
+
+Tickets that change user-facing workflows should update this E2E suite as part
+of their definition of done. If a ticket does not need browser coverage, the PR
+or decision note should say why.
+
 ## Workflow Constraint
 
 E2E tests should exercise features through visible user-facing controls rather

@@ -47,7 +47,11 @@ test("dispatcher submits quote and facility manager approves it", async ({ page 
   await page.getByRole("link", { name: "View Facility Requests" }).click();
   await expect(page.getByRole("heading", { name: "Service Requests" })).toBeVisible();
   await page.getByRole("searchbox", { name: "Search" }).fill(title);
-  await page.getByRole("link", { name: title, exact: true }).click();
+  const requestRow = page.getByRole("row", { name: new RegExp(title) });
+  await expect(requestRow).toBeVisible();
+  const requestLink = requestRow.getByRole("link", { name: title, exact: true });
+  await requestLink.focus();
+  await requestLink.press("Enter");
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
   await expect(page.getByText("Pending approval")).toBeVisible();
