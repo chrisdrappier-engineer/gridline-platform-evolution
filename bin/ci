@@ -8,6 +8,7 @@ cleanup() {
 trap cleanup EXIT
 
 npm run lint:css
+bin/workload-ci
 docker compose build
 docker compose up -d db
 docker compose run --rm app bin/rails db:prepare

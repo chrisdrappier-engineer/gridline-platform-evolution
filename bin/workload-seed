@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+node_bin="${NODE_BIN:-node_modules/.bin/node}"
+
+if [ ! -x "$node_bin" ]; then
+  node_bin="node"
+fi
+
+"$node_bin" -e 'const { randomUUID } = require("crypto"); console.log(randomUUID());'

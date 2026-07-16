@@ -13,5 +13,5 @@ node_modules/
 /app/storage/*
 !/app/storage/.keep
 
-/workload_lab/archive/*
-!/workload_lab/archive/README.md
+/workload-lab/archive/*
+!/workload-lab/archive/README.md

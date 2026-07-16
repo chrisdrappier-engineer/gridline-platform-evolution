@@ -4,12 +4,16 @@
   },
   "scripts": {
     "lint:css": "node_modules/.bin/node node_modules/stylelint/bin/stylelint.mjs \"app/app/assets/stylesheets/**/*.css\"",
+    "lint:workload": "node_modules/.bin/node node_modules/eslint/bin/eslint.js \"workload-lab/**/*.mjs\"",
+    "validate:workload-profile": "node_modules/.bin/node workload-lab/scripts/validate-profile.mjs",
+    "test:workload": "node_modules/.bin/node --test workload-lab/test/*.test.mjs",
     "test:e2e": "playwright test --workers=1",
     "test:e2e:headed": "playwright test --headed --workers=1",
     "test:e2e:debug": "PWDEBUG=1 playwright test --headed --workers=1"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
+    "eslint": "^10.7.0",
     "stylelint": "^17.14.0",
     "stylelint-config-standard": "^40.0.0"
   },

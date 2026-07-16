@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "test-scenario",
+  "profileId": "valid-fixture",
+  "description": "Small fixture profile used to test workload lab code without validating every real profile.",
+  "resourceEnvelope": "local-small",
+  "seedDataProfile": "fixture",
+  "actors": {
+    "dispatcher": [
+      {
+        "email": "dispatcher@example.test",
+        "password": "password"
+      }
+    ]
+  },
+  "k6": {
+    "vus": 1,
+    "iterations": 4,
+    "thresholds": {
+      "http_req_failed": ["rate<0.01"]
+    }
+  },
+  "timeBuckets": [
+    {
+      "name": "fixture",
+      "iterations": 4,
+      "workflowMix": {
+        "dashboard": 1,
+        "serviceRequestIndex": 2,
+        "siteIndex": 1
+      }
+    }
+  ],
+  "workflows": {
+    "dashboard": {
+      "type": "dashboard"
+    },
+    "serviceRequestIndex": {
+      "type": "service-request-index",
+      "bounds": {
+        "search": ["", "HVAC"],
+        "sort": ["reported_at", "priority"],
+        "direction": ["asc", "desc"],
+        "limit": [10, 20]
+      }
+    },
+    "siteIndex": {
+      "type": "site-index",
+      "bounds": {
+        "search": ["", "Palmetto"],
+        "sort": ["site", "customer"],
+        "direction": ["asc", "desc"],
+        "limit": [10, 20],
+        "site_status": ["", "active"]
+      }
+    }
+  }
+}

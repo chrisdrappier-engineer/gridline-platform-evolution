@@ -197,6 +197,43 @@ mutate shared demo data while exercising realistic user paths.
 
 Additional browser test details live in [`e2e/README.md`](e2e/README.md).
 
+## Workload Lab
+
+The workload lab lives in [`workload-lab`](workload-lab/README.md). It is the
+evidence-generation foundation for future vertical optimization and scaling
+scenario work.
+
+The current foundation includes a deterministic traffic generator, profile
+validation for selected profiles, ESLint-backed workload-lab checks with a
+`Math.random()` ban, a tiny baseline smoke profile, and a k6 runner. The smoke
+profile is intentionally small; it proves the lab framework works, but it is
+not a full Scenario 00 scaling evidence run.
+
+Run fast workload-lab checks with:
+
+```bash
+bin/workload-ci
+```
+
+Validate a selected workload profile with:
+
+```bash
+bin/workload-validate-profile workload-lab/profiles/baseline-smoke.json
+```
+
+Run the Docker-backed k6 smoke profile against the production-like runtime
+with:
+
+```bash
+bin/workload-smoke
+```
+
+Generate a UUID-formatted workload seed with:
+
+```bash
+bin/workload-seed
+```
+
 ## Production-Like Runtime
 
 The repository also includes a production-like local runtime for workload-lab
@@ -210,9 +247,35 @@ The production-like runtime:
 - does not bind-mount the Rails source tree into the app container
 - precompiles assets during the image build
 - serves static assets through the production app container
+- applies the default `local-small` resource envelope
+- allows `host.docker.internal` so Dockerized workload tools can reach the
+  host-published production app
 - uses named volumes for Postgres and local Active Storage files
 - disables forced SSL by default for local HTTP access
 - uses an explicit health check and smoke test path
+
+The default `local-small` resource envelope constrains the production-like
+runtime so workload evidence is not based on unconstrained Docker Desktop
+capacity:
+
+| Service | CPU Limit | Memory Limit | Related Runtime Settings |
+|---|---:|---:|---|
+| Rails app | `1.0` CPU | `768m` | `WEB_CONCURRENCY=1`, `RAILS_MAX_THREADS=5` |
+| Postgres | `1.0` CPU | `768m` | default Postgres settings |
+
+These limits are diagnostic constraints for local evidence, not a claim that
+the laptop faithfully emulates a production provider. Future workload runs
+should record the resource envelope alongside the scenario, profile, seed,
+target URL, data set, and application revision.
+
+The envelope can be overridden for experiments:
+
+```bash
+RESOURCE_ENVELOPE=local-app-constrained \
+PRODUCTION_APP_CPUS=0.5 \
+PRODUCTION_APP_MEMORY=512m \
+docker compose -f compose.production.yml up --build
+```
 
 Run the production runtime validation with:
 

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+node workload-lab/scripts/validate-profile.mjs "$@"
