@@ -18,3 +18,4 @@ understand why the system evolved the way it did.
 - [ADR 0007: Render Rails views from prepared view models](0007-render-rails-views-from-prepared-view-models.md)
 - [ADR 0008: Use live queries for initial reporting metrics](0008-use-live-queries-for-initial-reporting-metrics.md)
 - [ADR 0009: Create an evidence-first workload lab](0009-create-an-evidence-first-workload-lab.md)
+- [ADR 0010: Use duration-based workload series as performance evidence](0010-use-duration-based-workload-series-as-performance-evidence.md)
