@@ -12,3 +12,6 @@ node_modules/
 !/app/tmp/pids/.keep
 /app/storage/*
 !/app/storage/.keep
+
+/workload_lab/archive/*
+!/workload_lab/archive/README.md
