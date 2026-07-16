@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+base_url="${TARGET_BASE_URL:-${1:-http://localhost:3001}}"
+email="${GRIDLINE_SMOKE_EMAIL:-dispatcher@gridline.test}"
+password="${GRIDLINE_SMOKE_PASSWORD:-gridline}"
+expected_name="${GRIDLINE_SMOKE_NAME:-Dana Dispatcher}"
+cookie_jar="$(mktemp)"
+
+cleanup() {
+  rm -f "$cookie_jar"
+}
+
+trap cleanup EXIT
+
+health_url="${base_url%/}/health"
+login_url="${base_url%/}/login"
+dashboard_url="${base_url%/}/dashboard"
+
+for _ in $(seq 1 60); do
+  if curl -fsS "$health_url" >/dev/null 2>&1; then
+    break
+  fi
+
+  sleep 1
+done
+
+curl -fsS "$health_url" >/dev/null
+
+login_page="$(curl -fsS -c "$cookie_jar" "$login_url")"
+
+asset_path="$(
+  printf "%s" "$login_page" |
+    sed -n 's/.*href="\([^"]*assets[^"]*\.css\)".*/\1/p' |
+    head -n 1
+)"
+
+if [ -n "$asset_path" ]; then
+  curl -fsS "${base_url%/}${asset_path}" >/dev/null
+fi
+
+csrf_token="$(
+  printf "%s" "$login_page" |
+    sed -n 's/.*<meta name="csrf-token" content="\([^"]*\)".*/\1/p' |
+    head -n 1
+)"
+
+if [ -z "$csrf_token" ]; then
+  echo "Could not find CSRF token on login page." >&2
+  exit 1
+fi
+
+curl -fsS -c "$cookie_jar" -b "$cookie_jar" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "authenticity_token=$csrf_token" \
+  --data-urlencode "session[email]=$email" \
+  --data-urlencode "session[password]=$password" \
+  "$login_url" >/dev/null
+
+dashboard_page="$(curl -fsS -b "$cookie_jar" "$dashboard_url")"
+
+if ! printf "%s" "$dashboard_page" | grep -q "Gridline Operations"; then
+  echo "Dashboard smoke check did not find expected application chrome." >&2
+  exit 1
+fi
+
+if ! printf "%s" "$dashboard_page" | grep -q "$expected_name"; then
+  echo "Dashboard smoke check did not find signed-in user name." >&2
+  exit 1
+fi
+
+if ! printf "%s" "$dashboard_page" | grep -q "Dispatcher Dashboard"; then
+  echo "Dashboard smoke check did not find dispatcher dashboard content." >&2
+  exit 1
+fi
+
+echo "Production smoke passed for ${base_url%/}."
