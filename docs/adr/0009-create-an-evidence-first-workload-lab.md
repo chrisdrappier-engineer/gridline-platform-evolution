@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
@@ -30,6 +30,26 @@ The workload lab will use k6 as its initial pressure tool. k6 scenarios should
 be designed around business workflows instead of raw endpoint hammering. Focused
 endpoint pressure may still be used after a workflow run identifies a likely
 bottleneck.
+
+Several alternatives were considered:
+
+- Locust maps naturally to role-based workflow modeling through Python user and
+  task classes, but it would require more project discipline around thresholds,
+  repeatable CLI evidence, and avoiding reliance on the interactive web UI for
+  interpretation.
+- A custom Ruby runner using Typhoeus or Async::HTTP would keep workload code
+  closer to the Rails application, but would require building runner behavior
+  that k6 already provides, including concurrency, ramping, thresholds, metrics,
+  result capture, and summaries.
+- Playwright remains appropriate for browser-visible workflow verification, but
+  browser automation is too expensive for high-concurrency pressure testing.
+- JMeter or Ruby JMeter would provide mature load-testing capabilities, but the
+  toolchain is heavier than needed for the first workload-lab foundation.
+
+k6 is selected because the workload lab's first responsibility is evidence
+quality: repeatable pressure, threshold-based interpretation, compact metrics,
+Docker-friendly execution, and before/after comparisons. Business-workflow
+scenario design will be used to keep the workload narrative readable.
 
 Workload profiles will be defined by operational texture and scaled by volume
 and frequency:
@@ -113,3 +133,7 @@ deterministic seed tracking, and avoid repository bloat. Codex recommended k6
 with business-workflow scenario design, promoted seeds for reproducible
 architectural examples, and a Git-tracked narrative layer backed by ignored
 local raw archives.
+
+More detail about the discussion is captured in the
+[Workload Lab Strategy](../decision-notes/2026-07-16-workload-lab-strategy.md)
+decision note.
