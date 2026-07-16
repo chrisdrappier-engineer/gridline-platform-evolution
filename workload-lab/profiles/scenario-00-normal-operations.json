@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "00-vertical-scaling-limit",
+  "profileId": "normal-operations-local-small",
+  "description": "Scenario 00 normal-operations texture for the mature monolith baseline. This profile represents everyday read-heavy Gridline usage before ramping frequency to discover vertical scaling pressure.",
+  "resourceEnvelope": "local-small",
+  "seedDataProfile": "demo",
+  "actors": {
+    "dispatcher": [
+      {
+        "email": "dispatcher@gridline.test",
+        "password": "gridline"
+      }
+    ],
+    "facilityManager": [
+      {
+        "email": "facility.manager@magnoliaproperty.test",
+        "password": "gridline"
+      }
+    ],
+    "customerContact": [
+      {
+        "email": "customer.contact@magnoliaproperty.test",
+        "password": "gridline"
+      }
+    ],
+    "serviceProviderUser": [
+      {
+        "email": "provider.user@coastalcoldchain.test",
+        "password": "gridline"
+      }
+    ],
+    "admin": [
+      {
+        "email": "admin@gridline.test",
+        "password": "gridline"
+      }
+    ]
+  },
+  "k6": {
+    "vus": 4,
+    "iterations": 120,
+    "thresholds": {
+      "http_req_failed": ["rate<0.01"],
+      "http_req_duration": ["p(95)<2000"]
+    }
+  },
+  "timeBuckets": [
+    {
+      "name": "morning-open",
+      "iterations": 30,
+      "workflowMix": {
+        "dispatcherDashboard": 6,
+        "dispatcherRequestQueue": 14,
+        "dispatcherRequestDetail": 10,
+        "dispatcherSiteLookup": 4,
+        "customerContactDashboard": 4,
+        "customerContactRequestReview": 5,
+        "facilityManagerDashboard": 4,
+        "facilityManagerRequestReview": 5,
+        "providerDashboard": 3,
+        "providerRequestReview": 4,
+        "adminUserReview": 1
+      }
+    },
+    {
+      "name": "steady-operations",
+      "iterations": 60,
+      "workflowMix": {
+        "dispatcherDashboard": 5,
+        "dispatcherRequestQueue": 12,
+        "dispatcherRequestDetail": 12,
+        "dispatcherCustomerLookup": 3,
+        "dispatcherSiteLookup": 5,
+        "dispatcherProviderLookup": 3,
+        "customerContactDashboard": 4,
+        "customerContactRequestReview": 6,
+        "customerContactSiteLookup": 4,
+        "facilityManagerDashboard": 4,
+        "facilityManagerRequestReview": 6,
+        "facilityManagerSiteLookup": 4,
+        "providerDashboard": 4,
+        "providerRequestReview": 6,
+        "providerProviderLookup": 3,
+        "adminPermissionMatrix": 1,
+        "adminRoleAssignments": 1
+      }
+    },
+    {
+      "name": "afternoon-review",
+      "iterations": 30,
+      "workflowMix": {
+        "dispatcherDashboard": 5,
+        "dispatcherRequestQueue": 8,
+        "dispatcherRequestDetail": 8,
+        "customerContactDashboard": 5,
+        "customerContactRequestReview": 7,
+        "facilityManagerDashboard": 5,
+        "facilityManagerRequestReview": 7,
+        "providerDashboard": 4,
+        "providerRequestReview": 5,
+        "adminPermissionMatrix": 1,
+        "adminUserReview": 1
+      }
+    }
+  ],
+  "workflows": {
+    "dispatcherDashboard": {
+      "actorRole": "dispatcher",
+      "type": "dashboard"
+    },
+    "dispatcherRequestQueue": {
+      "actorRole": "dispatcher",
+      "type": "service-request-index",
+      "bounds": {
+        "service_requests[search]": ["", "HVAC", "inspection", "roof", "freezer", "water"],
+        "service_requests[sort]": ["reported_at", "priority", "status", "dispatcher", "site", "request"],
+        "service_requests[direction]": ["asc", "desc"],
+        "service_requests[limit]": [10, 20, 30],
+        "service_requests[status]": ["", "new", "triaged", "scheduled", "resolved"],
+        "service_requests[priority]": ["", "low", "normal", "high", "urgent"]
+      }
+    },
+    "dispatcherRequestDetail": {
+      "actorRole": "dispatcher",
+      "type": "service-request-detail",
+      "bounds": {
+        "service_requests[search]": ["", "HVAC", "inspection", "roof", "freezer", "water"],
+        "service_requests[sort]": ["reported_at", "priority", "status", "site", "request"],
+        "service_requests[direction]": ["asc", "desc"],
+        "service_requests[limit]": [10, 20]
+      }
+    },
+    "dispatcherCustomerLookup": {
+      "actorRole": "dispatcher",
+      "type": "customer-index",
+      "bounds": {
+        "customers[search]": ["", "Magnolia", "Palmetto", "health", "warehouse"],
+        "customers[sort]": ["customer", "status", "industry"],
+        "customers[direction]": ["asc", "desc"],
+        "customers[limit]": [10, 20, 30],
+        "customers[account_status]": ["", "active", "onboarding"]
+      }
+    },
+    "dispatcherSiteLookup": {
+      "actorRole": "dispatcher",
+      "type": "customer-site-index",
+      "bounds": {
+        "customer_sites[search]": ["", "Palmetto", "Savannah", "Atlanta", "Jacksonville"],
+        "customer_sites[sort]": ["site", "customer", "status", "location"],
+        "customer_sites[direction]": ["asc", "desc"],
+        "customer_sites[limit]": [10, 20, 30],
+        "customer_sites[site_status]": ["", "active", "temporarily_closed"]
+      }
+    },
+    "dispatcherProviderLookup": {
+      "actorRole": "dispatcher",
+      "type": "service-provider-index",
+      "bounds": {
+        "service_providers[search]": ["", "Coastal", "mechanical", "electrical", "plumbing"],
+        "service_providers[sort]": ["provider", "type", "status", "created_by"],
+        "service_providers[direction]": ["asc", "desc"],
+        "service_providers[limit]": [10, 20, 30],
+        "service_providers[provider_type]": ["", "vendor_partner", "internal_team"],
+        "service_providers[status]": ["", "active", "inactive"]
+      }
+    },
+    "facilityManagerDashboard": {
+      "actorRole": "facilityManager",
+      "type": "dashboard"
+    },
+    "facilityManagerRequestReview": {
+      "actorRole": "facilityManager",
+      "type": "service-request-detail",
+      "bounds": {
+        "service_requests[search]": ["", "HVAC", "inspection", "water", "roof"],
+        "service_requests[sort]": ["reported_at", "priority", "status", "site", "request"],
+        "service_requests[direction]": ["asc", "desc"],
+        "service_requests[limit]": [10, 20]
+      }
+    },
+    "facilityManagerSiteLookup": {
+      "actorRole": "facilityManager",
+      "type": "customer-site-index",
+      "bounds": {
+        "customer_sites[search]": ["", "Palmetto", "Jacksonville", "Savannah"],
+        "customer_sites[sort]": ["site", "status", "location"],
+        "customer_sites[direction]": ["asc", "desc"],
+        "customer_sites[limit]": [10, 20],
+        "customer_sites[site_status]": ["", "active"]
+      }
+    },
+    "customerContactDashboard": {
+      "actorRole": "customerContact",
+      "type": "dashboard"
+    },
+    "customerContactRequestReview": {
+      "actorRole": "customerContact",
+      "type": "service-request-detail",
+      "bounds": {
+        "service_requests[search]": ["", "HVAC", "inspection", "water", "roof"],
+        "service_requests[sort]": ["reported_at", "priority", "status", "site", "request"],
+        "service_requests[direction]": ["asc", "desc"],
+        "service_requests[limit]": [10, 20]
+      }
+    },
+    "customerContactSiteLookup": {
+      "actorRole": "customerContact",
+      "type": "customer-site-index",
+      "bounds": {
+        "customer_sites[search]": ["", "Palmetto", "Jacksonville", "Savannah"],
+        "customer_sites[sort]": ["site", "customer", "status", "location"],
+        "customer_sites[direction]": ["asc", "desc"],
+        "customer_sites[limit]": [10, 20],
+        "customer_sites[site_status]": ["", "active"]
+      }
+    },
+    "providerDashboard": {
+      "actorRole": "serviceProviderUser",
+      "type": "dashboard"
+    },
+    "providerRequestReview": {
+      "actorRole": "serviceProviderUser",
+      "type": "service-request-detail",
+      "bounds": {
+        "service_requests[search]": ["", "HVAC", "inspection", "freezer", "refrigeration"],
+        "service_requests[sort]": ["reported_at", "priority", "status", "site", "request"],
+        "service_requests[direction]": ["asc", "desc"],
+        "service_requests[limit]": [10, 20]
+      }
+    },
+    "providerProviderLookup": {
+      "actorRole": "serviceProviderUser",
+      "type": "service-provider-index",
+      "bounds": {
+        "service_providers[search]": ["", "Coastal", "Cold", "Chain"],
+        "service_providers[sort]": ["provider", "type", "status"],
+        "service_providers[direction]": ["asc", "desc"],
+        "service_providers[limit]": [10, 20],
+        "service_providers[status]": ["", "active"]
+      }
+    },
+    "adminPermissionMatrix": {
+      "actorRole": "admin",
+      "type": "admin-permission-matrix"
+    },
+    "adminRoleAssignments": {
+      "actorRole": "admin",
+      "type": "admin-role-assignments",
+      "bounds": {
+        "role_assignments[search]": ["", "dispatcher", "manager", "provider", "admin"],
+        "role_assignments[sort]": ["user", "role"],
+        "role_assignments[direction]": ["asc", "desc"],
+        "role_assignments[limit]": [10, 20, 30],
+        "role_assignments[scope]": ["", "global", "Customer", "CustomerSite", "ServiceProvider"]
+      }
+    },
+    "adminUserReview": {
+      "actorRole": "admin",
+      "type": "admin-users",
+      "bounds": {
+        "users[search]": ["", "dispatcher", "manager", "provider", "admin"],
+        "users[sort]": ["user", "email", "legacy_role"],
+        "users[direction]": ["asc", "desc"],
+        "users[limit]": [10, 20, 30],
+        "users[active]": ["", "true", "false"]
+      }
+    }
+  }
+}

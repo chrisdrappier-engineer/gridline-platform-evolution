@@ -29,15 +29,24 @@ be reproduced before and after an optimization.
 The current workload lab contains the first framework pieces:
 
 - a generic deterministic traffic generator in `lib/`
+- workflow route mapping in `config/workflow-paths.json`
 - profile validation in `lib/profile.mjs`
-- reusable request/path helpers in `workflows/`
+- reusable request/path helpers in `lib/requests.mjs`
 - a tiny read-heavy smoke profile in `profiles/baseline-smoke.json`
+- a first normal-operations profile in
+  `profiles/scenario-00-normal-operations.json`
 - a k6 entrypoint in `scenarios/run-profile.mjs`
 - fast lint, profile-validation, and determinism tests
 
 The baseline smoke profile is intentionally small. It proves that the workload
 lab can generate deterministic business-shaped traffic and execute it through
 k6. It is not a Scenario 00 scaling evidence run.
+
+The Scenario 00 normal-operations profile is the first business-texture profile
+for evidence work. It mixes dispatcher, facility manager, customer contact,
+service provider, and admin read traffic against the mature monolith baseline.
+It is still a baseline profile, not an optimization claim or a bottleneck
+finding.
 
 ## Fast Checks
 
@@ -63,6 +72,9 @@ used:
 ```bash
 bin/workload-validate-profile workload-lab/profiles/baseline-smoke.json
 ```
+
+Workflow HTTP paths are configured in `config/workflow-paths.json`. Add new
+workflow types there before referencing them from a profile.
 
 ## Docker Smoke
 
@@ -95,8 +107,43 @@ The smoke runner uses:
 - `WORKLOAD_SEED`, defaulting to `018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a`
 - `RESOURCE_ENVELOPE`, defaulting to `local-small`
 
-Generated smoke summaries are written under `workload-lab/archive/`, which is
-ignored by Git except for the archive README.
+Generated summaries are written under `workload-lab/archive/`, which is
+ignored by Git except for the archive README. Summary filenames use the pattern
+`<scenario-id>-<profile-id>-<timestamp>.summary.json` and
+`<scenario-id>-<profile-id>-<timestamp>.summary.md` so runs do not overwrite
+previous results.
+
+Each summary records the effective run settings, including VUs, iterations,
+thresholds, profile path, time buckets, workflow mix, actor roles, target URL,
+application commit, resource envelope, seed data profile, and workload seed.
+
+## Scenario 00 Normal Operations
+
+Run the first normal-operations workload profile with:
+
+```bash
+bin/workload-scenario-00
+```
+
+This command uses:
+
+- `PROFILE_PATH`, defaulting to
+  `/workload-lab/profiles/scenario-00-normal-operations.json`
+- `WORKLOAD_SEED`, defaulting to
+  `01981f6d-89a0-7b2c-9c45-5d8df49f5e40`
+- the same production-like target and `local-small` resource envelope defaults
+  as the smoke runner
+
+Validate the profile without running k6:
+
+```bash
+bin/workload-validate-profile workload-lab/profiles/scenario-00-normal-operations.json
+```
+
+Scenario 00 intentionally starts with normal operational texture instead of an
+endpoint hammer. Later profiles can reuse the same shape and increase
+frequency, virtual users, duration, or targeted workflow weights to discover
+where the vertically constrained monolith first degrades.
 
 ## Seed Convention
 

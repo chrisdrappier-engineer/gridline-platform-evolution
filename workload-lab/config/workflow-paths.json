@@ -1,0 +1,12 @@
+{
+  "dashboard": "/dashboard",
+  "customer-index": "/customers",
+  "customer-site-index": "/customer_sites",
+  "site-index": "/customer_sites",
+  "service-request-index": "/service_requests",
+  "service-request-detail": "/service_requests",
+  "service-provider-index": "/service_providers",
+  "admin-permission-matrix": "/admin/permission-matrix",
+  "admin-role-assignments": "/admin/role-assignments",
+  "admin-users": "/admin/users"
+}

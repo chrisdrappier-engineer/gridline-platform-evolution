@@ -1,13 +1,16 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
 
+import { summaryFileNames } from "../lib/archive-names.mjs";
+import { profileRunContext } from "../lib/profile-summary.mjs";
+import { pathForEvent, firstServiceRequestPath } from "../lib/requests.mjs";
 import { eventFor } from "../lib/traffic-plan.mjs";
-import { pathForEvent, firstServiceRequestPath } from "../workflows/requests.mjs";
 
-const profile = JSON.parse(open(__ENV.PROFILE_PATH || "/workload-lab/profiles/baseline-smoke.json"));
+const profilePath = __ENV.PROFILE_PATH || "/workload-lab/profiles/baseline-smoke.json";
+const profile = JSON.parse(open(profilePath));
+const workflowPaths = JSON.parse(open(__ENV.WORKFLOW_PATHS_PATH || "/workload-lab/config/workflow-paths.json"));
 const seed = __ENV.WORKLOAD_SEED || "018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a";
 const targetBaseUrl = (__ENV.TARGET_BASE_URL || "http://host.docker.internal:3001").replace(/\/$/, "");
-const actor = profile.actors.dispatcher[0];
 
 export const options = {
   vus: Number(__ENV.WORKLOAD_VUS || profile.k6.vus),
@@ -15,20 +18,17 @@ export const options = {
   thresholds: profile.k6.thresholds
 };
 
-let signedIn = false;
+let signedInActorEmail = null;
 
 export default function runProfile() {
-  if (!signedIn) {
-    signIn();
-    signedIn = true;
-  }
-
   const event = eventFor(profile, { seed, vu: __VU, iteration: __ITER });
+  signInAs(event.actor);
   executeEvent(event);
   sleep(0.2);
 }
 
 export function handleSummary(data) {
+  const generatedAt = new Date().toISOString();
   const metadata = {
     scenarioId: profile.scenarioId,
     profileId: profile.profileId,
@@ -39,7 +39,8 @@ export function handleSummary(data) {
     seedDataProfile: profile.seedDataProfile,
     vus: options.vus,
     iterations: options.iterations,
-    generatedAt: new Date().toISOString()
+    generatedAt,
+    ...profileRunContext(profile, { profilePath, thresholds: profile.k6.thresholds })
   };
 
   const summary = {
@@ -51,15 +52,16 @@ export function handleSummary(data) {
       checksRate: data.metrics.checks?.values?.rate
     }
   };
+  const fileNames = summaryFileNames(metadata);
 
   return {
-    "archive/latest-summary.json": JSON.stringify(summary, null, 2),
-    "archive/latest-summary.md": markdownSummary(summary)
+    [fileNames.json]: JSON.stringify(summary, null, 2),
+    [fileNames.markdown]: markdownSummary(summary)
   };
 }
 
 function executeEvent(event) {
-  const path = pathForEvent(event);
+  const path = pathForEvent(event, workflowPaths);
   const response = http.get(`${targetBaseUrl}${path}`, tags(event));
 
   check(response, {
@@ -82,7 +84,11 @@ function executeEvent(event) {
   }
 }
 
-function signIn() {
+function signInAs(actor) {
+  if (signedInActorEmail === actor.email) {
+    return;
+  }
+
   const loginResponse = http.get(`${targetBaseUrl}/login`, { tags: { workflow: "login" } });
   const token = csrfToken(loginResponse.body);
 
@@ -98,13 +104,15 @@ function signIn() {
       "session[email]": actor.email,
       "session[password]": actor.password
     },
-    { tags: { workflow: "login" } }
+    { tags: { workflow: "login", actor_email: actor.email } }
   );
 
   check(response, {
     "login POST succeeded": (result) => result.status === 200,
     "login reached dashboard": (result) => result.body.includes("Dashboard")
   });
+
+  signedInActorEmail = actor.email;
 }
 
 function csrfToken(html) {
@@ -120,6 +128,7 @@ function tags(event, extra = {}) {
       resource_envelope: __ENV.RESOURCE_ENVELOPE || profile.resourceEnvelope,
       workflow: event.workflow,
       workflow_type: event.type,
+      actor_role: event.actorRole,
       time_bucket: event.timeBucket,
       ...extra
     }
@@ -127,10 +136,10 @@ function tags(event, extra = {}) {
 }
 
 function markdownSummary(summary) {
-  return `# Workload Smoke Summary
+  return `# Workload Summary
 
-This generated summary is written to the ignored local archive. It is a smoke
-artifact, not promoted workload evidence.
+This generated summary is written to the ignored local archive. It is a raw
+workload artifact unless it is later promoted into tracked evidence.
 
 ## Metadata
 
@@ -143,6 +152,21 @@ artifact, not promoted workload evidence.
 - VUs: ${summary.metadata.vus}
 - Iterations: ${summary.metadata.iterations}
 - Generated at: ${summary.metadata.generatedAt}
+- Profile path: ${summary.metadata.profilePath}
+
+## Thresholds
+
+${markdownThresholds(summary.metadata.thresholds)}
+
+## Workload Shape
+
+### Time Buckets
+
+${markdownTimeBuckets(summary.metadata.timeBuckets)}
+
+### Workflows
+
+${markdownWorkflows(summary.metadata.workflows)}
 
 ## Metrics
 
@@ -151,4 +175,40 @@ artifact, not promoted workload evidence.
 - HTTP duration avg: ${summary.metrics.httpReqDurationAvg}
 - Check pass rate: ${summary.metrics.checksRate}
 `;
+}
+
+function markdownThresholds(thresholds) {
+  return Object.entries(thresholds || {})
+    .map(([metric, rules]) => `- ${metric}: ${formatThresholdRules(rules)}`)
+    .join("\n");
+}
+
+function formatThresholdRules(rules) {
+  if (Array.isArray(rules)) {
+    return rules.join(", ");
+  }
+
+  if (rules && typeof rules === "object") {
+    return Object.values(rules).join(", ");
+  }
+
+  return String(rules);
+}
+
+function markdownTimeBuckets(timeBuckets) {
+  return timeBuckets
+    .map((bucket) => {
+      const mix = Object.entries(bucket.workflowMix)
+        .map(([workflow, weight]) => `${workflow}=${weight}`)
+        .join(", ");
+
+      return `- ${bucket.name}: ${bucket.iterations} iterations; ${mix}`;
+    })
+    .join("\n");
+}
+
+function markdownWorkflows(workflows) {
+  return Object.entries(workflows)
+    .map(([name, workflow]) => `- ${name}: ${workflow.type} as ${workflow.actorRole}`)
+    .join("\n");
 }

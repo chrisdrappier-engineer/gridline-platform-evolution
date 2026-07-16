@@ -39,6 +39,8 @@ export function eventFor(profile, { seed, vu, iteration }) {
     iteration,
     timeBucket: bucket.name,
     workflow: workflowName,
+    actorRole: workflow.actorRole || "dispatcher",
+    actor: actorForWorkflow(profile, workflow, seed, vu, iteration, workflowName),
     type: workflow.type,
     params: paramsForWorkflow(workflow, seed, vu, iteration, workflowName)
   };
@@ -80,4 +82,11 @@ function paramsForWorkflow(workflow, seed, vu, iteration, workflowName) {
   }
 
   return params;
+}
+
+function actorForWorkflow(profile, workflow, seed, vu, iteration, workflowName) {
+  const actorRole = workflow.actorRole || "dispatcher";
+  const actors = profile.actors[actorRole];
+
+  return deterministicChoice(actors, seed, vu, iteration, workflowName, "actor");
 }
