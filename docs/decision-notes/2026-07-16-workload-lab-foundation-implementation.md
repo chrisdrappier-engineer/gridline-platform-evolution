@@ -29,6 +29,8 @@ The workload lab foundation includes:
 - selected-profile validation
 - deterministic event-plan tests
 - workflow request/path helpers
+- ESLint-backed workload-lab linting with a project-specific `Math.random()`
+  ban
 - a baseline smoke profile
 - a k6 runner
 - fast workload-specific CI checks

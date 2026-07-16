@@ -204,9 +204,10 @@ evidence-generation foundation for future vertical optimization and scaling
 scenario work.
 
 The current foundation includes a deterministic traffic generator, profile
-validation for selected profiles, a tiny baseline smoke profile, and a k6
-runner. The smoke profile is intentionally small; it proves the lab framework
-works, but it is not a full Scenario 00 scaling evidence run.
+validation for selected profiles, ESLint-backed workload-lab checks with a
+`Math.random()` ban, a tiny baseline smoke profile, and a k6 runner. The smoke
+profile is intentionally small; it proves the lab framework works, but it is
+not a full Scenario 00 scaling evidence run.
 
 Run fast workload-lab checks with:
 

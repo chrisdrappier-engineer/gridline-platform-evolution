@@ -49,7 +49,8 @@ bin/workload-ci
 
 This command runs:
 
-- JavaScript syntax and randomness linting
+- ESLint for workload-lab JavaScript
+- a project-specific ESLint rule banning uncontrolled `Math.random()` calls
 - Node tests for deterministic event generation, fixture profile validation,
   seed validation, and request-path construction
 
