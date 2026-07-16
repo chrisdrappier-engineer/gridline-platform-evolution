@@ -1,9 +1,12 @@
 services:
   app:
+    cpus: "${PRODUCTION_APP_CPUS:-1.0}"
+    mem_limit: "${PRODUCTION_APP_MEMORY:-768m}"
     build:
       context: ./app
       target: production
     environment:
+      RESOURCE_ENVELOPE: ${RESOURCE_ENVELOPE:-local-small}
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: ${RAILS_LOG_TO_STDOUT:-true}
       RAILS_SERVE_STATIC_FILES: ${RAILS_SERVE_STATIC_FILES:-true}
@@ -36,8 +39,11 @@ services:
       start_period: 10s
 
   db:
+    cpus: "${PRODUCTION_DB_CPUS:-1.0}"
+    mem_limit: "${PRODUCTION_DB_MEMORY:-768m}"
     image: postgres:18.4-trixie
     environment:
+      RESOURCE_ENVELOPE: ${RESOURCE_ENVELOPE:-local-small}
       POSTGRES_DB: ${POSTGRES_DB:-gridline_production}
       POSTGRES_USER: ${POSTGRES_USER:-gridline}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gridline}

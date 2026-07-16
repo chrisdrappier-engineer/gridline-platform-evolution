@@ -210,9 +210,33 @@ The production-like runtime:
 - does not bind-mount the Rails source tree into the app container
 - precompiles assets during the image build
 - serves static assets through the production app container
+- applies the default `local-small` resource envelope
 - uses named volumes for Postgres and local Active Storage files
 - disables forced SSL by default for local HTTP access
 - uses an explicit health check and smoke test path
+
+The default `local-small` resource envelope constrains the production-like
+runtime so workload evidence is not based on unconstrained Docker Desktop
+capacity:
+
+| Service | CPU Limit | Memory Limit | Related Runtime Settings |
+|---|---:|---:|---|
+| Rails app | `1.0` CPU | `768m` | `WEB_CONCURRENCY=1`, `RAILS_MAX_THREADS=5` |
+| Postgres | `1.0` CPU | `768m` | default Postgres settings |
+
+These limits are diagnostic constraints for local evidence, not a claim that
+the laptop faithfully emulates a production provider. Future workload runs
+should record the resource envelope alongside the scenario, profile, seed,
+target URL, data set, and application revision.
+
+The envelope can be overridden for experiments:
+
+```bash
+RESOURCE_ENVELOPE=local-app-constrained \
+PRODUCTION_APP_CPUS=0.5 \
+PRODUCTION_APP_MEMORY=512m \
+docker compose -f compose.production.yml up --build
+```
 
 Run the production runtime validation with:
 
