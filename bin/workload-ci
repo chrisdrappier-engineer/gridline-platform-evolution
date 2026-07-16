@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+npm run lint:workload
+npm run validate:workload
+npm run test:workload

@@ -12,7 +12,7 @@ services:
       RAILS_SERVE_STATIC_FILES: ${RAILS_SERVE_STATIC_FILES:-true}
       RAILS_ASSUME_SSL: ${RAILS_ASSUME_SSL:-false}
       RAILS_FORCE_SSL: ${RAILS_FORCE_SSL:-false}
-      RAILS_ALLOWED_HOSTS: ${RAILS_ALLOWED_HOSTS:-localhost,127.0.0.1,app}
+      RAILS_ALLOWED_HOSTS: ${RAILS_ALLOWED_HOSTS:-localhost,127.0.0.1,host.docker.internal,app}
       RAILS_MAX_THREADS: ${RAILS_MAX_THREADS:-5}
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-local-production-secret-key-base-for-gridline-workload-lab}

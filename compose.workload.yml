@@ -1,0 +1,13 @@
+services:
+  k6:
+    image: grafana/k6:latest
+    working_dir: /workload-lab
+    environment:
+      TARGET_BASE_URL: ${TARGET_BASE_URL:-http://host.docker.internal:3001}
+      PROFILE_PATH: ${PROFILE_PATH:-/workload-lab/profiles/baseline-smoke.json}
+      WORKLOAD_SEED: ${WORKLOAD_SEED:-2026071601}
+      RESOURCE_ENVELOPE: ${RESOURCE_ENVELOPE:-local-small}
+      APP_COMMIT: ${APP_COMMIT:-unknown}
+    volumes:
+      - ./workload-lab:/workload-lab
+    command: ["run", "scenarios/run-profile.mjs"]

@@ -197,6 +197,30 @@ mutate shared demo data while exercising realistic user paths.
 
 Additional browser test details live in [`e2e/README.md`](e2e/README.md).
 
+## Workload Lab
+
+The workload lab lives in [`workload-lab`](workload-lab/README.md). It is the
+evidence-generation foundation for future vertical optimization and scaling
+scenario work.
+
+The current foundation includes a deterministic traffic generator, profile
+validation, a tiny baseline smoke profile, and a k6 runner. The smoke profile
+is intentionally small; it proves the lab framework works, but it is not a full
+Scenario 00 scaling evidence run.
+
+Run fast workload-lab checks with:
+
+```bash
+bin/workload-ci
+```
+
+Run the Docker-backed k6 smoke profile against the production-like runtime
+with:
+
+```bash
+bin/workload-smoke
+```
+
 ## Production-Like Runtime
 
 The repository also includes a production-like local runtime for workload-lab
@@ -211,6 +235,8 @@ The production-like runtime:
 - precompiles assets during the image build
 - serves static assets through the production app container
 - applies the default `local-small` resource envelope
+- allows `host.docker.internal` so Dockerized workload tools can reach the
+  host-published production app
 - uses named volumes for Postgres and local Active Storage files
 - disables forced SSL by default for local HTTP access
 - uses an explicit health check and smoke test path

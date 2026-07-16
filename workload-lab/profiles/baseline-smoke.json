@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "00-vertical-scaling-limit",
+  "profileId": "baseline-smoke",
+  "description": "Tiny read-heavy proof profile for the workload lab foundation. This is not a scaling evidence run.",
+  "resourceEnvelope": "local-small",
+  "seedDataProfile": "demo",
+  "actors": {
+    "dispatcher": [
+      {
+        "email": "dispatcher@gridline.test",
+        "password": "gridline"
+      }
+    ]
+  },
+  "k6": {
+    "vus": 1,
+    "iterations": 6,
+    "thresholds": {
+      "http_req_failed": ["rate<0.01"],
+      "http_req_duration": ["p(95)<1500"]
+    }
+  },
+  "timeBuckets": [
+    {
+      "name": "smoke-read-path",
+      "iterations": 6,
+      "workflowMix": {
+        "dashboard": 2,
+        "serviceRequestIndex": 4,
+        "serviceRequestDetail": 3,
+        "siteIndex": 1
+      }
+    }
+  ],
+  "workflows": {
+    "dashboard": {
+      "type": "dashboard"
+    },
+    "serviceRequestIndex": {
+      "type": "service-request-index",
+      "bounds": {
+        "search": ["", "Palmetto", "HVAC", "inspection", "roof"],
+        "sort": ["reported_at", "priority", "status", "site"],
+        "direction": ["asc", "desc"],
+        "limit": [10, 20],
+        "status": ["", "new", "triaged", "resolved"]
+      }
+    },
+    "serviceRequestDetail": {
+      "type": "service-request-detail",
+      "bounds": {
+        "search": ["", "Palmetto", "HVAC", "inspection", "roof"],
+        "sort": ["reported_at", "priority", "status", "site"],
+        "direction": ["asc", "desc"],
+        "limit": [10, 20]
+      }
+    },
+    "siteIndex": {
+      "type": "site-index",
+      "bounds": {
+        "search": ["", "Palmetto", "Savannah", "Atlanta", "Jacksonville"],
+        "sort": ["site", "customer", "status", "location"],
+        "direction": ["asc", "desc"],
+        "limit": [10, 20],
+        "site_status": ["", "active", "inactive"]
+      }
+    }
+  }
+}

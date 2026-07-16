@@ -34,3 +34,4 @@ commit message or pull request body instead of adding a decision note.
 - [2026-07-16: Live Reporting Dashboard Metrics](2026-07-16-live-reporting-dashboard-metrics.md)
 - [2026-07-16: Workload Lab Strategy](2026-07-16-workload-lab-strategy.md)
 - [2026-07-16: Production Runtime Hardening](2026-07-16-production-runtime-hardening.md)
+- [2026-07-16: Workload Lab Foundation Implementation](2026-07-16-workload-lab-foundation-implementation.md)

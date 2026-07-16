@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export TARGET_BASE_URL="${TARGET_BASE_URL:-http://host.docker.internal:3001}"
+export PROFILE_PATH="${PROFILE_PATH:-/workload-lab/profiles/baseline-smoke.json}"
+export WORKLOAD_SEED="${WORKLOAD_SEED:-2026071601}"
+export RESOURCE_ENVELOPE="${RESOURCE_ENVELOPE:-local-small}"
+export APP_COMMIT="${APP_COMMIT:-$(git rev-parse HEAD)}"
+
+docker compose -f compose.workload.yml run --rm k6
