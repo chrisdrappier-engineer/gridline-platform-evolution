@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -123,6 +123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
     t.uuid "recorded_by_id", null: false
     t.uuid "service_request_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["category", "incurred_on"], name: "index_service_request_costs_on_category_and_incurred"
     t.index ["category"], name: "index_service_request_costs_on_category"
     t.index ["incurred_on"], name: "index_service_request_costs_on_incurred_on"
     t.index ["recorded_by_id"], name: "index_service_request_costs_on_recorded_by_id"
@@ -150,6 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
     t.uuid "service_request_id", null: false
     t.uuid "submitted_by_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["follow_up_needed", "rating"], name: "index_service_request_feedbacks_on_follow_up_and_rating"
     t.index ["service_request_id"], name: "index_service_request_feedbacks_on_service_request_id", unique: true
     t.index ["submitted_by_id"], name: "index_service_request_feedbacks_on_submitted_by_id"
   end
@@ -195,6 +197,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
     t.index ["created_by_id"], name: "index_service_request_quotes_on_created_by_id"
     t.index ["rejected_by_id"], name: "index_service_request_quotes_on_rejected_by_id"
     t.index ["service_request_id"], name: "index_service_request_quotes_on_service_request_id", unique: true
+    t.index ["status", "approval_required"], name: "index_service_request_quotes_on_status_and_required"
     t.index ["status"], name: "index_service_request_quotes_on_status"
   end
 
@@ -229,15 +232,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_003313) do
     t.index ["assigned_dispatcher_id"], name: "index_service_requests_on_assigned_dispatcher_id"
     t.index ["completion_verified_by_id"], name: "index_service_requests_on_completion_verified_by_id"
     t.index ["created_by_id"], name: "index_service_requests_on_created_by_id"
+    t.index ["customer_site_id", "status", "reported_at"], name: "index_service_requests_on_site_status_reported"
     t.index ["customer_site_id"], name: "index_service_requests_on_customer_site_id"
+    t.index ["follow_up_to_service_request_id", "reported_at"], name: "index_service_requests_on_follow_up_and_reported"
     t.index ["follow_up_to_service_request_id"], name: "index_service_requests_on_follow_up_to_service_request_id"
+    t.index ["priority", "status"], name: "index_service_requests_on_priority_and_status"
     t.index ["priority"], name: "index_service_requests_on_priority"
     t.index ["provider_completion_seconds"], name: "index_service_requests_on_provider_completion_seconds"
     t.index ["provider_responded_at"], name: "index_service_requests_on_provider_responded_at"
     t.index ["provider_response_seconds"], name: "index_service_requests_on_provider_response_seconds"
     t.index ["reported_at"], name: "index_service_requests_on_reported_at"
     t.index ["resolved_at"], name: "index_service_requests_on_resolved_at"
+    t.index ["service_provider_id", "status", "reported_at"], name: "index_service_requests_on_provider_status_reported"
     t.index ["service_provider_id"], name: "index_service_requests_on_service_provider_id"
+    t.index ["status", "reported_at"], name: "index_service_requests_on_status_and_reported_at"
     t.index ["status"], name: "index_service_requests_on_status"
   end
 

@@ -29,10 +29,15 @@ async function createMagnoliaRequest(page, title) {
   await page.getByRole("link", { name: "View Sites" }).click();
   await expect(page.getByRole("heading", { name: "Sites" })).toBeVisible();
   await page.getByRole("searchbox", { name: "Search" }).fill("Magnolia Midtown Atlanta");
-  await page.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).click();
+  const siteRow = page.getByRole("row", { name: /Magnolia Midtown Atlanta/ });
+  await expect(siteRow).toBeVisible();
+  await siteRow.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Magnolia Midtown Atlanta" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Create Service Request" }).click();
+  await Promise.all([
+    page.waitForURL(/\/service_requests\/new/),
+    page.getByRole("link", { name: "Create Service Request" }).click()
+  ]);
   await expect(page.getByRole("heading", { name: "New Service Request" })).toBeVisible();
   await page.getByLabel("Service Provider").selectOption({ label: "Gridline Internal Dispatch Team" });
   await page.getByLabel("Title").fill(title);

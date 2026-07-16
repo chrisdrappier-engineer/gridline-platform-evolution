@@ -108,6 +108,8 @@ The Rails app currently implements the first operational baseline:
 - service request notes with role-aware visibility rules and evidence file
   attachments
 - facility-manager service feedback, ratings, and linked follow-up requests
+- live authorization-scoped dashboard reporting for operational, financial,
+  quality, and provider performance metrics
 - scoped read access for facility managers, customer contacts, and service
   provider users
 - admin maintenance screens for customers, sites, providers, users, role
@@ -253,6 +255,8 @@ The baseline application includes:
   assignments, and the permission matrix
 - Backend-driven operational tables with search, filters, sorting, pagination,
   and shareable query params
+- Live authorization-scoped dashboard reporting for operational, financial,
+  quality, and provider performance metrics
 - Seeded development and demo data
 - Health and identity endpoints
 - Minitest and Playwright test coverage
@@ -267,11 +271,9 @@ Known limitations at this stage:
 - No background job processor
 - No read replica
 - Limited operational visibility
-- Cost reporting is still limited to request-level quote and actual-cost data
-- Provider performance reporting is limited to request and provider-level
-  summaries
-- SLA policy reporting and broader management dashboards are captured as user
-  stories but not yet implemented
+- Reporting is still live-query based and intentionally not cached or
+  precomputed
+- SLA policy reporting and richer management drilldowns are not yet implemented
 
 These limitations motivate the later scenarios.
 
@@ -285,9 +287,9 @@ sketch. The app currently centers on customers, sites, service providers,
 service requests, users, scoped RBAC, service request quotes, actual service
 costs, request notes, request evidence files, service feedback, ratings, and
 linked follow-up requests. Lifecycle timing, provider performance summaries,
-note visibility rules, and local evidence-file storage are implemented for the
-baseline workflow. SLA reporting and broader management reporting are captured in
-[`docs/user-stories`](docs/user-stories/README.md) for future feature work.
+live dashboard reporting, note visibility rules, and local evidence-file
+storage are implemented for the baseline workflow. SLA reporting and richer
+management drilldowns remain future feature work.
 
 ## Repository Structure
 

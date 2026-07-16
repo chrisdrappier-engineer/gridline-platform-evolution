@@ -84,3 +84,7 @@ messages, ADRs, decision notes, and pull request descriptions.
 ### 2026-07-15
 
 - Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate migration AddFollowUpToServiceRequests follow_up_to_service_request:references`
+
+### 2026-07-15
+
+- Rails `8.1.3`; Ruby image `ruby:4.0.5-slim`; command: `bin/rails-generate migration AddReportingDashboardIndexes`
