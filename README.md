@@ -32,13 +32,6 @@ reproducible verification, and explicit documentation.
 - [Roadmap](docs/roadmap/README.md): see where the product and scaling story is
   headed.
 
-Version tags:
-
-| Tag | Meaning |
-|---|---|
-| `app-v1` | First complete Gridline monolith application |
-| `workload-lab-v1` | First meaningful workload lab scenario |
-
 ## Documentation Map
 
 ### Application
