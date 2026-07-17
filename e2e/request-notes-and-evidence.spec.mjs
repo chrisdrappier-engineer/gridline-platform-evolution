@@ -70,7 +70,7 @@ test("notes and evidence files follow role visibility rules", async ({ page }) =
     visibility: "internal",
     body: internalNote,
     evidenceCategory: "diagnostic_report",
-    filePath: "app/db/demo_files/diagnostic-report.txt"
+    filePath: "monolith/db/demo_files/diagnostic-report.txt"
   });
 
   const dispatcherNote = page.locator(".note-card", { hasText: internalNote });
@@ -89,7 +89,7 @@ test("notes and evidence files follow role visibility rules", async ({ page }) =
     visibility: "customer_visible",
     body: customerNote,
     evidenceCategory: "approval_document",
-    filePath: "app/db/demo_files/approval-document.pdf"
+    filePath: "monolith/db/demo_files/approval-document.pdf"
   });
 
   const facilityManagerNote = page.locator(".note-card", { hasText: customerNote });

@@ -3,7 +3,7 @@ services:
     cpus: "${PRODUCTION_APP_CPUS:-1.0}"
     mem_limit: "${PRODUCTION_APP_MEMORY:-768m}"
     build:
-      context: ./app
+      context: ./monolith
       target: production
     environment:
       RESOURCE_ENVELOPE: ${RESOURCE_ENVELOPE:-local-small}

@@ -3,7 +3,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "lint:css": "node_modules/.bin/node node_modules/stylelint/bin/stylelint.mjs \"app/app/assets/stylesheets/**/*.css\"",
+    "lint:css": "node_modules/.bin/node node_modules/stylelint/bin/stylelint.mjs \"monolith/app/assets/stylesheets/**/*.css\"",
     "lint:workload": "node_modules/.bin/node node_modules/eslint/bin/eslint.js \"workload-lab/**/*.mjs\"",
     "validate:workload-profile": "node_modules/.bin/node workload-lab/scripts/validate-profile.mjs",
     "test:workload": "node_modules/.bin/node --test workload-lab/test/*.test.mjs",
