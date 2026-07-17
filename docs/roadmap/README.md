@@ -42,6 +42,44 @@ pressure.
 - Capture major AI-assisted reasoning in decision notes when the discussion is
   useful context for future reviewers.
 
+## Architecture Concepts
+
+The project focuses on scaling concepts commonly encountered as a Rails
+application matures:
+
+- Modular monolith design
+- Dockerized local runtime
+- Load-balanced web workers
+- Shared session state
+- Persistent database state
+- Read/write database separation
+- Redis caching
+- Background job processing
+- Rate limiting and backpressure
+- Health and readiness checks
+- Observability foundations
+- Deployment and orchestration patterns
+
+CI/CD is included as a supporting engineering practice. Each scenario is
+intended to be buildable, testable, and smoke-verifiable, but the primary story
+is application scaling.
+
+## Architecture Scenario Roadmap
+
+| Scenario | Focus | Status |
+|---|---|---|
+| 00 Vertical Scaling Limit | Pre-history: why vertical scaling is no longer enough | Planned |
+| 01 Mature Monolith Baseline | Single-instance Rails operations platform | Baseline Complete |
+| 02 Load-Balanced Web Tier | Multiple Rails web workers behind a load balancer | Planned |
+| 03 Shared Redis Sessions | Stateless web containers and shared session state | Planned |
+| 04 Persistent Postgres State | Shared durable database state | Planned |
+| 05 Read Replica Split | Scaling read-heavy dashboard traffic | Planned |
+| 06 Redis Cache Store | Reducing repeated expensive reads | Planned |
+| 07 Background Jobs | Moving slow work out of the request path | Planned |
+| 08 Backpressure And Rate Limiting | Protecting constrained resources during spikes | Planned |
+| 09 Observability | Logs, metrics, and operational insight | Planned |
+| 10 Orchestration Patterns | Health checks, replica operations, and deployment shape | Planned |
+
 ## Horizon 1: Operational Richness
 
 This horizon makes the baseline application more like a real facilities

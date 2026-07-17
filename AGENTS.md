@@ -9,11 +9,14 @@ project's documented decisions.
 Before re-discussing project direction, read the existing docs in this order:
 
 1. `README.md`
-2. `docs/roadmap/README.md`
-3. relevant ADRs in `docs/adr/`
-4. relevant decision notes in `docs/decision-notes/`
-5. relevant design rules in `docs/design/`
-6. relevant user stories in `docs/user-stories/`
+2. `docs/application/README.md`
+3. `docs/roadmap/README.md`
+4. relevant runtime docs in `docs/runtime/`
+5. relevant development docs in `docs/development/`
+6. relevant ADRs in `docs/adr/`
+7. relevant decision notes in `docs/decision-notes/`
+8. relevant design rules in `docs/design/`
+9. relevant user stories in `docs/user-stories/`
 
 Do not ask the user to restate settled context that is already captured in
 these documents.
@@ -25,6 +28,8 @@ explicitly asks to revisit them.
 
 Settled direction includes:
 
+- this repository demonstrates both platform evolution and AI-assisted
+  development lifecycle practices
 - Docker-first runtime and Rails monolith baseline
 - simulated PaaS-style local baseline
 - UUID primary keys
