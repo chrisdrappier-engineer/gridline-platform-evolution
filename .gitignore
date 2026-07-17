@@ -2,16 +2,16 @@
 .env
 node_modules/
 
-/app/config/master.key
-/app/log/*
-!/app/log/.keep
-/app/tmp/*
-!/app/tmp/.keep
-!/app/tmp/pids/
-/app/tmp/pids/*
-!/app/tmp/pids/.keep
-/app/storage/*
-!/app/storage/.keep
+/monolith/config/master.key
+/monolith/log/*
+!/monolith/log/.keep
+/monolith/tmp/*
+!/monolith/tmp/.keep
+!/monolith/tmp/pids/
+/monolith/tmp/pids/*
+!/monolith/tmp/pids/.keep
+/monolith/storage/*
+!/monolith/storage/.keep
 
 /workload-lab/archive/*
 !/workload-lab/archive/README.md

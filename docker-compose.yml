@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: ./app
+      context: ./monolith
       target: development
     environment:
       RAILS_ENV: ${RAILS_ENV:-development}
@@ -16,7 +16,7 @@ services:
     ports:
       - "${APP_PORT:-3000}:3000"
     volumes:
-      - ./app:/app
+      - ./monolith:/app
       - app_storage:/app/storage
     depends_on:
       db:

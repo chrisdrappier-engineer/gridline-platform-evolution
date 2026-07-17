@@ -16,7 +16,10 @@ test("dispatcher can open a site and create a request with site context", async 
   await page.getByRole("searchbox", { name: "Search" }).fill("Magnolia Midtown Atlanta");
   const siteRow = page.getByRole("row", { name: /Magnolia Midtown Atlanta/ });
   await expect(siteRow).toBeVisible();
-  await siteRow.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).click();
+  await Promise.all([
+    page.waitForURL(/\/customer_sites\/[0-9a-f-]+/),
+    siteRow.getByRole("link", { name: "Magnolia Midtown Atlanta", exact: true }).click()
+  ]);
   await expect(page.getByRole("heading", { name: "Magnolia Midtown Atlanta" })).toBeVisible();
 
   await page.getByRole("link", { name: "Create Service Request" }).click();

@@ -10,8 +10,8 @@ for arg in "$@"; do
   fi
 done
 
-if [[ -f app/config/application.rb && "$force_requested" == false ]]; then
-  echo "Refusing to run rails new because app/config/application.rb already exists." >&2
+if [[ -f monolith/config/application.rb && "$force_requested" == false ]]; then
+  echo "Refusing to run rails new because monolith/config/application.rb already exists." >&2
   echo "Pass --force if you intentionally want Rails to overwrite the existing app skeleton." >&2
   exit 1
 fi
@@ -40,5 +40,5 @@ record_command() {
   } >> "$history_file"
 }
 
-docker compose -f compose.generator.yml run --rm generator rails new app "$@"
+docker compose -f compose.generator.yml run --rm generator rails new monolith "$@"
 record_command "$@"

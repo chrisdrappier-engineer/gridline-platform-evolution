@@ -74,7 +74,7 @@ modified result.
 
 ## Demo Data
 
-Committed demo source files live under `app/db/demo_files`.
+Committed demo source files live under `monolith/db/demo_files`.
 
 The repository stores only tiny deterministic source files. Active Storage
 runtime blobs are generated during seeding and remain outside git.

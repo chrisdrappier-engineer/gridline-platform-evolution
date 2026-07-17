@@ -337,13 +337,13 @@ The Rails implementation should keep the domain modular inside the monolith.
 Suggested service and query objects:
 
 ```text
-app/services/service_requests/create.rb
-app/services/service_requests/convert_to_work_order.rb
-app/services/work_orders/assign_technician.rb
-app/services/work_orders/start.rb
-app/services/work_orders/complete.rb
-app/queries/dispatch_board_query.rb
-app/queries/daily_summary_query.rb
+monolith/app/services/service_requests/create.rb
+monolith/app/services/service_requests/convert_to_work_order.rb
+monolith/app/services/work_orders/assign_technician.rb
+monolith/app/services/work_orders/start.rb
+monolith/app/services/work_orders/complete.rb
+monolith/app/queries/dispatch_board_query.rb
+monolith/app/queries/daily_summary_query.rb
 ```
 
 Suggested request spec coverage:
@@ -364,4 +364,3 @@ Suggested model or service spec coverage:
 - assignment rejects unavailable technicians
 - completion rejects unassigned work orders
 - lifecycle changes create audit events
-

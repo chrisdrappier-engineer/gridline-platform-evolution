@@ -3,8 +3,8 @@ set -euo pipefail
 
 history_file="docs/rails-generator-history.md"
 
-if [[ ! -f app/bin/rails ]]; then
-  echo "Refusing to run rails generate because app/bin/rails does not exist yet." >&2
+if [[ ! -f monolith/bin/rails ]]; then
+  echo "Refusing to run rails generate because monolith/bin/rails does not exist yet." >&2
   exit 1
 fi
 
@@ -33,7 +33,7 @@ record_command() {
 }
 
 docker compose -f compose.generator.yml run --rm \
-  --workdir /workspace/app \
-  -e BUNDLE_GEMFILE=/workspace/app/Gemfile \
+  --workdir /workspace/monolith \
+  -e BUNDLE_GEMFILE=/workspace/monolith/Gemfile \
   generator bash -lc 'bundle install && bin/rails generate "$@"' -- "$@"
 record_command "$@"

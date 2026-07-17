@@ -9,7 +9,7 @@ on the host machine's Ruby, Rails, Bundler, or native gem environment.
 
 Use the repository scripts rather than invoking this image directly:
 
-- `bin/rails-new` creates the initial Rails application under `app/` with the
+- `bin/rails-new` creates the initial Rails application under `monolith/` with the
   pinned generator Rails version
 - `bin/rails-generate` runs future Rails generators inside the generated app
   with the app's own bundle

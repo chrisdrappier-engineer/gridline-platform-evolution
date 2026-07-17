@@ -81,7 +81,7 @@ The baseline includes:
 
 - an `app` container that runs the Rails monolith with Puma
 - a `db` container running Postgres as the managed database stand-in
-- a bind mount from `./app` into the app container so local Rails file changes
+- a bind mount from `./monolith` into the app container so local Rails file changes
   are visible without rebuilding the image
 - environment-variable configuration
 - app-to-database communication over the Compose network
@@ -148,17 +148,16 @@ rebuild:
 docker compose up app
 ```
 
-Changes under `app/` are mounted into the running container. Restart the app
+Changes under `monolith/` are mounted into the running container. Restart the app
 container for changes that Rails does not reload automatically, and rebuild only
-when image-level inputs change, such as `app/Gemfile`, `app/Gemfile.lock`, or
-`app/Dockerfile`.
+when image-level inputs change, such as `monolith/Gemfile`,
+`monolith/Gemfile.lock`, or `monolith/Dockerfile`.
 
-The repository currently has paths such as `app/app/models` because the outer
-`app/` directory is the Rails application root inside this portfolio repository,
-while the inner `app/` directory is the normal Rails framework directory. The
-project is expected to remain a single Rails monolith, so the outer directory is
-planned to be renamed for clarity in
-[#33](https://github.com/chrisdrappier-engineer/gridline-platform-evolution/issues/33).
+The Rails application root lives under `monolith/`. Rails framework paths
+therefore read as `monolith/app/models`, `monolith/app/controllers`,
+`monolith/config`, and `monolith/db`. The project is expected to remain a
+single Rails monolith; this directory name is for repository clarity, not
+service decomposition.
 
 Then visit:
 
@@ -366,7 +365,7 @@ Generator tooling lives outside the application runtime:
 
 - `generator/` defines the Ruby and Rails image used only for file generation
 - `compose.generator.yml` mounts the repository into the generator container
-- `bin/rails-new` creates the initial Rails application under `app/`
+- `bin/rails-new` creates the initial Rails application under `monolith/`
 - `bin/rails-generate` runs future Rails generators inside the generated app
 - `docs/rails-generator-history.md` records successful generator commands
 
@@ -466,7 +465,7 @@ management drilldowns remain future feature work.
 
 ```text
 gridline-platform-evolution/
-  app/
+  monolith/
     # Rails monolith root; contains Rails' own app/, config/, db/, and Gemfile
 
   generator/
