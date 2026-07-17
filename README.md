@@ -15,9 +15,14 @@ operations platform starts as a mature single-instance Rails monolith and is
 expected to grow into a horizontally scalable operations system.
 
 This repository demonstrates how that kind of platform can evolve as usage
-increases, operational risk grows, and scaling pressure appears. The main story
-is the engineering process: documentation, CI/CD, workload evidence,
-optimization tradeoffs, and architecture decisions.
+increases, operational risk grows, and scaling pressure appears. It also
+demonstrates how AI collaboration can speed and simplify the development
+lifecycle of a large, complex application when the work remains organized
+around human-owned architecture decisions, reviewable issues, reproducible
+verification, and explicit documentation.
+
+The main story is the engineering process: documentation, AI-assisted planning,
+CI/CD, workload evidence, optimization tradeoffs, and architecture decisions.
 
 ## What Gridline Is
 
@@ -93,38 +98,11 @@ duration-based series model is captured in
 
 ## Quick Start
 
-Run the full development verification suite:
+Start with the [Quick Start Guide](docs/runtime/quick-start.md).
 
-```bash
-bin/ci
-```
-
-Start the development app:
-
-```bash
-docker compose up --build
-```
-
-Prepare the development database with presentation-friendly demo data:
-
-```bash
-docker compose run --rm -e SEED_DEMO_DATA=true app bin/rails db:prepare db:seed
-```
-
-Then visit:
-
-```text
-http://localhost:3000/login
-```
-
-The default stub password for seeded users is:
-
-```text
-gridline
-```
-
-Development runtime details live in
-[`docs/runtime/development.md`](docs/runtime/development.md).
+It covers the shortest useful path through project verification, the
+production-like runtime, the first workload profile, where workload summaries
+are written, and what the first run does and does not prove.
 
 ## Production-Like Runtime
 
@@ -173,8 +151,10 @@ Additional browser test details live in [`e2e/README.md`](e2e/README.md).
 | Topic | Location |
 |---|---|
 | Current Rails monolith baseline | [`docs/application`](docs/application/README.md) |
+| Quick start | [`docs/runtime/quick-start.md`](docs/runtime/quick-start.md) |
 | Development runtime | [`docs/runtime/development.md`](docs/runtime/development.md) |
 | Production-like runtime | [`docs/runtime/production-like.md`](docs/runtime/production-like.md) |
+| AI collaboration model | [`docs/development/ai-collaboration.md`](docs/development/ai-collaboration.md) |
 | Rails generator tooling | [`docs/development/rails-generator-tooling.md`](docs/development/rails-generator-tooling.md) |
 | Workload lab | [`workload-lab/README.md`](workload-lab/README.md) |
 | Architecture decisions | [`docs/adr`](docs/adr/README.md) |
@@ -199,6 +179,9 @@ engineering process used to build, document, and verify the case study.
 Substantial AI-assisted architecture discussions may be summarized in
 [`docs/decision-notes`](docs/decision-notes/README.md). ADRs remain the source
 of truth for final architecture decisions.
+
+The AI collaboration model is documented in
+[`docs/development/ai-collaboration.md`](docs/development/ai-collaboration.md).
 
 ## Repository Structure
 

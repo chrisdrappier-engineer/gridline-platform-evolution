@@ -28,6 +28,8 @@ explicitly asks to revisit them.
 
 Settled direction includes:
 
+- this repository demonstrates both platform evolution and AI-assisted
+  development lifecycle practices
 - Docker-first runtime and Rails monolith baseline
 - simulated PaaS-style local baseline
 - UUID primary keys
