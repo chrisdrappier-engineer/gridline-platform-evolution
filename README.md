@@ -8,6 +8,14 @@ The goal is not to showcase infrastructure for its own sake. Each phase starts
 from business or engineering pressure, measures how the current system behaves,
 and then applies the smallest architecture change that addresses the pressure.
 
+## Quick Start
+
+Start with the [Quick Start Guide](docs/runtime/quick-start.md).
+
+It covers the shortest useful path through project verification, the
+production-like runtime, the first workload profile, where workload summaries
+are written, and what the first run does and does not prove.
+
 ## Why This Exists
 
 Gridline is a fictional commercial facilities maintenance company. Its internal
@@ -95,14 +103,6 @@ The workload strategy is captured in
 [`ADR 0009`](docs/adr/0009-create-an-evidence-first-workload-lab.md), and the
 duration-based series model is captured in
 [`ADR 0010`](docs/adr/0010-use-duration-based-workload-series-as-performance-evidence.md).
-
-## Quick Start
-
-Start with the [Quick Start Guide](docs/runtime/quick-start.md).
-
-It covers the shortest useful path through project verification, the
-production-like runtime, the first workload profile, where workload summaries
-are written, and what the first run does and does not prove.
 
 ## Production-Like Runtime
 
