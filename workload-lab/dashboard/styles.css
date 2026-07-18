@@ -16,7 +16,6 @@
 body { margin: 0; min-width: 320px; }
 button, input { font: inherit; }
 button, .secondary, .compact-picker { cursor: pointer; }
-input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
 
 .masthead { height: 44px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: var(--surface); }
 .masthead p { color: var(--muted); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
@@ -31,6 +30,7 @@ h1 { max-width: 850px; margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); font-weig
 .browser-heading { display: flex; align-items: center; justify-content: space-between; }
 .browser-heading h2 { margin: 0; font-size: 1rem; }
 .compact-picker { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); font-size: 1.3rem; }
+.compact-picker:disabled { cursor: wait; opacity: .45; }
 .search { display: block; margin-top: 24px; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
 .search input { width: 100%; margin-top: 7px; padding: 10px 0; border: 0; border-bottom: 1px solid #a9ada6; outline: none; background: transparent; color: var(--ink); }
 .search input:focus { border-color: var(--green); }
