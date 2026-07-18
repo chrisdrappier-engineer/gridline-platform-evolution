@@ -72,15 +72,21 @@ async function runSeries(series) {
     generatedAt
   });
   const stepSummaries = [];
+  let failedStep = null;
 
   for (const step of series.steps) {
     const summaryPath = seriesStepSummaryPath({ baseName, stepName: step.name });
-    runStep({ series, step, summaryPath });
+    const status = runStep({ series, step, summaryPath });
 
     stepSummaries.push(JSON.parse(await readFile(path.join("workload-lab", summaryPath), "utf8")));
+    if (status !== 0) {
+      failedStep = step.name;
+      break;
+    }
   }
 
   const summary = {
+    schemaVersion: 1,
     metadata: {
       scenarioId: profile.scenarioId,
       profileId: profile.profileId,
@@ -100,7 +106,9 @@ async function runSeries(series) {
       executionModel: "duration-based-sequential-users",
       cumulativeSteps: true,
       warmup: false,
-      cooldown: false
+      cooldown: false,
+      status: failedStep ? "threshold-failed" : "completed",
+      failedStep
     },
     steps: stepSummaries.map((stepSummary) => ({
       name: stepSummary.metadata.stepName,
@@ -109,6 +117,7 @@ async function runSeries(series) {
       cadence: stepSummary.metadata.cadence,
       metrics: stepSummary.metrics,
       composition: workflowCompositionFromStep(stepSummary),
+      coverage: stepSummary.coverage || { endpoints: [], workflowSequences: [] },
       stepSummaryPath: path.join("workload-lab", seriesStepSummaryPath({ baseName, stepName: stepSummary.metadata.stepName }))
     }))
   };
@@ -119,6 +128,10 @@ async function runSeries(series) {
 
   console.log(`Series summary written: ${summaryPaths.json}`);
   console.log(`Series summary written: ${summaryPaths.markdown}`);
+
+  if (failedStep) {
+    throw new Error(`Series threshold failed: ${series.name} / ${failedStep}. Partial series summary was preserved.`);
+  }
 }
 
 function runStep({ series, step, summaryPath }) {
@@ -143,9 +156,7 @@ function runStep({ series, step, summaryPath }) {
     }
   });
 
-  if (result.status !== 0) {
-    throw new Error(`Series step failed: ${series.name} / ${step.name}`);
-  }
+  return result.status;
 }
 
 function containerProfilePath(value) {

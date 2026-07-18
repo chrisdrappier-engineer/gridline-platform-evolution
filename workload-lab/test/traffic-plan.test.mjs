@@ -5,7 +5,7 @@ import test from "node:test";
 import { summaryFileNames } from "../lib/archive-names.mjs";
 import { cadenceSleepSeconds } from "../lib/cadence.mjs";
 import { profileRunContext } from "../lib/profile-summary.mjs";
-import { pathForEvent, withQuery } from "../lib/requests.mjs";
+import { pathForEvent, serviceRequestNotesPath, withQuery } from "../lib/requests.mjs";
 import { selectSeries, stableJsonHash, workflowCompositionFromStep } from "../lib/series.mjs";
 import { eventFor, generatePlan, MAX_SEED_LENGTH } from "../lib/traffic-plan.mjs";
 import { validateProfile } from "../lib/profile.mjs";
@@ -15,6 +15,12 @@ const profile = JSON.parse(
 );
 const scenario00Profile = JSON.parse(
   await readFile(new URL("../profiles/scenario-00-normal-operations.json", import.meta.url), "utf8")
+);
+const mixedOperationsLargeProfile = JSON.parse(
+  await readFile(new URL("../profiles/scenario-00-mixed-operations-large.json", import.meta.url), "utf8")
+);
+const fullEndpointProfile = JSON.parse(
+  await readFile(new URL("../profiles/scenario-00-full-endpoint-exercise.json", import.meta.url), "utf8")
 );
 const workflowPaths = JSON.parse(
   await readFile(new URL("../config/workflow-paths.json", import.meta.url), "utf8")
@@ -74,6 +80,26 @@ test("scenario 00 normal operations profile is valid and deterministic", () => {
   assert.ok(first.some((event) => event.actorRole === "customerContact"));
   assert.ok(first.some((event) => event.actorRole === "serviceProviderUser"));
   assert.ok(first.some((event) => event.actorRole === "admin"));
+});
+
+test("large mixed-operations profile is valid and includes deterministic writes", () => {
+  assert.deepEqual(validateProfile(mixedOperationsLargeProfile, { workflowPaths }), []);
+  const events = generatePlan(mixedOperationsLargeProfile, { seed: seedA, vus: 4, iterations: 400 });
+  const writes = events.filter((event) => event.type === "service-request-note-create");
+
+  assert.ok(writes.length > 0);
+  assert.deepEqual(events, generatePlan(mixedOperationsLargeProfile, { seed: seedA, vus: 4, iterations: 400 }));
+  assert.deepEqual(new Set(writes.map((event) => event.actorRole)), new Set(["dispatcher", "facilityManager", "customerContact", "serviceProviderUser"]));
+});
+
+test("full endpoint profile is valid and is the largest series", () => {
+  assert.deepEqual(validateProfile(fullEndpointProfile, { workflowPaths }), []);
+  const series = fullEndpointProfile.series[0];
+
+  assert.equal(series.steps.length, 5);
+  assert.equal(series.steps.reduce((total, step) => total + Number.parseFloat(step.duration), 0), 10);
+  assert.equal(Math.max(...series.steps.map((step) => step.vus)), 300);
+  assert.equal(fullEndpointProfile.workflows.fullEndpointSequence.type, "full-endpoint-exercise");
 });
 
 test("profile validation accepts named duration-based series definitions", () => {
@@ -206,6 +232,14 @@ test("workflow request paths use backend table query parameters", () => {
     pathForEvent(event, workflowPaths),
     "/customer_sites?search=Palmetto&sort=site&direction=asc&limit=20&site_status=active"
   );
+});
+
+test("service request note paths are derived from discovered request details", () => {
+  assert.equal(
+    serviceRequestNotesPath("/service_requests/018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a"),
+    "/service_requests/018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a/service_request_notes"
+  );
+  assert.throws(() => serviceRequestNotesPath("/service_requests/not-a-uuid"), /Invalid service request detail path/);
 });
 
 test("scenario workflow paths support role-specific resource indexes", () => {

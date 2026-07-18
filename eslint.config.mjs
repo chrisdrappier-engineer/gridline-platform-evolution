@@ -47,5 +47,16 @@ export default [
         open: "readonly"
       }
     }
+  },
+  {
+    files: ["workload-lab/dashboard/app.mjs"],
+    languageOptions: {
+      globals: {
+        ...commonGlobals,
+        document: "readonly",
+        window: "readonly",
+        Intl: "readonly"
+      }
+    }
   }
 ];

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Gridline Workload Evidence</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="brand" href="#">Gridline / Workload Evidence</a>
+      <p>Local · read only</p>
+    </header>
+
+    <main>
+      <section id="workspace" class="workspace">
+        <aside class="run-browser">
+          <div class="browser-heading">
+            <div><p class="eyebrow">Local archive</p><h2>Series runs</h2></div>
+            <label class="compact-picker" title="Add series summaries">+<input id="add-files" type="file" accept=".json,application/json" multiple></label>
+          </div>
+          <label class="search">Search runs<input id="run-search" type="search" placeholder="Scenario, commit, envelope…"></label>
+          <p id="load-summary" class="load-summary"></p>
+          <ol id="run-list" class="run-list"></ol>
+        </aside>
+
+        <article id="run-detail" class="run-detail" aria-live="polite">
+          <div class="detail-empty"><p class="eyebrow">No evidence loaded</p><h1>Add a series summary with +</h1></div>
+        </article>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="app.mjs"></script>
+  </body>
+</html>

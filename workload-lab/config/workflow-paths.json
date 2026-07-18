@@ -5,6 +5,8 @@
   "site-index": "/customer_sites",
   "service-request-index": "/service_requests",
   "service-request-detail": "/service_requests",
+  "service-request-note-create": "/service_requests",
+  "full-endpoint-exercise": "/",
   "service-provider-index": "/service_providers",
   "admin-permission-matrix": "/admin/permission-matrix",
   "admin-role-assignments": "/admin/role-assignments",

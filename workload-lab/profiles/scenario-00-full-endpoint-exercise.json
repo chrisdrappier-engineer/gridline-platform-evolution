@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "00-vertical-scaling-limit",
+  "profileId": "full-endpoint-exercise",
+  "description": "Largest Scenario 00 series. It combines sustained multi-role operational traffic with deterministic admin sequences that exercise every application-owned route and HTTP method. Rails framework transport endpoints are excluded.",
+  "resourceEnvelope": "local-small",
+  "seedDataProfile": "demo",
+  "actors": {
+    "dispatcher": [{ "email": "dispatcher@gridline.test", "password": "gridline" }],
+    "facilityManager": [{ "email": "facility.manager@magnoliaproperty.test", "password": "gridline" }],
+    "customerContact": [{ "email": "customer.contact@magnoliaproperty.test", "password": "gridline" }],
+    "serviceProviderUser": [{ "email": "provider.user@coastalcoldchain.test", "password": "gridline" }],
+    "admin": [{ "email": "admin@gridline.test", "password": "gridline" }]
+  },
+  "k6": { "vus": 30, "iterations": 2000, "thresholds": { "http_req_failed": ["rate<0.03"], "http_req_duration": ["p(95)<5000"], "checks": ["rate>0.94"] } },
+  "series": [{
+    "name": "local-small-full-endpoint-ramp",
+    "description": "Ten-minute cumulative route-coverage and pressure series; the largest and longest Gridline workload series to date.",
+    "steps": [
+      { "name": "baseline", "vus": 20, "duration": "2m", "cadence": { "mode": "bounded-random", "distribution": "normal", "min": 0.2, "max": 1.5, "mean": 0.6, "standardDeviation": 0.2 } },
+      { "name": "busy", "vus": 60, "duration": "2m", "cadence": { "mode": "bounded-random", "distribution": "normal", "min": 0.12, "max": 1.0, "mean": 0.4, "standardDeviation": 0.18 } },
+      { "name": "heavy", "vus": 120, "duration": "2m", "cadence": { "mode": "bounded-random", "distribution": "uniform", "min": 0.08, "max": 0.7 } },
+      { "name": "saturation", "vus": 200, "duration": "2m", "cadence": { "mode": "bounded-random", "distribution": "uniform", "min": 0.04, "max": 0.4 } },
+      { "name": "extended-saturation", "vus": 300, "duration": "2m", "cadence": { "mode": "bounded-random", "distribution": "uniform", "min": 0.02, "max": 0.25 } }
+    ]
+  }],
+  "timeBuckets": [
+    { "name": "opening", "iterations": 200, "workflowMix": { "dispatcherQueue": 18, "dispatcherDetail": 14, "dispatcherNote": 4, "facilityDashboard": 7, "facilityDetail": 8, "facilityNote": 2, "customerDashboard": 7, "customerDetail": 8, "providerDashboard": 7, "providerDetail": 9, "providerNote": 3, "fullEndpointSequence": 1 } },
+    { "name": "peak", "iterations": 400, "workflowMix": { "dispatcherQueue": 20, "dispatcherDetail": 16, "dispatcherNote": 6, "facilityDashboard": 6, "facilityDetail": 9, "facilityNote": 3, "customerDashboard": 6, "customerDetail": 9, "providerDashboard": 6, "providerDetail": 11, "providerNote": 5, "fullEndpointSequence": 2 } },
+    { "name": "extended-peak", "iterations": 200, "workflowMix": { "dispatcherQueue": 16, "dispatcherDetail": 15, "dispatcherNote": 7, "facilityDashboard": 5, "facilityDetail": 9, "facilityNote": 4, "customerDashboard": 5, "customerDetail": 9, "providerDashboard": 5, "providerDetail": 12, "providerNote": 6, "fullEndpointSequence": 3 } }
+  ],
+  "workflows": {
+    "dispatcherQueue": { "actorRole": "dispatcher", "type": "service-request-index", "bounds": { "service_requests[search]": ["", "HVAC", "inspection", "roof", "water"], "service_requests[sort]": ["reported_at", "priority", "status", "site"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "dispatcherDetail": { "actorRole": "dispatcher", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "dispatcherNote": { "actorRole": "dispatcher", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "facilityDashboard": { "actorRole": "facilityManager", "type": "dashboard" },
+    "facilityDetail": { "actorRole": "facilityManager", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "facilityNote": { "actorRole": "facilityManager", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "customerDashboard": { "actorRole": "customerContact", "type": "dashboard" },
+    "customerDetail": { "actorRole": "customerContact", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "providerDashboard": { "actorRole": "serviceProviderUser", "type": "dashboard" },
+    "providerDetail": { "actorRole": "serviceProviderUser", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "providerNote": { "actorRole": "serviceProviderUser", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "fullEndpointSequence": { "actorRole": "admin", "type": "full-endpoint-exercise" }
+  }
+}
