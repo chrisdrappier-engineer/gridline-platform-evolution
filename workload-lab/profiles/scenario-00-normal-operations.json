@@ -45,6 +45,51 @@
       "http_req_duration": ["p(95)<2000"]
     }
   },
+  "series": [
+    {
+      "name": "local-small-ramp",
+      "description": "Initial duration-based pressure series against the local-small production-like resource envelope.",
+      "steps": [
+        {
+          "name": "light",
+          "vus": 4,
+          "duration": "30s",
+          "cadence": {
+            "mode": "bounded-random",
+            "distribution": "normal",
+            "min": 0.2,
+            "max": 1.5,
+            "mean": 0.6,
+            "standardDeviation": 0.2
+          }
+        },
+        {
+          "name": "moderate",
+          "vus": 12,
+          "duration": "30s",
+          "cadence": {
+            "mode": "bounded-random",
+            "distribution": "normal",
+            "min": 0.15,
+            "max": 1.2,
+            "mean": 0.45,
+            "standardDeviation": 0.2
+          }
+        },
+        {
+          "name": "heavy",
+          "vus": 30,
+          "duration": "30s",
+          "cadence": {
+            "mode": "bounded-random",
+            "distribution": "uniform",
+            "min": 0.1,
+            "max": 0.8
+          }
+        }
+      ]
+    }
+  ],
   "timeBuckets": [
     {
       "name": "morning-open",

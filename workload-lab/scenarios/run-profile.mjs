@@ -1,7 +1,9 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
+import { Counter } from "k6/metrics";
 
 import { summaryFileNames } from "../lib/archive-names.mjs";
+import { cadenceSleepSeconds } from "../lib/cadence.mjs";
 import { profileRunContext } from "../lib/profile-summary.mjs";
 import { pathForEvent, firstServiceRequestPath } from "../lib/requests.mjs";
 import { eventFor } from "../lib/traffic-plan.mjs";
@@ -11,12 +13,16 @@ const profile = JSON.parse(open(profilePath));
 const workflowPaths = JSON.parse(open(__ENV.WORKFLOW_PATHS_PATH || "/workload-lab/config/workflow-paths.json"));
 const seed = __ENV.WORKLOAD_SEED || "018f3d5f-9f50-77b4-9f2a-4eec5b3f7d1a";
 const targetBaseUrl = (__ENV.TARGET_BASE_URL || "http://host.docker.internal:3001").replace(/\/$/, "");
+const executionMode = __ENV.WORKLOAD_EXECUTION_MODE || "single-run";
+const seriesName = __ENV.WORKLOAD_SERIES_NAME || "";
+const seriesStepName = __ENV.WORKLOAD_SERIES_STEP_NAME || "";
+const seriesStepCadence = __ENV.WORKLOAD_STEP_CADENCE ? JSON.parse(__ENV.WORKLOAD_STEP_CADENCE) : null;
+const workflowCounters = Object.fromEntries(
+  Object.keys(profile.workflows).map((name) => [name, new Counter(`workload_workflow_${metricSlug(name)}_events`)])
+);
+const workloadEvents = new Counter("workload_events");
 
-export const options = {
-  vus: Number(__ENV.WORKLOAD_VUS || profile.k6.vus),
-  iterations: Number(__ENV.WORKLOAD_ITERATIONS || profile.k6.iterations),
-  thresholds: profile.k6.thresholds
-};
+export const options = buildOptions();
 
 let signedInActorEmail = null;
 
@@ -27,7 +33,18 @@ export default function runProfile() {
   sleep(0.2);
 }
 
+export function runSeriesStep() {
+  const event = eventFor(profile, { seed, vu: __VU, iteration: __ITER, cycleTimeBuckets: true });
+  signInAs(event.actor);
+  executeEvent(event);
+  sleep(cadenceSleepSeconds(seriesStepCadence, { seed, seriesName, stepName: seriesStepName, vu: __VU, iteration: __ITER }));
+}
+
 export function handleSummary(data) {
+  if (executionMode === "series-step") {
+    return handleSeriesStepSummary(data);
+  }
+
   const generatedAt = new Date().toISOString();
   const metadata = {
     scenarioId: profile.scenarioId,
@@ -82,6 +99,76 @@ function executeEvent(event) {
       });
     }
   }
+
+  workloadEvents.add(1, tags(event).tags);
+  workflowCounters[event.workflow].add(1, tags(event).tags);
+}
+
+function handleSeriesStepSummary(data) {
+  const generatedAt = new Date().toISOString();
+  const summary = {
+    metadata: {
+      scenarioId: profile.scenarioId,
+      profileId: profile.profileId,
+      seriesName,
+      stepName: seriesStepName,
+      seed,
+      targetBaseUrl,
+      appCommit: __ENV.APP_COMMIT || "unknown",
+      resourceEnvelope: __ENV.RESOURCE_ENVELOPE || profile.resourceEnvelope,
+      seedDataProfile: profile.seedDataProfile,
+      vus: Number(__ENV.WORKLOAD_STEP_VUS),
+      duration: __ENV.WORKLOAD_STEP_DURATION,
+      cadence: seriesStepCadence,
+      generatedAt,
+      ...profileRunContext(profile, { profilePath, thresholds: profile.k6.thresholds })
+    },
+    metrics: {
+      httpReqFailedRate: data.metrics.http_req_failed?.values?.rate,
+      httpReqDurationP95: data.metrics.http_req_duration?.values?.["p(95)"],
+      httpReqDurationAvg: data.metrics.http_req_duration?.values?.avg,
+      checksRate: data.metrics.checks?.values?.rate,
+      workloadEvents: data.metrics.workload_events?.values?.count || 0,
+      workflows: workflowMetrics(data)
+    }
+  };
+
+  return {
+    [__ENV.WORKLOAD_STEP_SUMMARY_PATH]: JSON.stringify(summary, null, 2)
+  };
+}
+
+function workflowMetrics(data) {
+  return Object.fromEntries(
+    Object.keys(profile.workflows).map((name) => [
+      name,
+      {
+        count: data.metrics[`workload_workflow_${metricSlug(name)}_events`]?.values?.count || 0
+      }
+    ])
+  );
+}
+
+function buildOptions() {
+  if (executionMode === "series-step") {
+    return {
+      scenarios: {
+        series_step: {
+          executor: "constant-vus",
+          vus: Number(__ENV.WORKLOAD_STEP_VUS),
+          duration: __ENV.WORKLOAD_STEP_DURATION,
+          exec: "runSeriesStep"
+        }
+      },
+      thresholds: profile.k6.thresholds
+    };
+  }
+
+  return {
+    vus: Number(__ENV.WORKLOAD_VUS || profile.k6.vus),
+    iterations: Number(__ENV.WORKLOAD_ITERATIONS || profile.k6.iterations),
+    thresholds: profile.k6.thresholds
+  };
 }
 
 function signInAs(actor) {
@@ -211,4 +298,11 @@ function markdownWorkflows(workflows) {
   return Object.entries(workflows)
     .map(([name, workflow]) => `- ${name}: ${workflow.type} as ${workflow.actorRole}`)
     .join("\n");
+}
+
+function metricSlug(value) {
+  return String(value)
+    .trim()
+    .replace(/[^A-Za-z0-9_]/g, "_")
+    .replace(/^_+|_+$/g, "");
 }

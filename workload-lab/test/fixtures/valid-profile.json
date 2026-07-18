@@ -20,6 +20,34 @@
       "http_req_failed": ["rate<0.01"]
     }
   },
+  "series": [
+    {
+      "name": "fixture-ramp",
+      "description": "Tiny fixture series for duration-based workload tests.",
+      "steps": [
+        {
+          "name": "light",
+          "vus": 1,
+          "duration": "1s",
+          "cadence": {
+            "mode": "static",
+            "seconds": 0
+          }
+        },
+        {
+          "name": "moderate",
+          "vus": 2,
+          "duration": "1s",
+          "cadence": {
+            "mode": "bounded-random",
+            "distribution": "uniform",
+            "min": 0,
+            "max": 0.1
+          }
+        }
+      ]
+    }
+  ],
   "timeBuckets": [
     {
       "name": "fixture",
