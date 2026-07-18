@@ -1,34 +1,40 @@
-import { eventsPerSecond, groupedComposition, parseSeriesSummary, runRecord } from "../lib/dashboard-summary.mjs";
+import { eventsPerSecond, groupedComposition } from "../lib/dashboard-summary.mjs";
 
 const state = { runs: [], selectedId: null };
 const elements = {
-  filePicker: document.querySelector("#add-files"),
+  refresh: document.querySelector("#refresh-runs"),
   search: document.querySelector("#run-search"), list: document.querySelector("#run-list"), detail: document.querySelector("#run-detail"),
   loadSummary: document.querySelector("#load-summary"), toast: document.querySelector("#toast")
 };
 
-elements.filePicker.addEventListener("change", () => loadFiles([...elements.filePicker.files]));
+elements.refresh.addEventListener("click", loadRuns);
 elements.search.addEventListener("input", renderRunList);
+loadRuns();
+connectArchiveEvents();
 
-async function loadFiles(files) {
-  const candidates = files.filter((file) => file.name.endsWith(".series-summary.json"));
-  const loaded = [];
-  const errors = [];
+async function loadRuns() {
+  elements.refresh.disabled = true;
+  try {
+    const response = await fetch("/api/runs", { cache: "no-store" });
+    if (!response.ok) throw new Error(`Archive request failed with HTTP ${response.status}.`);
+    const archive = await response.json();
+    state.runs = archive.runs.map((run) => ({ ...run, sourceName: run.filename, generatedAt: new Date(run.summary.metadata.generatedAt), legacySchema: run.summary.schemaVersion === undefined }));
+    if (!state.runs.some((run) => run.id === state.selectedId)) state.selectedId = state.runs[0]?.id || null;
+    elements.loadSummary.textContent = `${state.runs.length} runs${archive.rejected.length ? ` · ${archive.rejected.length} rejected` : ""}`;
+    if (archive.rejected.length) showError(archive.rejected.map((item) => `${item.filename}: ${item.reason}`).join(" "));
+    renderRunList();
+    if (state.selectedId) renderDetail(); else renderEmptyDetail();
+  } catch (error) {
+    elements.loadSummary.textContent = "Archive unavailable";
+    showError(error.message);
+  } finally {
+    elements.refresh.disabled = false;
+  }
+}
 
-  await Promise.all(candidates.map(async (file) => {
-    try { loaded.push(runRecord(parseSeriesSummary(await file.text(), file.name), file.name)); }
-    catch (error) { errors.push(error.message); }
-  }));
-
-  const bySource = new Map(state.runs.map((run) => [run.sourceName, run]));
-  loaded.forEach((run) => bySource.set(run.sourceName, run));
-  state.runs = [...bySource.values()].sort((left, right) => right.generatedAt - left.generatedAt);
-  state.selectedId ||= state.runs[0]?.id;
-  elements.loadSummary.textContent = `${loaded.length} loaded${errors.length ? ` · ${errors.length} rejected` : ""}`;
-  if (errors.length) showError(errors.join(" "));
-  if (state.runs.length) {
-    renderRunList(); renderDetail();
-  } else if (candidates.length === 0) showError("No .series-summary.json files were selected.");
+function connectArchiveEvents() {
+  const events = new EventSource("/api/events");
+  events.addEventListener("archive-changed", loadRuns);
 }
 
 function renderRunList() {
@@ -38,13 +44,18 @@ function renderRunList() {
     const item = document.createElement("li");
     const button = document.createElement("button");
     button.type = "button"; button.dataset.runId = run.id; button.ariaCurrent = run.id === state.selectedId ? "true" : "false";
-    const title = document.createElement("strong"); title.textContent = run.summary.metadata.seriesName;
-    const meta = document.createElement("span"); meta.textContent = `${run.summary.metadata.resourceEnvelope} · ${formatDate(run.generatedAt)}`;
+    const title = document.createElement("strong"); title.textContent = run.displayName;
+    const status = humanize(run.summary.metadata.status || "completed");
+    const meta = document.createElement("span"); meta.textContent = `${humanize(run.summary.metadata.resourceEnvelope)} · ${formatDate(run.generatedAt)} · ${status}`;
     button.append(title, meta);
     if (run.legacySchema) { const flag = document.createElement("span"); flag.className = "schema-flag"; flag.textContent = "Legacy unversioned summary"; button.append(flag); }
     button.addEventListener("click", () => { state.selectedId = run.id; renderRunList(); renderDetail(); });
     item.append(button); return item;
   }));
+}
+
+function renderEmptyDetail() {
+  elements.detail.innerHTML = `<div class="detail-empty"><p class="eyebrow">No evidence found</p><h1>Run a workload series to add evidence.</h1></div>`;
 }
 
 function renderDetail() {

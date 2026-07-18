@@ -1,6 +1,10 @@
 const commonGlobals = {
+  clearTimeout: "readonly",
+  clearInterval: "readonly",
   console: "readonly",
   process: "readonly",
+  setTimeout: "readonly",
+  setInterval: "readonly",
   URL: "readonly"
 };
 
@@ -54,6 +58,8 @@ export default [
       globals: {
         ...commonGlobals,
         document: "readonly",
+        EventSource: "readonly",
+        fetch: "readonly",
         window: "readonly",
         Intl: "readonly"
       }

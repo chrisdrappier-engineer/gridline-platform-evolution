@@ -18,10 +18,10 @@
         <aside class="run-browser">
           <div class="browser-heading">
             <div><p class="eyebrow">Local archive</p><h2>Series runs</h2></div>
-            <label class="compact-picker" title="Add series summaries">+<input id="add-files" type="file" accept=".json,application/json" multiple></label>
+            <button id="refresh-runs" class="compact-picker" type="button" title="Refresh runs" aria-label="Refresh runs">↻</button>
           </div>
           <label class="search">Search runs<input id="run-search" type="search" placeholder="Scenario, commit, envelope…"></label>
-          <p id="load-summary" class="load-summary"></p>
+          <p id="load-summary" class="load-summary" aria-live="polite">Loading archive…</p>
           <ol id="run-list" class="run-list"></ol>
         </aside>
 

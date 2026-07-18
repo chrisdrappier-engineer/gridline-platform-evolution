@@ -244,9 +244,11 @@ Start the static, read-only series viewer with:
 bin/workload-dashboard
 ```
 
-Open `http://127.0.0.1:4173`, then use the `+` button to choose one or more
-`.series-summary.json` files. The browser reads selected files locally; the
-dashboard does not upload, modify, or generate evidence.
+Open `http://127.0.0.1:4173`. The server discovers analyzable
+`.series-summary.json` files in `workload-lab/archive`, and the dashboard updates
+when files change. Use the refresh button if live updates disconnect. Archive
+access is local and read-only; the dashboard does not modify or generate
+evidence.
 
 ## Seed Convention
 
