@@ -1,0 +1,250 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gridline.local/workload-lab/profile.schema.json",
+  "title": "Gridline Workload Profile",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "scenarioId",
+    "profileId",
+    "resourceEnvelope",
+    "seedDataProfile",
+    "actors",
+    "k6",
+    "timeBuckets",
+    "workflows"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "scenarioId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profileId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "resourceEnvelope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seedDataProfile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actors": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["email", "password"],
+          "additionalProperties": true,
+          "properties": {
+            "email": {
+              "type": "string",
+              "minLength": 1
+            },
+            "password": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "k6": {
+      "type": "object",
+      "required": ["vus", "iterations", "thresholds"],
+      "additionalProperties": true,
+      "properties": {
+        "vus": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "timeBuckets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "iterations", "workflowMix"],
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "iterations": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "workflowMix": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "workflows": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "additionalProperties": true,
+        "properties": {
+          "actorRole": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bounds": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": ["string", "number", "boolean"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "series": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "steps"],
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["name", "vus", "duration", "cadence"],
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "vus": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "duration": {
+                  "type": "string",
+                  "pattern": "^\\d+(\\.\\d+)?(ms|s|m|h)$"
+                },
+                "cadence": {
+                  "type": "object",
+                  "required": ["mode"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "enum": ["static", "bounded-random"]
+                    },
+                    "seconds": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "distribution": {
+                      "enum": ["uniform", "normal"]
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "standardDeviation": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "required": ["mode"],
+                        "properties": { "mode": { "const": "static" } }
+                      },
+                      "then": {
+                        "required": ["seconds"]
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": ["mode"],
+                        "properties": { "mode": { "const": "bounded-random" } }
+                      },
+                      "then": {
+                        "required": ["distribution", "min", "max"]
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": ["distribution"],
+                        "properties": { "distribution": { "const": "normal" } }
+                      },
+                      "then": {
+                        "required": ["mean", "standardDeviation"]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

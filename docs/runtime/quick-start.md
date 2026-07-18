@@ -41,17 +41,23 @@ The production-like app is available at:
 http://localhost:3001
 ```
 
-## 3. Run The First Workload Profile
+## 3. Run The First Workload Series
 
-Run Scenario 00 normal operations:
+Run Scenario 00 normal operations as a duration-based workload series:
 
 ```bash
-bin/workload-scenario-00
+bin/workload-run-series workload-lab/profiles/scenario-00-normal-operations.json local-small-ramp
 ```
 
 This sends deterministic, business-shaped traffic to the production-like app.
 The profile uses dispatcher, facility manager, customer contact, service
 provider, and admin read workflows against the mature monolith baseline.
+
+To run every series defined in the profile, omit the series name:
+
+```bash
+bin/workload-run-series workload-lab/profiles/scenario-00-normal-operations.json
+```
 
 ## 4. Read The Results
 
@@ -85,13 +91,13 @@ Use the JSON summary when a later tool or dashboard needs structured data.
 
 ## 5. Interpret The First Run
 
-The first Scenario 00 run proves that the workload lab can send realistic
-traffic through the production-like runtime and record repeatable summary
-artifacts.
+The first Scenario 00 series proves that the workload lab can send realistic
+duration-based traffic through the production-like runtime and record repeatable
+series artifacts.
 
 It does not yet prove a bottleneck, scaling limit, or optimization need. Those
-claims require workload series that compare behavior across load steps,
-resource envelopes, seeds, and application versions.
+claims require comparing behavior across load steps, resource envelopes, seeds,
+and application versions.
 
 The workload series model is documented in
 [ADR 0010](../adr/0010-use-duration-based-workload-series-as-performance-evidence.md).

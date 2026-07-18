@@ -3,9 +3,11 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { summaryFileNames } from "../lib/archive-names.mjs";
+import { cadenceSleepSeconds } from "../lib/cadence.mjs";
 import { profileRunContext } from "../lib/profile-summary.mjs";
 import { pathForEvent, withQuery } from "../lib/requests.mjs";
-import { generatePlan, MAX_SEED_LENGTH } from "../lib/traffic-plan.mjs";
+import { selectSeries, stableJsonHash, workflowCompositionFromStep } from "../lib/series.mjs";
+import { eventFor, generatePlan, MAX_SEED_LENGTH } from "../lib/traffic-plan.mjs";
 import { validateProfile } from "../lib/profile.mjs";
 
 const profile = JSON.parse(
@@ -72,6 +74,108 @@ test("scenario 00 normal operations profile is valid and deterministic", () => {
   assert.ok(first.some((event) => event.actorRole === "customerContact"));
   assert.ok(first.some((event) => event.actorRole === "serviceProviderUser"));
   assert.ok(first.some((event) => event.actorRole === "admin"));
+});
+
+test("profile validation accepts named duration-based series definitions", () => {
+  assert.deepEqual(validateProfile(profile, { workflowPaths }), []);
+
+  assert.deepEqual(
+    profile.series.map((definition) => definition.name),
+    ["fixture-ramp"]
+  );
+});
+
+test("profile validation rejects invalid series cadence definitions", () => {
+  const invalidProfile = JSON.parse(JSON.stringify(profile));
+  invalidProfile.series[0].steps[0].cadence = {
+    mode: "bounded-random",
+    distribution: "normal",
+    min: 0,
+    max: 1,
+    mean: 0.5,
+    standardDeviation: 0
+  };
+
+  assert.deepEqual(
+    validateProfile(invalidProfile, { workflowPaths }),
+    ["series[0].steps[0].cadence.standardDeviation must be a positive number."]
+  );
+});
+
+test("series selection runs all series when no series name is provided", () => {
+  assert.deepEqual(selectSeries(profile).map((definition) => definition.name), ["fixture-ramp"]);
+  assert.deepEqual(selectSeries(profile, "fixture-ramp").map((definition) => definition.name), ["fixture-ramp"]);
+  assert.throws(
+    () => selectSeries(profile, "missing-series"),
+    /Unknown workload series: missing-series. Available series: fixture-ramp/
+  );
+});
+
+test("duration-based series events cycle time buckets deterministically", () => {
+  const event = eventFor(profile, { seed: seedA, vu: 1, iteration: 4, cycleTimeBuckets: true });
+
+  assert.equal(event.timeBucket, "fixture");
+});
+
+test("cadence calculations are deterministic and bounded", () => {
+  const uniformCadence = {
+    mode: "bounded-random",
+    distribution: "uniform",
+    min: 0.25,
+    max: 1.5
+  };
+  const normalCadence = {
+    mode: "bounded-random",
+    distribution: "normal",
+    min: 0.1,
+    max: 0.9,
+    mean: 0.5,
+    standardDeviation: 0.2
+  };
+  const args = { seed: seedA, seriesName: "fixture-ramp", stepName: "light", vu: 1, iteration: 2 };
+
+  assert.equal(cadenceSleepSeconds({ mode: "static", seconds: 0.3 }, args), 0.3);
+  assert.equal(cadenceSleepSeconds(uniformCadence, args), cadenceSleepSeconds(uniformCadence, args));
+  assert.equal(cadenceSleepSeconds(normalCadence, args), cadenceSleepSeconds(normalCadence, args));
+  assert.ok(cadenceSleepSeconds(uniformCadence, args) >= 0.25);
+  assert.ok(cadenceSleepSeconds(uniformCadence, args) <= 1.5);
+  assert.ok(cadenceSleepSeconds(normalCadence, args) >= 0.1);
+  assert.ok(cadenceSleepSeconds(normalCadence, args) <= 0.9);
+});
+
+test("series helpers produce stable hashes and workflow composition", () => {
+  assert.equal(stableJsonHash({ b: 2, a: 1 }), stableJsonHash({ a: 1, b: 2 }));
+
+  assert.deepEqual(
+    workflowCompositionFromStep({
+      metadata: {
+        workflows: {
+          dashboard: { type: "dashboard", actorRole: "dispatcher" },
+          siteIndex: { type: "site-index", actorRole: "dispatcher" }
+        }
+      },
+      metrics: {
+        workflows: {
+          dashboard: { count: 3 },
+          siteIndex: { count: 1 }
+        }
+      }
+    }),
+    {
+      dashboard: {
+        type: "dashboard",
+        actorRole: "dispatcher",
+        observedEvents: 3,
+        observedShare: 0.75
+      },
+      siteIndex: {
+        type: "site-index",
+        actorRole: "dispatcher",
+        observedEvents: 1,
+        observedShare: 0.25
+      }
+    }
+  );
 });
 
 test("seeds may be any bounded non-empty string", () => {

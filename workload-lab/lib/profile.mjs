@@ -1,34 +1,24 @@
-const REQUIRED_TOP_LEVEL_FIELDS = [
-  "schemaVersion",
-  "scenarioId",
-  "profileId",
-  "resourceEnvelope",
-  "seedDataProfile",
-  "actors",
-  "k6",
-  "timeBuckets",
-  "workflows"
-];
+import { readFileSync } from "node:fs";
+
+import Ajv from "ajv";
+
+const PROFILE_SCHEMA_URL = new URL("../schemas/profile.schema.json", import.meta.url);
+const profileSchema = JSON.parse(readFileSync(PROFILE_SCHEMA_URL, "utf8"));
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true, strict: true, strictRequired: false });
+const validateProfileShape = ajv.compile(profileSchema);
 
 export function validateProfile(profile, { workflowPaths } = {}) {
-  const errors = [];
+  const errors = validateProfileSchema(profile);
 
-  for (const field of REQUIRED_TOP_LEVEL_FIELDS) {
-    if (profile[field] === undefined || profile[field] === null) {
-      errors.push(`Missing required field: ${field}`);
-    }
+  if (errors.length > 0) {
+    return errors;
   }
 
-  if (profile.schemaVersion !== 1) {
-    errors.push("schemaVersion must be 1.");
-  }
-
-  validateK6(profile.k6, errors);
-  validateActors(profile.actors, errors);
-  validateWorkflows(profile.workflows, profile.actors, workflowPaths, errors);
-  validateTimeBuckets(profile.timeBuckets, profile.workflows, errors);
-
-  return errors;
+  return [
+    ...validateWorkflows(profile.workflows, profile.actors, workflowPaths),
+    ...validateTimeBuckets(profile.timeBuckets, profile.workflows),
+    ...validateSeries(profile.series)
+  ];
 }
 
 export function assertValidProfile(profile) {
@@ -41,99 +31,128 @@ export function assertValidProfile(profile) {
   return profile;
 }
 
-function validateK6(k6, errors) {
-  if (!isObject(k6)) {
-    errors.push("k6 must be an object.");
-    return;
+function validateProfileSchema(profile) {
+  if (validateProfileShape(profile)) {
+    return [];
   }
 
-  if (!Number.isInteger(k6.vus) || k6.vus < 1) {
-    errors.push("k6.vus must be a positive integer.");
-  }
-
-  if (!Number.isInteger(k6.iterations) || k6.iterations < 1) {
-    errors.push("k6.iterations must be a positive integer.");
-  }
-
-  if (!isObject(k6.thresholds)) {
-    errors.push("k6.thresholds must be an object.");
-  }
+  return validateProfileShape.errors.map(formatAjvError);
 }
 
-function validateActors(actors, errors) {
-  if (!isObject(actors)) {
-    errors.push("actors must be an object.");
-    return;
-  }
-
-  for (const [role, roleActors] of Object.entries(actors)) {
-    if (!Array.isArray(roleActors) || roleActors.length === 0) {
-      errors.push(`actors.${role} must be a non-empty array.`);
-      continue;
-    }
-
-    roleActors.forEach((actor, index) => {
-      if (!actor.email || !actor.password) {
-        errors.push(`actors.${role}[${index}] must include email and password.`);
-      }
-    });
-  }
-}
-
-function validateWorkflows(workflows, actors, workflowPaths, errors) {
-  if (!isObject(workflows)) {
-    errors.push("workflows must be an object.");
-    return;
-  }
+function validateWorkflows(workflows, actors, workflowPaths) {
+  const errors = [];
 
   for (const [name, workflow] of Object.entries(workflows)) {
     if (workflowPaths && !workflowPaths[workflow.type]) {
       errors.push(`workflows.${name}.type is not registered: ${workflow.type}`);
     }
 
-    if (workflow.bounds !== undefined && !isObject(workflow.bounds)) {
-      errors.push(`workflows.${name}.bounds must be an object when present.`);
-    }
-
     const actorRole = workflow.actorRole || "dispatcher";
-    if (!actors?.[actorRole]) {
+    if (!actors[actorRole]) {
       errors.push(`workflows.${name}.actorRole is not registered in actors: ${actorRole}`);
     }
   }
+
+  return errors;
 }
 
-function validateTimeBuckets(timeBuckets, workflows, errors) {
-  if (!Array.isArray(timeBuckets) || timeBuckets.length === 0) {
-    errors.push("timeBuckets must be a non-empty array.");
-    return;
-  }
+function validateTimeBuckets(timeBuckets, workflows) {
+  const errors = [];
 
   timeBuckets.forEach((bucket, index) => {
-    if (!bucket.name) {
-      errors.push(`timeBuckets[${index}] must include a name.`);
-    }
-
-    if (!Number.isInteger(bucket.iterations) || bucket.iterations < 1) {
-      errors.push(`timeBuckets[${index}].iterations must be a positive integer.`);
-    }
-
-    if (!isObject(bucket.workflowMix)) {
-      errors.push(`timeBuckets[${index}].workflowMix must be an object.`);
-      return;
-    }
-
-    for (const [workflowName, weight] of Object.entries(bucket.workflowMix)) {
-      if (!workflows || !workflows[workflowName]) {
+    for (const workflowName of Object.keys(bucket.workflowMix)) {
+      if (!workflows[workflowName]) {
         errors.push(`timeBuckets[${index}] references unknown workflow: ${workflowName}`);
-      }
-
-      if (Number(weight) <= 0) {
-        errors.push(`timeBuckets[${index}].workflowMix.${workflowName} must be positive.`);
       }
     }
   });
+
+  return errors;
 }
 
-function isObject(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function validateSeries(series = []) {
+  const errors = [];
+  const names = new Set();
+
+  series.forEach((definition, index) => {
+    if (names.has(definition.name)) {
+      errors.push(`series[${index}].name is duplicated: ${definition.name}`);
+    } else {
+      names.add(definition.name);
+    }
+
+    definition.steps.forEach((step, stepIndex) => {
+      validateCadenceBounds(step.cadence, `series[${index}].steps[${stepIndex}].cadence`, errors);
+    });
+  });
+
+  return errors;
+}
+
+function validateCadenceBounds(cadence, path, errors) {
+  if (cadence.mode !== "bounded-random") {
+    return;
+  }
+
+  if (cadence.max < cadence.min) {
+    errors.push(`${path}.min and ${path}.max must be non-negative numbers with max >= min.`);
+  }
+}
+
+function formatAjvError(error) {
+  const path = jsonPointerToPath(error.instancePath);
+
+  if (error.keyword === "required") {
+    return path
+      ? `${path} must include ${error.params.missingProperty}.`
+      : `Missing required field: ${error.params.missingProperty}`;
+  }
+
+  if (error.keyword === "const" && path === "schemaVersion") {
+    return "schemaVersion must be 1.";
+  }
+
+  if (error.keyword === "minimum" && error.params.limit === 1) {
+    return `${path} must be a positive integer.`;
+  }
+
+  if (error.keyword === "minimum" && error.params.limit === 0) {
+    return `${path} must be a non-negative number.`;
+  }
+
+  if (error.keyword === "exclusiveMinimum" && error.params.limit === 0) {
+    return `${path} must be a positive number.`;
+  }
+
+  if (error.keyword === "minItems") {
+    return `${path} must be a non-empty array.`;
+  }
+
+  if (error.keyword === "minProperties") {
+    return `${path} must be a non-empty object.`;
+  }
+
+  if (error.keyword === "pattern" && path.endsWith(".duration")) {
+    return `${path} must be a duration string like 30s, 2m, or 1h.`;
+  }
+
+  return `${path || "profile"} ${error.message}.`;
+}
+
+function jsonPointerToPath(pointer) {
+  if (!pointer) {
+    return "";
+  }
+
+  return pointer
+    .split("/")
+    .slice(1)
+    .map((part) => part.replace(/~1/g, "/").replace(/~0/g, "~"))
+    .reduce((path, part) => {
+      if (/^\d+$/.test(part)) {
+        return `${path}[${part}]`;
+      }
+
+      return path ? `${path}.${part}` : part;
+    }, "");
 }
