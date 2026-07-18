@@ -26,3 +26,11 @@ export function firstServiceRequestPath(html) {
   const match = String(html).match(/href="(\/service_requests\/[0-9a-f-]+)"/);
   return match ? match[1] : null;
 }
+
+export function serviceRequestNotesPath(serviceRequestPath) {
+  if (!/^\/service_requests\/[0-9a-f-]+$/.test(String(serviceRequestPath))) {
+    throw new Error(`Invalid service request detail path: ${serviceRequestPath}`);
+  }
+
+  return `${serviceRequestPath}/service_request_notes`;
+}

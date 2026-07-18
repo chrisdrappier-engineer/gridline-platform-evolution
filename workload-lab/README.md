@@ -158,6 +158,35 @@ endpoint hammer. Later profiles can reuse the same shape and increase
 frequency, virtual users, duration, or targeted workflow weights to discover
 where the vertically constrained monolith first degrades.
 
+### Larger Mixed Read/Write Profile
+
+`profiles/scenario-00-mixed-operations-large.json` expands Scenario 00 to a
+four-step, 12-to-160 VU ramp and adds role-valid service-request note writes.
+Writes are cumulative: each step adds notes to the demo database, so later
+request-detail reads operate against a larger data footprint. Run it against a
+freshly seeded disposable production-like database with:
+
+```bash
+bin/workload-run-series workload-lab/profiles/scenario-00-mixed-operations-large.json local-small-large-ramp
+```
+
+This profile intentionally mutates the target database. Reseed the target
+before reproducibility or before/after comparison runs.
+
+### Full Application Endpoint Exercise
+
+`profiles/scenario-00-full-endpoint-exercise.json` is the largest profile and
+longest series. Its five two-minute steps ramp from 20 to 300 VUs while a
+deterministic admin sequence exercises every application-owned route and HTTP
+method alongside sustained multi-role reads and writes. Rails framework
+transport routes are outside this profile's coverage boundary.
+
+Run it only against a freshly seeded disposable target:
+
+```bash
+bin/workload-run-series workload-lab/profiles/scenario-00-full-endpoint-exercise.json local-small-full-endpoint-ramp
+```
+
 ## Workload Series
 
 Workload series are the primary evidence unit for scaling decisions. A profile
@@ -202,7 +231,22 @@ ignored by Git except for the archive README. Each series writes:
 
 Series summaries include profile hash, texture hash, series hash, seed, target
 URL, application commit, workload tooling commit, resource envelope, step
-settings, metrics, and observed workflow composition.
+settings, metrics, observed workflow composition, and request-level coverage.
+Each step's `coverage` object records workflow stage, HTTP method, path template,
+request count, failure count, and any stateful workflow-sequence definitions
+declared by the profile.
+
+## Local Evidence Dashboard
+
+Start the static, read-only series viewer with:
+
+```bash
+bin/workload-dashboard
+```
+
+Open `http://127.0.0.1:4173`, then use the `+` button to choose one or more
+`.series-summary.json` files. The browser reads selected files locally; the
+dashboard does not upload, modify, or generate evidence.
 
 ## Seed Convention
 

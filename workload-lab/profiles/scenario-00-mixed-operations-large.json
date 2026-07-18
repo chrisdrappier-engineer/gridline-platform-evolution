@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "00-vertical-scaling-limit",
+  "profileId": "mixed-operations-large",
+  "description": "A larger cumulative Scenario 00 workload with sustained multi-role reads and service-request note writes. Note creation grows the database and makes request-detail reads progressively heavier across the series.",
+  "resourceEnvelope": "local-small",
+  "seedDataProfile": "demo",
+  "actors": {
+    "dispatcher": [{ "email": "dispatcher@gridline.test", "password": "gridline" }],
+    "facilityManager": [{ "email": "facility.manager@magnoliaproperty.test", "password": "gridline" }],
+    "customerContact": [{ "email": "customer.contact@magnoliaproperty.test", "password": "gridline" }],
+    "serviceProviderUser": [{ "email": "provider.user@coastalcoldchain.test", "password": "gridline" }],
+    "admin": [{ "email": "admin@gridline.test", "password": "gridline" }]
+  },
+  "k6": { "vus": 20, "iterations": 1000, "thresholds": { "http_req_failed": ["rate<0.02"], "http_req_duration": ["p(95)<3000"], "checks": ["rate>0.95"] } },
+  "series": [{
+    "name": "local-small-large-ramp",
+    "description": "Four-minute cumulative read/write ramp that increases concurrency and write-generated data volume against local-small.",
+    "steps": [
+      { "name": "baseline", "vus": 12, "duration": "1m", "cadence": { "mode": "bounded-random", "distribution": "normal", "min": 0.15, "max": 1.2, "mean": 0.45, "standardDeviation": 0.2 } },
+      { "name": "busy", "vus": 40, "duration": "1m", "cadence": { "mode": "bounded-random", "distribution": "normal", "min": 0.1, "max": 0.8, "mean": 0.3, "standardDeviation": 0.15 } },
+      { "name": "heavy", "vus": 90, "duration": "1m", "cadence": { "mode": "bounded-random", "distribution": "uniform", "min": 0.05, "max": 0.5 } },
+      { "name": "saturation", "vus": 160, "duration": "1m", "cadence": { "mode": "bounded-random", "distribution": "uniform", "min": 0.02, "max": 0.25 } }
+    ]
+  }],
+  "timeBuckets": [
+    { "name": "morning-intake", "iterations": 100, "workflowMix": { "dispatcherDashboard": 6, "dispatcherRequestQueue": 16, "dispatcherRequestDetail": 12, "dispatcherInternalNote": 5, "facilityManagerDashboard": 4, "facilityManagerRequestReview": 7, "facilityManagerCustomerNote": 2, "customerContactDashboard": 4, "customerContactRequestReview": 6, "customerContactCustomerNote": 2, "providerDashboard": 4, "providerRequestReview": 7, "providerWorkNote": 3, "adminUserReview": 1 } },
+    { "name": "peak-operations", "iterations": 200, "workflowMix": { "dispatcherDashboard": 5, "dispatcherRequestQueue": 18, "dispatcherRequestDetail": 14, "dispatcherInternalNote": 7, "dispatcherSiteLookup": 5, "dispatcherProviderLookup": 4, "facilityManagerDashboard": 4, "facilityManagerRequestReview": 8, "facilityManagerCustomerNote": 3, "customerContactDashboard": 4, "customerContactRequestReview": 7, "customerContactCustomerNote": 3, "providerDashboard": 4, "providerRequestReview": 9, "providerWorkNote": 5, "adminPermissionMatrix": 1, "adminRoleAssignments": 1, "adminUserReview": 1 } },
+    { "name": "closeout", "iterations": 100, "workflowMix": { "dispatcherDashboard": 5, "dispatcherRequestQueue": 12, "dispatcherRequestDetail": 13, "dispatcherInternalNote": 6, "facilityManagerDashboard": 5, "facilityManagerRequestReview": 9, "facilityManagerCustomerNote": 4, "customerContactDashboard": 5, "customerContactRequestReview": 8, "customerContactCustomerNote": 3, "providerDashboard": 5, "providerRequestReview": 10, "providerWorkNote": 5, "adminPermissionMatrix": 1, "adminUserReview": 1 } }
+  ],
+  "workflows": {
+    "dispatcherDashboard": { "actorRole": "dispatcher", "type": "dashboard" },
+    "dispatcherRequestQueue": { "actorRole": "dispatcher", "type": "service-request-index", "bounds": { "service_requests[search]": ["", "HVAC", "inspection", "roof", "freezer", "water"], "service_requests[sort]": ["reported_at", "priority", "status", "dispatcher", "site", "request"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30], "service_requests[status]": ["", "new", "triaged", "scheduled", "resolved"], "service_requests[priority]": ["", "normal", "high", "urgent"] } },
+    "dispatcherRequestDetail": { "actorRole": "dispatcher", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "dispatcherInternalNote": { "actorRole": "dispatcher", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "dispatcherSiteLookup": { "actorRole": "dispatcher", "type": "customer-site-index", "bounds": { "customer_sites[search]": ["", "Palmetto", "Savannah", "Atlanta"], "customer_sites[sort]": ["site", "customer", "location"], "customer_sites[direction]": ["asc", "desc"], "customer_sites[limit]": [20, 30] } },
+    "dispatcherProviderLookup": { "actorRole": "dispatcher", "type": "service-provider-index", "bounds": { "service_providers[search]": ["", "Coastal", "mechanical", "electrical"], "service_providers[sort]": ["provider", "type", "status"], "service_providers[direction]": ["asc", "desc"], "service_providers[limit]": [20, 30] } },
+    "facilityManagerDashboard": { "actorRole": "facilityManager", "type": "dashboard" },
+    "facilityManagerRequestReview": { "actorRole": "facilityManager", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "facilityManagerCustomerNote": { "actorRole": "facilityManager", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "customerContactDashboard": { "actorRole": "customerContact", "type": "dashboard" },
+    "customerContactRequestReview": { "actorRole": "customerContact", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "customerContactCustomerNote": { "actorRole": "customerContact", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "providerDashboard": { "actorRole": "serviceProviderUser", "type": "dashboard" },
+    "providerRequestReview": { "actorRole": "serviceProviderUser", "type": "service-request-detail", "bounds": { "service_requests[sort]": ["reported_at", "priority", "status"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "providerWorkNote": { "actorRole": "serviceProviderUser", "type": "service-request-note-create", "bounds": { "service_requests[sort]": ["reported_at", "priority"], "service_requests[direction]": ["asc", "desc"], "service_requests[limit]": [20, 30] } },
+    "adminPermissionMatrix": { "actorRole": "admin", "type": "admin-permission-matrix" },
+    "adminRoleAssignments": { "actorRole": "admin", "type": "admin-role-assignments", "bounds": { "role_assignments[sort]": ["user", "role"], "role_assignments[direction]": ["asc", "desc"], "role_assignments[limit]": [20, 30] } },
+    "adminUserReview": { "actorRole": "admin", "type": "admin-users", "bounds": { "users[sort]": ["user", "email", "legacy_role"], "users[direction]": ["asc", "desc"], "users[limit]": [20, 30] } }
+  }
+}
