@@ -1,4 +1,4 @@
-import { eventsPerSecond, groupedComposition } from "../lib/dashboard-summary.mjs";
+import { comparisonAgainst, eventsPerSecond, groupedComposition, provenancePresentation } from "../lib/dashboard-summary.mjs";
 
 const state = { runs: [], selectedId: null };
 const elements = {
@@ -70,10 +70,17 @@ function renderDetail() {
     <header class="detail-header"><div><p class="eyebrow">${escapeHtml(metadata.scenarioId)}</p><h1>${escapeHtml(metadata.seriesName)}</h1><p class="description">${escapeHtml(metadata.seriesDescription || "Duration-based workload series")}</p></div><p class="run-stamp">${escapeHtml(metadata.resourceEnvelope)}<br>${formatDate(run.generatedAt)}<br>${shortHash(metadata.appCommit)}</p></header>
     <section class="metric-strip" aria-label="Series summary"><div class="metric"><span>Peak p95 latency</span><strong>${formatMs(peakP95)}</strong><small>Across all steps</small></div><div class="metric"><span>Peak throughput</span><strong>${peakThroughput.toFixed(1)}/s</strong><small>Workload events</small></div><div class="metric"><span>Lowest checks</span><strong>${formatPercent(lowestChecks)}</strong><small>Correctness, not HTTP status</small></div><div class="metric"><span>Final load</span><strong>${finalStep.vus} VUs</strong><small>${escapeHtml(finalStep.duration)}</small></div></section>
     <section class="chart-grid"><div class="panel"><h2>Latency under load</h2><p>p95 and average response time by virtual users</p><canvas id="latency-chart" role="img" aria-label="Latency line chart"></canvas></div><div class="panel"><h2>Throughput under load</h2><p>Completed workload events per second</p><canvas id="throughput-chart" role="img" aria-label="Throughput line chart"></canvas></div></section>
-    ${stepTable(steps)}${compositionSection(finalStep)}${provenanceSection(metadata, run)}
+    ${evidenceSection(metadata, run)}${stepTable(steps)}${compositionSection(finalStep)}${provenanceSection(run)}
   `;
   drawChart(document.querySelector("#latency-chart"), steps.map((step) => ({ x: step.vus, values: [numeric(step.metrics.httpReqDurationP95), numeric(step.metrics.httpReqDurationAvg)] })), ["p95", "average"], ["#111111", "#888888"], "ms");
   drawChart(document.querySelector("#throughput-chart"), steps.map((step) => ({ x: step.vus, values: [eventsPerSecond(step) || 0] })), ["events/s"], ["#111111"], "");
+}
+
+function evidenceSection(metadata, run) {
+  const comparisons = comparisonAgainst(run, state.runs);
+  const comparable = comparisons.filter((comparison) => comparison.status === "comparable").length;
+  const warnings = [...(metadata.evidenceStatusReasons || []), ...comparisons.flatMap((comparison) => comparison.differences).filter((value, index, values) => values.indexOf(value) === index)];
+  return `<section class="data-section"><p class="eyebrow">Evidence quality</p><h2>${humanize(metadata.evidenceStatus || "legacy unknown")}</h2><p>${comparable} archived run${comparable === 1 ? "" : "s"} fully comparable.</p>${warnings.length ? `<ul>${warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul>` : "<p>No provenance warnings.</p>"}</section>`;
 }
 
 function stepTable(steps) {
@@ -85,9 +92,13 @@ function compositionSection(step) {
   return `<section class="data-section"><p class="eyebrow">Final step</p><h2>Observed workload composition</h2><div class="role-grid">${roles.map((role) => `<article class="role-card"><h3>${humanize(role.role)} · ${role.events}</h3>${role.workflows.sort((a,b) => b.events-a.events).slice(0,5).map((workflow) => `<p><span>${humanize(workflow.name)}</span><strong>${workflow.events}</strong></p>`).join("")}</article>`).join("")}</div></section>`;
 }
 
-function provenanceSection(metadata, run) {
-  const fields = [["Source", run.sourceName], ["Schema", run.legacySchema ? "Legacy / unversioned" : `Version ${run.summary.schemaVersion}`], ["Seed", metadata.seed], ["App commit", metadata.appCommit], ["Tooling commit", metadata.workloadToolingCommit], ["Profile hash", metadata.profileHash], ["Texture hash", metadata.textureHash], ["Series hash", metadata.seriesHash], ["Seed data", metadata.seedDataProfile], ["Execution", metadata.executionModel]];
-  return `<section class="data-section"><p class="eyebrow">Reproducibility</p><h2>Evidence provenance</h2><dl class="provenance">${fields.map(([label,value]) => `<div><dt>${label}</dt><dd>${escapeHtml(value || "unknown")}</dd></div>`).join("")}</dl></section>`;
+function provenanceSection(run) {
+  const presentation = provenancePresentation(run.summary, run.sourceName);
+  return `<section class="data-section"><p class="eyebrow">Reproducibility</p><h2>Evidence provenance</h2>${presentation.legacyNotice ? `<p class="provenance-note">${escapeHtml(presentation.legacyNotice)}</p>` : ""}<h3 class="provenance-heading">Run definition</h3>${fieldList(presentation.definition)}${presentation.revisions.length ? `<h3 class="provenance-heading">Revisions</h3><dl class="provenance">${presentation.revisions.map((field) => `<div><dt>${escapeHtml(field.label)}</dt><dd>${escapeHtml(field.value)}${field.commit ? `<small title="${escapeHtml(field.commit)}">commit ${escapeHtml(field.shortCommit)}</small>` : ""}</dd></div>`).join("")}</dl>` : ""}${presentation.fingerprints.length ? `<details class="fingerprints"><summary>Integrity fingerprints (${presentation.fingerprints.length})</summary>${fieldList(presentation.fingerprints)}</details>` : ""}<dl class="provenance provenance-source"><div><dt>Source</dt><dd>${escapeHtml(presentation.source)}</dd></div><div><dt>Schema</dt><dd>${escapeHtml(presentation.schema)}</dd></div></dl></section>`;
+}
+
+function fieldList(fields) {
+  return `<dl class="provenance">${fields.map((field) => `<div><dt>${escapeHtml(field.label)}</dt><dd>${escapeHtml(field.value)}${field.description ? `<small>${escapeHtml(field.description)}</small>` : ""}</dd></div>`).join("")}</dl>`;
 }
 
 function drawChart(canvas, points, labels, colors, suffix) {

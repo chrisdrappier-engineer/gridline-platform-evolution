@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { validateProfileFile } from "../lib/profile-file.mjs";
 import { selectSeries, seriesStepSummaryPath, seriesSummaryPaths, stableJsonHash, workflowCompositionFromStep } from "../lib/series.mjs";
+import { evidenceAssessment, gitContext, planDigest, resourceEnvelopeSnapshot } from "../lib/evidence.mjs";
 
 const [profilePath, seriesName, baseName] = process.argv.slice(2);
 
@@ -20,24 +21,51 @@ for (const step of series.steps) {
 }
 
 const firstMetadata = stepSummaries[0].metadata;
+const profileHash = stableJsonHash(profile);
+const textureHash = stableJsonHash({ actors: profile.actors, timeBuckets: profile.timeBuckets, workflows: profile.workflows });
+const seriesHash = stableJsonHash(series);
+const digest = planDigest({ profileHash, seriesHash, seed: firstMetadata.seed });
+const envelopeSnapshot = resourceEnvelopeSnapshot(firstMetadata.resourceEnvelope);
+const application = gitContext({ commit: firstMetadata.appCommit });
+const workloadTooling = gitContext();
+const evidence = evidenceAssessment({
+  profileHash,
+  textureHash,
+  seriesHash,
+  planDigest: digest,
+  seed: firstMetadata.seed,
+  resourceEnvelopeSnapshotHash: envelopeSnapshot.hash,
+  seedDataProfile: profile.seedDataProfile,
+  executionModel: "duration-based-sequential-users",
+  application,
+  workloadTooling
+});
 const summary = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   metadata: {
     scenarioId: profile.scenarioId,
     profileId: profile.profileId,
+    profileDescription: profile.description || "",
     seriesName: series.name,
     seriesDescription: series.description || "",
     seed: firstMetadata.seed,
     targetBaseUrl: firstMetadata.targetBaseUrl,
     appCommit: firstMetadata.appCommit,
-    workloadToolingCommit: firstMetadata.appCommit,
+    workloadToolingCommit: workloadTooling.commit || "unknown",
+    application,
+    workloadTooling,
     resourceEnvelope: firstMetadata.resourceEnvelope,
+    resourceEnvelopeSnapshot: envelopeSnapshot,
+    resourceEnvelopeSnapshotHash: envelopeSnapshot.hash,
     seedDataProfile: profile.seedDataProfile,
     generatedAt: firstMetadata.generatedAt,
     profilePath,
-    profileHash: stableJsonHash(profile),
-    textureHash: stableJsonHash({ actors: profile.actors, timeBuckets: profile.timeBuckets, workflows: profile.workflows }),
-    seriesHash: stableJsonHash(series),
+    profileHash,
+    textureHash,
+    seriesHash,
+    planDigest: digest,
+    evidenceStatus: evidence.status,
+    evidenceStatusReasons: evidence.reasons,
     executionModel: "duration-based-sequential-users",
     cumulativeSteps: true,
     warmup: false,

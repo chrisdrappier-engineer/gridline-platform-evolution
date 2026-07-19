@@ -232,6 +232,24 @@ ignored by Git except for the archive README. Each series writes:
 Series summaries include profile hash, texture hash, series hash, seed, target
 URL, application commit, workload tooling commit, resource envelope, step
 settings, metrics, observed workflow composition, and request-level coverage.
+Schema version 2 also records exact tags, branches, dirty state, deterministic
+plan digest, and a hashable resource-envelope snapshot.
+
+Evidence status is computed when a series finishes:
+
+- `exploratory`: required provenance is missing or either worktree is dirty
+- `comparable`: provenance is complete and clean, but exact tags are missing
+- `promoted-ready`: provenance is complete, clean, and exact-tagged
+
+Promotion remains a deliberate archive/review action; `promoted-ready` does not
+move or commit artifacts. Comparisons are full only when profile hash, series
+hash, workload seed, resource-envelope snapshot, seed-data profile, and
+execution model match. Dashboard warnings identify every differing dimension.
+
+For separate application revisions, set `APP_COMMIT`, `APP_TAG`, `APP_BRANCH`,
+and `APP_DIRTY=true|false`. Tooling provenance always comes from the worktree
+running the workload. Tags intended for promoted evidence should be annotated,
+immutable release tags; record the exact tag resolving each commit.
 Each step's `coverage` object records workflow stage, HTTP method, path template,
 request count, failure count, and any stateful workflow-sequence definitions
 declared by the profile.
