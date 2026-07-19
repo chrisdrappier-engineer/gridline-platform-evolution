@@ -79,7 +79,7 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 
 function respond(response, status, message) { response.writeHead(status, { "Content-Type": "text/plain; charset=utf-8" }); response.end(message); }
 function json(response, status, value) { response.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }); response.end(JSON.stringify(value)); }
-function allowedStaticPath(requested) { return requested.startsWith("dashboard/") || requested === "lib/dashboard-summary.mjs"; }
+function allowedStaticPath(requested) { return requested.startsWith("dashboard/") || ["lib/dashboard-summary.mjs", "lib/comparability.mjs"].includes(requested); }
 function broadcastArchiveChange() { for (const client of eventClients) client.write("event: archive-changed\ndata: {}\n\n"); }
 
 async function refreshArchiveSignature(notify = true) {

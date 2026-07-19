@@ -1,4 +1,6 @@
-const SUPPORTED_SCHEMA_VERSIONS = new Set([1]);
+import { compareEvidence } from "./comparability.mjs";
+
+const SUPPORTED_SCHEMA_VERSIONS = new Set([1, 2]);
 
 export function parseSeriesSummary(text, sourceName = "selected file") {
   let summary;
@@ -78,4 +80,54 @@ export function groupedComposition(step) {
   });
 
   return [...roles.values()].sort((left, right) => right.events - left.events);
+}
+
+export function comparisonAgainst(selected, runs) {
+  return runs
+    .filter((run) => run.id !== selected.id)
+    .map((run) => ({ run, ...compareEvidence(selected.summary.metadata, run.summary.metadata) }));
+}
+
+export function provenancePresentation(summary, sourceName) {
+  const metadata = summary.metadata;
+  const envelope = metadata.resourceEnvelopeSnapshot;
+
+  return {
+    legacyNotice: summary.schemaVersion === 2 ? null : "Legacy summary: revision context, plan digest, and effective resource settings were not recorded.",
+    definition: [
+      { label: "Scenario", value: metadata.scenarioId },
+      { label: "Profile", value: metadata.profileId, description: metadata.profileDescription },
+      { label: "Series", value: metadata.seriesName, description: metadata.seriesDescription },
+      { label: "Resource envelope", value: metadata.resourceEnvelope, description: envelopeDescription(envelope) },
+      { label: "Seed data", value: metadata.seedDataProfile },
+      { label: "Execution", value: metadata.executionModel },
+      { label: "Workload seed", value: metadata.seed }
+    ].filter((field) => field.value !== undefined && field.value !== null && field.value !== ""),
+    revisions: [
+      revisionField("Application", metadata.application, metadata.appCommit),
+      revisionField("Workload tooling", metadata.workloadTooling, metadata.workloadToolingCommit)
+    ].filter(Boolean),
+    fingerprints: [
+      { label: "Profile hash", value: metadata.profileHash },
+      { label: "Texture hash", value: metadata.textureHash },
+      { label: "Series hash", value: metadata.seriesHash },
+      { label: "Plan digest", value: metadata.planDigest },
+      { label: "Envelope hash", value: metadata.resourceEnvelopeSnapshotHash }
+    ].filter((field) => field.value),
+    source: sourceName,
+    schema: summary.schemaVersion ? `Version ${summary.schemaVersion}` : "Legacy / unversioned"
+  };
+}
+
+function revisionField(label, context, fallbackCommit) {
+  if (!context && !fallbackCommit) return null;
+  const commit = context?.commit || fallbackCommit;
+  const labels = [context?.tag && `tag ${context.tag}`, context?.branch && `branch ${context.branch}`, context?.dirty === true ? "dirty" : context?.dirty === false ? "clean" : null].filter(Boolean);
+
+  return { label, value: labels.join(" · ") || "Commit only; branch, tag, and clean state not recorded", commit, shortCommit: commit?.slice(0, 10) };
+}
+
+function envelopeDescription(envelope) {
+  if (!envelope) return null;
+  return `App ${envelope.app.cpus} CPU / ${envelope.app.memory}, ${envelope.app.webConcurrency} process / ${envelope.app.maxThreads} threads; DB ${envelope.database.cpus} CPU / ${envelope.database.memory}`;
 }

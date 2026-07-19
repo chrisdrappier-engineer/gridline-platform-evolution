@@ -12,6 +12,7 @@ import {
   workflowCompositionFromStep
 } from "../lib/series.mjs";
 import { assertValidSeed } from "../lib/traffic-plan.mjs";
+import { evidenceAssessment, gitContext, planDigest, resourceEnvelopeSnapshot } from "../lib/evidence.mjs";
 
 const DEFAULT_SEED = "01981f6d-89a0-7b2c-9c45-5d8df49f5e40";
 const DEFAULT_TARGET_BASE_URL = "http://host.docker.internal:3001";
@@ -27,6 +28,9 @@ let profileHash;
 let textureHash;
 let profile;
 let generatedAt;
+let application;
+let workloadTooling;
+let envelopeSnapshot;
 
 main().catch((error) => {
   console.error(error.message);
@@ -47,14 +51,22 @@ async function main() {
   generatedAt = new Date().toISOString();
   targetBaseUrl = process.env.TARGET_BASE_URL || DEFAULT_TARGET_BASE_URL;
   resourceEnvelope = process.env.RESOURCE_ENVELOPE || profile.resourceEnvelope || DEFAULT_RESOURCE_ENVELOPE;
-  appCommit = process.env.APP_COMMIT || gitValue(["rev-parse", "HEAD"]);
-  workloadToolingCommit = gitValue(["rev-parse", "HEAD"]);
+  application = gitContext({
+    commit: process.env.APP_COMMIT,
+    tag: process.env.APP_TAG,
+    branch: process.env.APP_BRANCH,
+    dirty: booleanEnvironmentValue("APP_DIRTY")
+  });
+  workloadTooling = gitContext();
+  appCommit = application.commit || "unknown";
+  workloadToolingCommit = workloadTooling.commit || "unknown";
   profileHash = stableJsonHash(profile);
   textureHash = stableJsonHash({
     actors: profile.actors,
     timeBuckets: profile.timeBuckets,
     workflows: profile.workflows
   });
+  envelopeSnapshot = resourceEnvelopeSnapshot(resourceEnvelope);
 
   await mkdir("workload-lab/archive", { recursive: true });
 
@@ -64,6 +76,20 @@ async function main() {
 }
 
 async function runSeries(series) {
+  const seriesHash = stableJsonHash(series);
+  const digest = planDigest({ profileHash, seriesHash, seed });
+  const evidence = evidenceAssessment({
+    profileHash,
+    textureHash,
+    seriesHash,
+    planDigest: digest,
+    seed,
+    resourceEnvelopeSnapshotHash: envelopeSnapshot.hash,
+    seedDataProfile: profile.seedDataProfile,
+    executionModel: "duration-based-sequential-users",
+    application,
+    workloadTooling
+  });
   const baseName = seriesRunBaseName({
     scenarioId: profile.scenarioId,
     profileId: profile.profileId,
@@ -86,23 +112,31 @@ async function runSeries(series) {
   }
 
   const summary = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     metadata: {
       scenarioId: profile.scenarioId,
       profileId: profile.profileId,
+      profileDescription: profile.description || "",
       seriesName: series.name,
       seriesDescription: series.description || "",
       seed,
       targetBaseUrl,
       appCommit,
       workloadToolingCommit,
+      application,
+      workloadTooling,
       resourceEnvelope,
+      resourceEnvelopeSnapshot: envelopeSnapshot,
+      resourceEnvelopeSnapshotHash: envelopeSnapshot.hash,
       seedDataProfile: profile.seedDataProfile,
       generatedAt,
       profilePath,
       profileHash,
       textureHash,
-      seriesHash: stableJsonHash(series),
+      seriesHash,
+      planDigest: digest,
+      evidenceStatus: evidence.status,
+      evidenceStatusReasons: evidence.reasons,
       executionModel: "duration-based-sequential-users",
       cumulativeSteps: true,
       warmup: false,
@@ -173,14 +207,11 @@ function containerProfilePath(value) {
   throw new Error("Profile path must be under workload-lab/ so it can be mounted into the k6 container.");
 }
 
-function gitValue(args) {
-  const result = spawnSync("git", args, { encoding: "utf8" });
-
-  if (result.status !== 0) {
-    return "unknown";
-  }
-
-  return result.stdout.trim() || "unknown";
+function booleanEnvironmentValue(name) {
+  if (!(name in process.env)) return undefined;
+  if (process.env[name] === "true") return true;
+  if (process.env[name] === "false") return false;
+  throw new Error(`${name} must be true or false.`);
 }
 
 function markdownSeriesSummary(summary) {
@@ -199,12 +230,16 @@ workload evidence unless it is later promoted into tracked evidence.
 - Resource envelope: ${summary.metadata.resourceEnvelope}
 - App commit: ${summary.metadata.appCommit}
 - Workload tooling commit: ${summary.metadata.workloadToolingCommit}
+- Evidence status: ${summary.metadata.evidenceStatus}
+- Evidence status reasons: ${summary.metadata.evidenceStatusReasons.join(", ") || "none"}
 - Execution model: ${summary.metadata.executionModel}
 - Cumulative steps: ${summary.metadata.cumulativeSteps}
 - Generated at: ${summary.metadata.generatedAt}
 - Profile hash: ${summary.metadata.profileHash}
 - Texture hash: ${summary.metadata.textureHash}
 - Series hash: ${summary.metadata.seriesHash}
+- Plan digest: ${summary.metadata.planDigest}
+- Resource envelope snapshot hash: ${summary.metadata.resourceEnvelopeSnapshotHash}
 
 ## Steps
 
