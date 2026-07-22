@@ -155,6 +155,20 @@ Do not begin implementation on a new issue until its prerequisite issues have
 been merged into `main`, unless the reason for parallel or delayed sequencing is
 documented in the issue, roadmap, or decision note.
 
+## Tag Component Changes On Main
+
+After merging to `main`, create an immutable annotated tag for each component
+whose behavior changed:
+
+- Rails application changes: `app-vN`
+- workload lab changes: `workload-lab-vN`
+- workload reporting dashboard changes: `workload-reporter-vN`
+
+Docs-only changes do not need tags unless they affect evidence interpretation.
+Cross-component changes should receive one tag per affected component. These
+tags are used by workload evidence to separate application, workload tooling,
+and reporting changes.
+
 ## Current Phase
 
 The baseline Rails monolith has been merged. The project is now between the

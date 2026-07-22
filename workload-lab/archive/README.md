@@ -41,5 +41,6 @@ artifacts into a tracked evidence location, verify checksums, and cite them from
 the architecture decision they support.
 
 Use immutable annotated tags for promoted evidence. Suggested namespaces are
-`app-vN` for application baselines, `workload-vN` for workload tooling, and
+`app-vN` for application baselines, `workload-lab-vN` for workload tooling,
+`workload-reporter-vN` for reporting dashboard behavior, and
 `evidence-YYYY-MM-DD-description` for a reviewed evidence bundle.

@@ -250,6 +250,11 @@ For separate application revisions, set `APP_COMMIT`, `APP_TAG`, `APP_BRANCH`,
 and `APP_DIRTY=true|false`. Tooling provenance always comes from the worktree
 running the workload. Tags intended for promoted evidence should be annotated,
 immutable release tags; record the exact tag resolving each commit.
+
+After merging to `main`, tag each changed component with its own version line:
+`app-vN` for Rails application behavior, `workload-lab-vN` for workload tooling,
+and `workload-reporter-vN` for the local reporting dashboard. Docs-only changes
+do not need tags unless they change how evidence should be interpreted.
 Each step's `coverage` object records workflow stage, HTTP method, path template,
 request count, failure count, and any stateful workflow-sequence definitions
 declared by the profile.
