@@ -15,6 +15,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 button, input { font: inherit; }
+select { font: inherit; }
 button, .secondary, .compact-picker { cursor: pointer; }
 
 .masthead { height: 44px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: var(--surface); }
@@ -63,6 +64,18 @@ h1 { max-width: 850px; margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); font-weig
 .panel p { margin: 5px 0 18px; color: var(--muted); font-size: .77rem; }
 canvas { display: block; width: 100%; height: 190px; }
 .data-section { margin-top: 28px; }
+.comparison-section { padding-top: 4px; }
+.comparison-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+.comparison-controls label { display: grid; gap: 7px; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
+.comparison-controls select { min-width: 0; width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); font-size: .8rem; text-transform: none; }
+.comparison-status { margin-top: 14px; padding: 12px 14px; border-left: 3px solid var(--ink); background: var(--paper); }
+.comparison-status strong { display: block; margin-bottom: 6px; font-size: .85rem; }
+.comparison-status ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .78rem; }
+.comparison-status-comparable { border-left-color: var(--green); }
+.comparison-status-partial { border-left-color: var(--amber); }
+.comparison-charts { margin-top: 14px; }
+.delta-good { color: #1f6f43; font-weight: 700; }
+.delta-bad { color: #8a2f2f; font-weight: 700; }
 .table-wrap { overflow-x: auto; margin-top: 14px; }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: right; font-size: .82rem; }
@@ -91,6 +104,7 @@ th:first-child, td:first-child { padding-left: 0; text-align: left; }
   .run-list { display: flex; overflow-x: auto; }
   .run-list li { min-width: 220px; }
   .chart-grid { grid-template-columns: 1fr; }
+  .comparison-controls { grid-template-columns: 1fr; }
   .metric-strip { grid-template-columns: 1fr 1fr; }
   .detail-header { display: block; }
   .run-stamp { margin-top: 18px; text-align: left; }

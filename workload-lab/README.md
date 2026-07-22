@@ -273,6 +273,40 @@ when files change. Use the refresh button if live updates disconnect. Archive
 access is local and read-only; the dashboard does not modify or generate
 evidence.
 
+## Before / After Comparisons
+
+Use before/after comparisons to evaluate performance changes across application
+revisions. A clean comparison holds workload behavior and runtime context
+constant while changing the application revision under test.
+
+A comparison is clean when these fields match:
+
+- profile hash
+- series hash
+- workload seed
+- resource-envelope snapshot hash
+- seed data profile
+- execution model
+
+Application commit or tag is expected to differ. The dashboard still allows
+exploratory comparisons when other fields differ, but it labels them and lists
+the exact differences before showing metric deltas.
+
+The first comparison view focuses on:
+
+- p95 latency
+- average latency
+- workload events per second
+- check rate
+- HTTP failure rate
+- observed workflow composition in the selected run detail
+
+These comparisons can support a claim that one application revision performed
+better than another for a specific workload, resource envelope, seed, and data
+profile. They do not prove universal performance improvement, capacity limits,
+or horizontal scaling behavior without additional profiles, seeds, envelopes,
+and promoted evidence review.
+
 ## Seed Convention
 
 Workload seeds are strings. UUIDs are the preferred convention because they are
