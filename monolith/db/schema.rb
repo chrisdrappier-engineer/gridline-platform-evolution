@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_005500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -56,7 +56,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.string "state", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_customer_sites_on_created_by_id"
+    t.index ["customer_id", "name"], name: "index_customer_sites_on_customer_name"
     t.index ["customer_id"], name: "index_customer_sites_on_customer_id"
+    t.index ["site_status", "name"], name: "index_customer_sites_on_status_name"
     t.index ["site_status"], name: "index_customer_sites_on_site_status"
   end
 
@@ -87,6 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.uuid "permission_id", null: false
     t.uuid "role_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["permission_id", "role_id"], name: "index_role_permissions_on_permission_role"
     t.index ["permission_id"], name: "index_role_permissions_on_permission_id"
     t.index ["role_id", "permission_id"], name: "index_role_permissions_on_role_id_and_permission_id", unique: true
     t.index ["role_id"], name: "index_role_permissions_on_role_id"
@@ -99,6 +102,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_roles_on_key", unique: true
+    t.index ["name"], name: "index_roles_on_name"
   end
 
   create_table "service_providers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -109,7 +113,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.string "status", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_service_providers_on_created_by_id"
+    t.index ["provider_type", "name"], name: "index_service_providers_on_type_name"
     t.index ["provider_type"], name: "index_service_providers_on_provider_type"
+    t.index ["status", "name"], name: "index_service_providers_on_status_name"
     t.index ["status"], name: "index_service_providers_on_status"
   end
 
@@ -229,9 +235,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.datetime "updated_at", null: false
     t.integer "verification_lag_seconds"
     t.index ["assigned_at"], name: "index_service_requests_on_assigned_at"
+    t.index ["assigned_dispatcher_id", "reported_at"], name: "index_service_requests_on_dispatcher_reported"
     t.index ["assigned_dispatcher_id"], name: "index_service_requests_on_assigned_dispatcher_id"
     t.index ["completion_verified_by_id"], name: "index_service_requests_on_completion_verified_by_id"
     t.index ["created_by_id"], name: "index_service_requests_on_created_by_id"
+    t.index ["customer_site_id", "reported_at"], name: "index_service_requests_on_site_reported"
     t.index ["customer_site_id", "status", "reported_at"], name: "index_service_requests_on_site_status_reported"
     t.index ["customer_site_id"], name: "index_service_requests_on_customer_site_id"
     t.index ["follow_up_to_service_request_id", "reported_at"], name: "index_service_requests_on_follow_up_and_reported"
@@ -243,8 +251,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.index ["provider_response_seconds"], name: "index_service_requests_on_provider_response_seconds"
     t.index ["reported_at"], name: "index_service_requests_on_reported_at"
     t.index ["resolved_at"], name: "index_service_requests_on_resolved_at"
+    t.index ["service_provider_id", "reported_at"], name: "index_service_requests_on_provider_reported"
     t.index ["service_provider_id", "status", "reported_at"], name: "index_service_requests_on_provider_status_reported"
     t.index ["service_provider_id"], name: "index_service_requests_on_service_provider_id"
+    t.index ["status", "priority", "reported_at"], name: "index_service_requests_on_status_priority_reported"
     t.index ["status", "reported_at"], name: "index_service_requests_on_status_and_reported_at"
     t.index ["status"], name: "index_service_requests_on_status"
   end
@@ -257,6 +267,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["resource_type", "resource_id"], name: "index_user_role_assignments_on_resource"
+    t.index ["resource_type", "role_id"], name: "index_user_role_assignments_on_resource_type_role"
+    t.index ["role_id", "user_id"], name: "index_user_role_assignments_on_role_user"
     t.index ["role_id"], name: "index_user_role_assignments_on_role_id"
     t.index ["user_id", "role_id", "resource_type", "resource_id"], name: "index_user_role_assignments_on_scoped_role", unique: true, where: "((resource_type IS NOT NULL) AND (resource_id IS NOT NULL))"
     t.index ["user_id", "role_id"], name: "index_user_role_assignments_on_global_role", unique: true, where: "((resource_type IS NULL) AND (resource_id IS NULL))"
@@ -271,7 +283,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_16_011535) do
     t.string "name", null: false
     t.string "role", null: false
     t.datetime "updated_at", null: false
+    t.index ["active", "name"], name: "index_users_on_active_name"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["role", "name"], name: "index_users_on_role_name"
     t.index ["role"], name: "index_users_on_role"
   end
 
