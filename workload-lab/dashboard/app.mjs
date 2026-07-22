@@ -1,6 +1,6 @@
-import { comparisonAgainst, eventsPerSecond, groupedComposition, provenancePresentation } from "../lib/dashboard-summary.mjs";
+import { compareSeriesSummaries, comparisonAgainst, eventsPerSecond, groupedComposition, provenancePresentation } from "../lib/dashboard-summary.mjs";
 
-const state = { runs: [], selectedId: null };
+const state = { runs: [], selectedId: null, baselineId: null, candidateId: null };
 const elements = {
   refresh: document.querySelector("#refresh-runs"),
   search: document.querySelector("#run-search"), list: document.querySelector("#run-list"), detail: document.querySelector("#run-detail"),
@@ -20,6 +20,8 @@ async function loadRuns() {
     const archive = await response.json();
     state.runs = archive.runs.map((run) => ({ ...run, sourceName: run.filename, generatedAt: new Date(run.summary.metadata.generatedAt), legacySchema: run.summary.schemaVersion === undefined }));
     if (!state.runs.some((run) => run.id === state.selectedId)) state.selectedId = state.runs[0]?.id || null;
+    if (!state.runs.some((run) => run.id === state.candidateId)) state.candidateId = state.selectedId;
+    if (!state.runs.some((run) => run.id === state.baselineId)) state.baselineId = firstCandidateId(state.candidateId);
     elements.loadSummary.textContent = `${state.runs.length} runs${archive.rejected.length ? ` · ${archive.rejected.length} rejected` : ""}`;
     if (archive.rejected.length) showError(archive.rejected.map((item) => `${item.filename}: ${item.reason}`).join(" "));
     renderRunList();
@@ -49,7 +51,7 @@ function renderRunList() {
     const meta = document.createElement("span"); meta.textContent = `${humanize(run.summary.metadata.resourceEnvelope)} · ${formatDate(run.generatedAt)} · ${status}`;
     button.append(title, meta);
     if (run.legacySchema) { const flag = document.createElement("span"); flag.className = "schema-flag"; flag.textContent = "Legacy unversioned summary"; button.append(flag); }
-    button.addEventListener("click", () => { state.selectedId = run.id; renderRunList(); renderDetail(); });
+    button.addEventListener("click", () => { state.selectedId = run.id; state.candidateId = run.id; state.baselineId = firstCandidateId(run.id); renderRunList(); renderDetail(); });
     item.append(button); return item;
   }));
 }
@@ -70,10 +72,12 @@ function renderDetail() {
     <header class="detail-header"><div><p class="eyebrow">${escapeHtml(metadata.scenarioId)}</p><h1>${escapeHtml(metadata.seriesName)}</h1><p class="description">${escapeHtml(metadata.seriesDescription || "Duration-based workload series")}</p></div><p class="run-stamp">${escapeHtml(metadata.resourceEnvelope)}<br>${formatDate(run.generatedAt)}<br>${shortHash(metadata.appCommit)}</p></header>
     <section class="metric-strip" aria-label="Series summary"><div class="metric"><span>Peak p95 latency</span><strong>${formatMs(peakP95)}</strong><small>Across all steps</small></div><div class="metric"><span>Peak throughput</span><strong>${peakThroughput.toFixed(1)}/s</strong><small>Workload events</small></div><div class="metric"><span>Lowest checks</span><strong>${formatPercent(lowestChecks)}</strong><small>Correctness, not HTTP status</small></div><div class="metric"><span>Final load</span><strong>${finalStep.vus} VUs</strong><small>${escapeHtml(finalStep.duration)}</small></div></section>
     <section class="chart-grid"><div class="panel"><h2>Latency under load</h2><p>p95 and average response time by virtual users</p><canvas id="latency-chart" role="img" aria-label="Latency line chart"></canvas></div><div class="panel"><h2>Throughput under load</h2><p>Completed workload events per second</p><canvas id="throughput-chart" role="img" aria-label="Throughput line chart"></canvas></div></section>
-    ${evidenceSection(metadata, run)}${stepTable(steps)}${compositionSection(finalStep)}${provenanceSection(run)}
+    ${evidenceSection(metadata, run)}${comparisonSection()}${stepTable(steps)}${compositionSection(finalStep)}${provenanceSection(run)}
   `;
+  wireComparisonControls();
   drawChart(document.querySelector("#latency-chart"), steps.map((step) => ({ x: step.vus, values: [numeric(step.metrics.httpReqDurationP95), numeric(step.metrics.httpReqDurationAvg)] })), ["p95", "average"], ["#111111", "#888888"], "ms");
   drawChart(document.querySelector("#throughput-chart"), steps.map((step) => ({ x: step.vus, values: [eventsPerSecond(step) || 0] })), ["events/s"], ["#111111"], "");
+  drawComparisonChart();
 }
 
 function evidenceSection(metadata, run) {
@@ -81,6 +85,56 @@ function evidenceSection(metadata, run) {
   const comparable = comparisons.filter((comparison) => comparison.status === "comparable").length;
   const warnings = [...(metadata.evidenceStatusReasons || []), ...comparisons.flatMap((comparison) => comparison.differences).filter((value, index, values) => values.indexOf(value) === index)];
   return `<section class="data-section"><p class="eyebrow">Evidence quality</p><h2>${humanize(metadata.evidenceStatus || "legacy unknown")}</h2><p>${comparable} archived run${comparable === 1 ? "" : "s"} fully comparable.</p>${warnings.length ? `<ul>${warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul>` : "<p>No provenance warnings.</p>"}</section>`;
+}
+
+function comparisonSection() {
+  if (state.runs.length < 2) return `<section class="data-section"><p class="eyebrow">Before / after</p><h2>Comparison needs at least two runs</h2><p class="note">Run another series summary to compare application versions.</p></section>`;
+
+  const baseline = runById(state.baselineId) || state.runs[0];
+  const candidate = runById(state.candidateId) || state.runs.find((run) => run.id !== baseline.id);
+  if (!baseline || !candidate) return "";
+
+  state.baselineId = baseline.id;
+  state.candidateId = candidate.id;
+  const comparison = compareSeriesSummaries(baseline.summary, candidate.summary);
+  const statusText = comparison.status === "comparable" ? "Clean comparison" : "Exploratory comparison";
+  const warnings = comparison.differences.length ? comparison.differences : ["All required comparison dimensions match."];
+
+  return `<section class="data-section comparison-section"><p class="eyebrow">Before / after</p><h2>Compare application revisions</h2><div class="comparison-controls"><label>Baseline<select id="baseline-run">${runOptions(baseline.id)}</select></label><label>Candidate<select id="candidate-run">${runOptions(candidate.id)}</select></label></div><div class="comparison-status comparison-status-${comparison.status}"><strong>${statusText}</strong><ul>${warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul></div><div class="chart-grid comparison-charts"><div class="panel"><h2>p95 latency comparison</h2><p>Baseline and candidate by series step</p><canvas id="comparison-latency-chart" role="img" aria-label="Baseline and candidate p95 latency chart"></canvas></div><div class="panel"><h2>Metric deltas</h2><p>Candidate minus baseline; percentages are relative to baseline.</p>${comparisonTable(comparison)}</div></div></section>`;
+}
+
+function comparisonTable(comparison) {
+  return `<div class="table-wrap"><table><thead><tr><th>Step</th><th>Metric</th><th>Baseline</th><th>Candidate</th><th>Delta</th><th>Delta %</th></tr></thead><tbody>${comparison.rows.flatMap((row) => row.metrics.map((metric) => `<tr><td>${escapeHtml(row.step)}</td><td>${escapeHtml(metric.label)}</td><td>${formatMetric(metric.baseline, metric.format)}</td><td>${metric.candidate === null ? "Missing" : formatMetric(metric.candidate, metric.format)}</td><td class="${deltaClass(metric)}">${formatSignedMetric(metric.absoluteDelta, metric.format)}</td><td class="${deltaClass(metric)}">${formatSignedPercent(metric.percentDelta)}</td></tr>`)).join("")}</tbody></table></div>`;
+}
+
+function wireComparisonControls() {
+  const baseline = document.querySelector("#baseline-run");
+  const candidate = document.querySelector("#candidate-run");
+  if (!baseline || !candidate) return;
+
+  baseline.addEventListener("change", () => {
+    state.baselineId = baseline.value;
+    if (state.candidateId === state.baselineId) state.candidateId = firstCandidateId(state.baselineId);
+    renderDetail();
+  });
+  candidate.addEventListener("change", () => {
+    state.candidateId = candidate.value;
+    renderDetail();
+  });
+}
+
+function drawComparisonChart() {
+  const canvas = document.querySelector("#comparison-latency-chart");
+  const baseline = runById(state.baselineId);
+  const candidate = runById(state.candidateId);
+  if (!canvas || !baseline || !candidate) return;
+
+  const candidateSteps = new Map(candidate.summary.steps.map((step, index) => [step.name || `step-${index}`, step]));
+  const points = baseline.summary.steps.map((step, index) => {
+    const candidateStep = candidateSteps.get(step.name || `step-${index}`) || candidate.summary.steps[index];
+    return { x: step.vus, values: [numeric(step.metrics.httpReqDurationP95), numeric(candidateStep?.metrics?.httpReqDurationP95)] };
+  });
+  drawChart(canvas, points, ["baseline", "candidate"], ["#111111", "#777777"], "ms");
 }
 
 function stepTable(steps) {
@@ -117,8 +171,36 @@ function drawChart(canvas, points, labels, colors, suffix) {
 function numeric(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
 function formatMs(value) { return `${numeric(value).toFixed(numeric(value) >= 100 ? 0 : 1)} ms`; }
 function formatPercent(value) { return `${(numeric(value) * 100).toFixed(2)}%`; }
+function formatRate(value) { return `${numeric(value).toFixed(1)}/s`; }
+function formatMetric(value, format) {
+  if (format === "ms") return formatMs(value);
+  if (format === "percent") return formatPercent(value);
+  if (format === "rate") return formatRate(value);
+  return String(value);
+}
+function formatSignedMetric(value, format) {
+  if (value === null) return "n/a";
+  const sign = value > 0 ? "+" : "";
+  if (format === "ms") return `${sign}${numeric(value).toFixed(Math.abs(value) >= 100 ? 0 : 1)} ms`;
+  if (format === "percent") return `${sign}${(numeric(value) * 100).toFixed(2)} pts`;
+  if (format === "rate") return `${sign}${numeric(value).toFixed(1)}/s`;
+  return `${sign}${value}`;
+}
+function formatSignedPercent(value) {
+  if (value === null) return "n/a";
+  return `${value > 0 ? "+" : ""}${(value * 100).toFixed(2)}%`;
+}
 function formatDate(value) { return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(value); }
 function shortHash(value) { return escapeHtml(String(value || "unknown").slice(0, 10)); }
 function humanize(value) { return escapeHtml(String(value).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").replace(/^./, (letter) => letter.toUpperCase())); }
 function escapeHtml(value) { const node = document.createElement("span"); node.textContent = String(value); return node.innerHTML; }
 function showError(message) { elements.toast.textContent = message; elements.toast.hidden = false; window.setTimeout(() => { elements.toast.hidden = true; }, 7000); }
+function runById(id) { return state.runs.find((run) => run.id === id); }
+function firstCandidateId(baselineId) { return state.runs.find((run) => run.id !== baselineId)?.id || null; }
+function runOptions(selectedId) {
+  return state.runs.map((run) => `<option value="${escapeHtml(run.id)}"${run.id === selectedId ? " selected" : ""}>${escapeHtml(run.displayName)} · ${formatDate(run.generatedAt)} · ${shortHash(run.summary.metadata.appCommit)}</option>`).join("");
+}
+function deltaClass(metric) {
+  if (metric.improvement === null) return "";
+  return metric.improvement ? "delta-good" : "delta-bad";
+}

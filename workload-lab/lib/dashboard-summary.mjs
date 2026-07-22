@@ -88,6 +88,39 @@ export function comparisonAgainst(selected, runs) {
     .map((run) => ({ run, ...compareEvidence(selected.summary.metadata, run.summary.metadata) }));
 }
 
+export const COMPARISON_METRICS = [
+  { key: "httpReqDurationP95", label: "p95 latency", format: "ms", lowerIsBetter: true, value: (step) => numeric(step.metrics.httpReqDurationP95) },
+  { key: "httpReqDurationAvg", label: "Average latency", format: "ms", lowerIsBetter: true, value: (step) => numeric(step.metrics.httpReqDurationAvg) },
+  { key: "eventsPerSecond", label: "Throughput", format: "rate", lowerIsBetter: false, value: (step) => eventsPerSecond(step) || 0 },
+  { key: "checksRate", label: "Check rate", format: "percent", lowerIsBetter: false, value: (step) => numeric(step.metrics.checksRate) },
+  { key: "httpReqFailedRate", label: "HTTP failure rate", format: "percent", lowerIsBetter: true, value: (step) => numeric(step.metrics.httpReqFailedRate) }
+];
+
+export function compareSeriesSummaries(baseline, candidate) {
+  const compatibility = compareEvidence(baseline.metadata, candidate.metadata);
+  const candidateSteps = new Map(candidate.steps.map((step, index) => [step.name || `step-${index}`, step]));
+  const rows = baseline.steps.map((baselineStep, index) => {
+    const stepKey = baselineStep.name || `step-${index}`;
+    const candidateStep = candidateSteps.get(stepKey) || candidate.steps[index];
+
+    return {
+      step: stepKey,
+      baselineVus: baselineStep.vus,
+      candidateVus: candidateStep?.vus,
+      metrics: COMPARISON_METRICS.map((metric) => comparisonMetric(metric, baselineStep, candidateStep))
+    };
+  });
+  const missingCandidateSteps = candidate.steps
+    .filter((step, index) => !baseline.steps.some((baselineStep) => (baselineStep.name || `step-${index}`) === (step.name || `step-${index}`)))
+    .map((step, index) => step.name || `extra-step-${index}`);
+
+  return {
+    status: compatibility.status,
+    differences: [...compatibility.differences, ...missingCandidateSteps.map((step) => `candidate has unmatched step ${step}`)],
+    rows
+  };
+}
+
 export function provenancePresentation(summary, sourceName) {
   const metadata = summary.metadata;
   const envelope = metadata.resourceEnvelopeSnapshot;
@@ -130,4 +163,19 @@ function revisionField(label, context, fallbackCommit) {
 function envelopeDescription(envelope) {
   if (!envelope) return null;
   return `App ${envelope.app.cpus} CPU / ${envelope.app.memory}, ${envelope.app.webConcurrency} process / ${envelope.app.maxThreads} threads; DB ${envelope.database.cpus} CPU / ${envelope.database.memory}`;
+}
+
+function comparisonMetric(metric, baselineStep, candidateStep) {
+  const baseline = metric.value(baselineStep);
+  const candidate = candidateStep ? metric.value(candidateStep) : null;
+  const absoluteDelta = candidate === null ? null : candidate - baseline;
+  const percentDelta = absoluteDelta === null || baseline === 0 ? null : absoluteDelta / baseline;
+  const improvement = absoluteDelta === null ? null : metric.lowerIsBetter ? absoluteDelta < 0 : absoluteDelta > 0;
+
+  return { key: metric.key, label: metric.label, format: metric.format, baseline, candidate, absoluteDelta, percentDelta, improvement };
+}
+
+function numeric(value, fallback = 0) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
 }
